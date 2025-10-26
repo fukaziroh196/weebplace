@@ -19,7 +19,7 @@ jobs:
         username: ${{ secrets.VDS_USER }}
         key: ${{ secrets.VDS_SSH_KEY }}
         script: |
-          cd /var/www/kristal
+          cd /var/www/kristal/weebplace
           git pull origin main
           cd server
           npm install
