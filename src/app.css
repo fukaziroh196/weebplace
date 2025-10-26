@@ -1,0 +1,318 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  min-height: 100vh !important;
+  min-width: 100vw !important;
+}
+
+/* Theme: dark */
+body.theme-dark {
+  /* Crystal night: deep navy with cyan/purple aurora */
+  background:
+    radial-gradient(1200px 600px at 15% -10%, rgba(56, 189, 248, 0.10), transparent 60%),
+    radial-gradient(900px 450px at 90% 0%, rgba(129, 140, 248, 0.10), transparent 60%),
+    linear-gradient(180deg, #07080c 0%, #0a0d13 60%, #080a0f 100%) !important;
+  color: #e9eef5 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.glass {
+  /* Crystal glass: cooler transparency with cyan rim */
+  background: rgba(10, 14, 20, 0.38) !important;
+  border-radius: 0px !important;
+  width: 1600px !important;
+  height: 900px !important;
+  box-shadow:
+    0 12px 48px 0 rgba(0, 0, 0, 0.55),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 0 0 1px rgba(56, 189, 248, 0.24),
+    0 0 80px rgba(129, 140, 248, 0.12) !important;
+  backdrop-filter: blur(28px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(120%) !important;
+  border: 1px solid rgba(56, 189, 248, 0.28) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 2.5rem 1.5rem 2.5rem 1.5rem !important;
+  margin: auto !important;
+  overflow: hidden !important;
+}
+
+/* Big content workspace frame */
+.workspace-frame {
+  border: 1px solid rgba(56, 189, 248, 0.24) !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05), 0 8px 30px rgba(56, 189, 248, 0.22) !important;
+  border-radius: 18px !important;
+  background: rgba(12, 16, 24, 0.32) !important;
+}
+
+/* Sidebar panel frame, same visual as workspace */
+.panel-frame {
+  border: 1px solid rgba(59, 130, 246, 0.24) !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05), 0 8px 30px rgba(30, 64, 175, 0.35) !important;
+  border-radius: 18px !important;
+  background: rgba(12, 14, 18, 0.32) !important;
+  transition: width .2s ease, min-width .2s ease, max-width .2s ease, padding .2s ease !important;
+  position: relative;
+}
+
+/* Top panel that visually merges with the left sidebar */
+/* removed top/left panel frames — keep only central workspace frame */
+
+/* sidebar visuals unchanged */
+
+/* Smooth collapse/expand for the sidebar container */
+.sidebar-shell {
+  transition: min-width 220ms ease, max-width 220ms ease, width 220ms ease, padding 220ms ease;
+}
+
+/* Subtle glass-like frame for banners/cards */
+.glass-frame {
+  border: 1px solid rgba(56, 189, 248, 0.22) !important;
+  box-shadow: 0 6px 24px rgba(56, 189, 248, 0.20) !important;
+  background: rgba(14, 18, 26, 0.28) !important;
+  background-clip: padding-box !important;
+  /* Keep rounded shape even when parent is transformed */
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  isolation: isolate;
+}
+
+/* Neutral card frame for compact list tiles (less pink glow) */
+.card-frame {
+  border: 1px solid rgba(56,189,248,0.20) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.04),
+    0 0 0 1px rgba(56,189,248,0.22),
+    0 10px 24px rgba(56,189,248,0.18) !important;
+  background: rgba(14, 18, 26, 0.30) !important;
+  backdrop-filter: blur(10px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(120%) !important;
+  /* Keep rounded shape even on hover scale (fix Chrome/Edge + backdrop-filter quirk) */
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  isolation: isolate;
+}
+
+/* Crystal buttons */
+.btn-kristal {
+  background: linear-gradient(180deg, rgba(255,255,255,0.28), rgba(255,255,255,0.18)) !important;
+  color: #0b1020 !important;
+  border: 1px solid rgba(255,255,255,0.24) !important;
+  box-shadow: 0 6px 22px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.35) !important;
+  backdrop-filter: blur(12px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(160%) !important;
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease !important;
+}
+.btn-kristal:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,255,255,0.45) !important; transform: translateY(-1px); background: linear-gradient(180deg, rgba(255,255,255,0.34), rgba(255,255,255,0.22)) !important; }
+.btn-kristal:active { transform: translateY(0); box-shadow: 0 4px 16px rgba(0,0,0,0.30) !important; }
+.btn-kristal.disabled, .btn-kristal:disabled { opacity: .6; cursor: default; }
+
+/* Accent variant to stand out (cyan → indigo) */
+.btn-kristal-accent {
+  background: linear-gradient(180deg, rgba(34,211,238,0.28), rgba(99,102,241,0.22)) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255,255,255,0.28) !important;
+  box-shadow: 0 10px 28px rgba(34,211,238,0.28), inset 0 0 0 1px rgba(255,255,255,0.35) !important;
+  backdrop-filter: blur(10px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(160%) !important;
+}
+.btn-kristal-accent:hover { filter: brightness(1.06); box-shadow: 0 12px 34px rgba(99,102,241,0.40), inset 0 0 0 1px rgba(255,255,255,0.45) !important; }
+.btn-kristal-accent:active { filter: brightness(0.98); }
+
+/* Crystal ghost button */
+.btn-kristal-ghost {
+  background: rgba(255,255,255,0.10) !important;
+  color: #e9eef5 !important;
+  border: 1px solid rgba(255,255,255,0.16) !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06), 0 6px 18px rgba(0,0,0,0.25) !important;
+  backdrop-filter: blur(10px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(160%) !important;
+  transition: background .12s ease, box-shadow .12s ease !important;
+}
+.btn-kristal-ghost:hover { background: rgba(255,255,255,0.16) !important; }
+
+/* Crystal toggle switch */
+.toggle-kristal {
+  appearance: none;
+  width: 46px; height: 26px;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 9999px; position: relative; outline: none;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 4px 12px rgba(0,0,0,0.25);
+  transition: background .15s ease, border-color .15s ease;
+}
+.toggle-kristal:checked { background: linear-gradient(180deg, rgba(255,255,255,0.28), rgba(255,255,255,0.18)); border-color: rgba(255,255,255,0.28); }
+.toggle-kristal::after {
+  content: ""; position: absolute; top: 3px; left: 3px;
+  width: 20px; height: 20px; border-radius: 9999px;
+  background: radial-gradient(circle at 30% 30%, #fff, #eaf7ff);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.55);
+  transition: transform .15s ease;
+}
+.toggle-kristal:checked::after { transform: translateX(20px); }
+
+/* Kristal glass input */
+.input-kristal {
+  background: rgba(255,255,255,0.10) !important;
+  color: #e9eef5 !important;
+  border: 1px solid rgba(255,255,255,0.16) !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06), 0 6px 18px rgba(0,0,0,0.25) !important;
+  backdrop-filter: blur(10px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(160%) !important;
+}
+.input-kristal::placeholder { color: rgba(255,255,255,0.55); }
+
+/* Glint effect for cards */
+/* glint effects removed per design */
+
+/* Menus / dropdowns to match dark glass theme */
+.menu-surface {
+  background: rgba(10, 12, 18, 0.92);
+  color: #e9eef5;
+  border: 1px solid rgba(59, 130, 246, 0.24);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(255,255,255,0.03);
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+}
+
+.menu-item {
+  padding: 8px 12px;
+  border-radius: 10px;
+}
+.menu-item:hover { background: rgba(255,255,255,0.08); }
+.menu-divider { border-top: 1px solid rgba(255,255,255,0.08); }
+
+/* Override inputs inside header search to fit dark theme */
+input[type="text"] {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #e9eef5;
+  border: 1px solid rgba(59,130,246,0.28);
+}
+
+/* Avatar frame styling depending on theme */
+body.theme-dark .avatar-frame {
+  border: 1px solid rgba(255,255,255,0.10);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+}
+
+body.theme-light .avatar-frame {
+  border: 1px solid rgba(0,0,0,0.18);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Theme: light (обновлено на жёлтый градиент) */
+body.theme-light {
+  background: linear-gradient(135deg, #e0f2fe 0%, #bfdbfe 45%, #93c5fd 100%) !important;
+  color: #111 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+body.theme-light .glass {
+  background: rgba(255, 255, 255, 0.20) !important;
+  border-radius: 0px !important;
+  box-shadow: 0 8px 40px 0 rgba(147, 197, 253, 0.30) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.25) !important;
+}
+
+body.theme-light .workspace-frame,
+body.theme-light .panel-frame,
+body.theme-light .glass-frame {
+  border: 1.5px solid rgba(255, 255, 255, 0.28) !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12), 0 8px 30px rgba(147, 197, 253, 0.22) !important;
+  background: rgba(255,255,255,0.20) !important;
+}
+
+body.theme-light input[type="text"] {
+  background-color: #f7c1d3;
+  color: #111;
+  border: 1px solid rgba(255,255,255,0.8);
+}
+
+/* Скрытие скроллбара для горизонтального слайдера */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Allow hovered scaled tiles to render outside their container in horizontal rows */
+.allow-overflow-visible {
+  overflow: visible !important;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}
+
+/* Вертикальный скролл для правой колонки: скрыт в начале, появляется при прокрутке */
+.scrollable {
+  /* Firefox */
+  scrollbar-width: none;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.scrollable--active {
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: #fbbf24 rgba(255, 255, 255, 0.15);
+  padding-right: 10px; /* compensate custom scrollbar width for symmetric gutters */
+}
+
+/* Edge fade masks for scrollable content */
+/* Use alpha mask instead of overlay to avoid visible glow on content */
+.scrollable::before,
+.scrollable::after { display: none; }
+
+.scrollable {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
+}
+
+/* WebKit (Chrome/Edge/Safari) */
+.scrollable::-webkit-scrollbar {
+  width: 0px;
+}
+
+.scrollable--active::-webkit-scrollbar {
+  width: 10px;
+}
+
+.scrollable--active::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+
+.scrollable--active::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #fcd34d, #f59e0b);
+  border-radius: 9999px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+}
+
+.scrollable--active:hover::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #fde68a, #fbbf24);
+}
+
+/* Accent remap: map "pink" utility classes to cool blue equivalents */
+.bg-pink-900\/70 { background-color: rgba(17, 24, 39, 0.70) !important; }
+.bg-pink-900\/50 { background-color: rgba(17, 24, 39, 0.50) !important; }
+.bg-pink-900\/40 { background-color: rgba(17, 24, 39, 0.40) !important; }
+.bg-pink-700 { background-color: rgba(59, 130, 246, 0.95) !important; } /* blue-500 */
+.bg-pink-700\/95 { background-color: rgba(59, 130, 246, 0.95) !important; }
+.hover\:bg-pink-600:hover { background-color: #2563eb !important; } /* blue-600 */
+.text-pink-200 { color: #bfdbfe !important; } /* blue-200 */
+.text-pink-300 { color: #93c5fd !important; } /* blue-300 */
+.bg-pink-300 { background-color: #93c5fd !important; }
+.text-pink-100\/95 { color: rgba(219, 234, 254, 0.95) !important; } /* blue-100 */
+.text-pink-100\/80 { color: rgba(219, 234, 254, 0.80) !important; }
+/* Additional overrides for commonly used variants */
+.hover\:text-pink-200:hover { color: #bfdbfe !important; }
+.bg-pink-600 { background-color: #2563eb !important; }
+.text-pink-700 { color: #1d4ed8 !important; } /* blue-700 */
+/* Ring override used in a few buttons */
+.focus\:ring-pink-500\/60:focus { --tw-ring-color: rgba(59, 130, 246, 0.6) !important; }
