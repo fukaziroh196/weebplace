@@ -3,13 +3,15 @@ name: Deploy to VDS
 on:
   push:
     branches: [ main, master ]
-  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
     - name: Deploy to VDS
       uses: appleboy/ssh-action@master
       with:
@@ -18,18 +20,17 @@ jobs:
         key: ${{ secrets.VDS_SSH_KEY }}
         script: |
           cd /var/www/kristal
-          
-          # Получаем последние изменения
           git pull origin main
-          
-          # Обновляем зависимости сервера
           cd server
           npm install
-          
-          # Перезапускаем сервер
           pm2 restart kristal-backend
           
-          # Логи
-          pm2 logs kristal-backend --lines 50
-
-
+    - name: Deployment Status
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.VDS_HOST }}
+        username: ${{ secrets.VDS_USER }}
+        key: ${{ secrets.VDS_SSH_KEY }}
+        script: |
+          pm2 status
+          echo "✅ Деплой завершен успешно!"
