@@ -11,8 +11,10 @@ export async function refreshQuizDates() {
     let cur;
     quizDate.subscribe((v) => (cur = v))();
     if (!cur) {
-      const first = Array.isArray(dates) && dates.length ? dates[0] : '';
-      quizDate.set(first);
+      const list = Array.isArray(dates) ? dates : [];
+      const today = (() => { const t=new Date(); return `${t.getUTCFullYear()}-${String(t.getUTCMonth()+1).padStart(2,'0')}-${String(t.getUTCDate()).padStart(2,'0')}`; })();
+      const initial = list.includes(today) ? today : (list[0] || '');
+      quizDate.set(initial);
     }
   } catch (_) {
     availableQuizDates.set([]);

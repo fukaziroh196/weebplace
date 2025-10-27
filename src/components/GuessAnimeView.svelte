@@ -4,7 +4,7 @@
   import { fetchSuggestions, suggestions, enabledSourceIds, adminImages } from '../stores/sources';
   import { clickOutside } from '../lib/clickOutside';
   import { animeGuesses as apiGuesses, getBatchSampleZipUrl } from '../lib/api';
-  import { quizDate, availableQuizDates, refreshQuizDates } from '../stores/quizzes';
+  import { quizDate, availableQuizDates, refreshQuizDates, setQuizDate } from '../stores/quizzes';
   
   // Данные об угадываемых аниме
   let animeGuesses = [];
@@ -13,6 +13,46 @@
   let selectedZip = null;
   let validateInfo = null;
   // date is managed globally in AniQuiz
+  let adminUploadDate = '';
+  let packSlots = Array.from({ length: 4 }, () => ({ file: null, title: '', uploading: false }));
+
+  function todayStr() {
+    const x = new Date();
+    return `${x.getUTCFullYear()}-${String(x.getUTCMonth()+1).padStart(2,'0')}-${String(x.getUTCDate()).padStart(2,'0')}`;
+  }
+  function setDateToday() { adminUploadDate = todayStr(); }
+  function setDateFromAniQuiz() { let d; quizDate.subscribe(v=>d=v)(); adminUploadDate = d || todayStr(); }
+  function generateManualAnimeId(title) {
+    const slug = String(title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'untitled';
+    return `manual-${slug}-${Date.now().toString(36)}`;
+  }
+  function onSlotFile(i, e) {
+    const f = e.target.files[0];
+    if (f && f.type.startsWith('image/')) { packSlots[i].file = f; packSlots = [...packSlots]; }
+  }
+  function onSlotTitle(i, e) { packSlots[i].title = e.currentTarget.value; packSlots = [...packSlots]; }
+  $: canSubmitPack = (packSlots || []).every(s => !!s.file && !!s.title?.trim()) && !!adminUploadDate;
+  async function submitPack() {
+    if (!adminUploadDate) { alert('Выберите дату сета'); return; }
+    if (!canSubmitPack) { alert('Заполните все 4 изображения и ответы'); return; }
+    try {
+      for (let i = 0; i < packSlots.length; i++) {
+        const s = packSlots[i];
+        s.uploading = true; packSlots = [...packSlots];
+        const manualId = generateManualAnimeId(s.title);
+        await apiGuesses.upload(s.file, s.title.trim(), manualId, 'manual', adminUploadDate);
+        s.uploading = false; packSlots = [...packSlots];
+      }
+      // очистить и обновить список
+      packSlots = Array.from({ length: 4 }, () => ({ file: null, title: '', uploading: false }));
+      setQuizDate(adminUploadDate);
+      await fetchAllGuesses(adminUploadDate);
+      alert('Пак загружен на дату ' + adminUploadDate);
+    } catch (e) {
+      alert('Ошибка загрузки пака: ' + (e?.message || ''));
+    }
+  }
+  function clearPack() { packSlots = Array.from({ length: 4 }, () => ({ file: null, title: '', uploading: false })); }
   
   // Для админа
   let adminSearchQuery = '';
@@ -29,10 +69,11 @@
   let showAnswer = false;
   
   // Загрузка данных из API
-  async function fetchAllGuesses() {
+  async function fetchAllGuesses(dateOverride) {
     loading = true;
     try {
-      let d; quizDate.subscribe((v)=> (d = v))();
+      let d;
+      if (dateOverride) { d = dateOverride; } else { quizDate.subscribe((v)=> (d = v))(); }
       const list = await apiGuesses.getAll(d);
       animeGuesses = Array.isArray(list) ? list : [];
     } catch (e) {
@@ -42,6 +83,18 @@
       loading = false;
     }
   }
+
+  // Автоперезагрузка при смене выбранной даты сета
+  let lastLoadedDate = '';
+  $: (async () => {
+    try {
+      let d; quizDate.subscribe(v=>d=v)();
+      if (d && d !== lastLoadedDate) {
+        lastLoadedDate = d;
+        await fetchAllGuesses(d);
+      }
+    } catch (_) {}
+  })();
   
   // Проверка, является ли пользователь админом
   $: isAdmin = $currentUser?.isAdmin || false;
@@ -236,6 +289,9 @@
   onMount(async () => {
     await refreshQuizDates();
     await fetchAllGuesses();
+    // init admin date from AniQuiz on first mount
+    let d; quizDate.subscribe(v=>d=v)();
+    adminUploadDate = d || todayStr();
   });
 </script>
 
@@ -243,82 +299,41 @@
   <h1 class="text-3xl font-bold text-white mb-6">🎌 Угадай аниме</h1>
   
   {#if isAdmin}
-    <!-- Панель администратора для загрузки картинок -->
+    <!-- Пак 4 картинки: отдельные поля и ответы -->
     <div class="bg-purple-900/70 backdrop-blur-md rounded-xl p-6 mb-6 glass-frame">
-      <h2 class="text-2xl font-bold text-white mb-4">📤 Загрузить новую картинку</h2>
-      
-      <!-- Дата выбранного сета управляется на экране AniQuiz -->
-
-      <div class="flex flex-col gap-4">
+      <h2 class="text-2xl font-bold text-white mb-4">📤 Загрузка сета (4 картинки)</h2>
+      <div class="flex items-end gap-3 mb-4 flex-wrap">
         <div>
-          <label class="block text-white/90 mb-2">Выберите картинку:</label>
-          <input 
-            type="file" 
-            id="fileInput"
-            accept="image/*" 
-            class="text-white"
-            on:change={handleFileSelect}
-          />
-          {#if selectedFile}
-            <div class="mt-2 text-green-400">✓ {selectedFile.name}</div>
-          {/if}
+          <label class="block text-white/90 mb-2">Дата сета (YYYY-MM-DD)</label>
+          <input type="date" bind:value={adminUploadDate} class="px-3 py-2 rounded-lg bg-white/10 text-white border border-white/20" />
         </div>
-        
-        <div class="relative" use:clickOutside={{ enabled: showAdminSuggestions, callback: () => showAdminSuggestions = false }}>
-          <label class="block text-white/90 mb-2">Выберите аниме из списка:</label>
-          <input 
-            type="text" 
-            bind:value={adminSearchQuery}
-            placeholder="Начните вводить название аниме..."
-            class="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-pink-500"
-            on:input={onAdminSearchInput}
-            autocomplete="off"
-          />
-          
-          {#if showAdminSuggestions && adminSuggestions.length > 0}
-            <div class="absolute left-0 right-0 mt-2 rounded-xl overflow-hidden z-20 menu-surface" style="max-height: 300px; overflow-y: auto;">
-              {#each adminSuggestions as s}
-                <div class="px-3 py-2 cursor-pointer flex items-center gap-2 menu-item hover:bg-white/10"
-                     on:click={() => selectAnime(s)}>
-                  {#if s.image}
-                    <img src={s.image} alt="" class="w-10 h-10 rounded object-cover" />
-                  {/if}
-                  <div class="flex-1">
-                    <div class="text-white truncate">{s.title}</div>
-                    {#if s.russian && s.russian !== s.title}
-                      <div class="text-white/60 text-xs truncate">{s.russian}</div>
-                    {/if}
-                  </div>
-                  {#if s.score}
-                    <span class="ml-auto text-sm text-white/90">★ {s.score}</span>
-                  {/if}
-                </div>
-              {/each}
-            </div>
-          {/if}
+        <div class="pb-1 flex gap-2">
+          <button class="bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-lg border border-white/20" on:click={setDateFromAniQuiz}>Из AniQuiz</button>
+          <button class="bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-lg border border-white/20" on:click={setDateToday}>Сегодня</button>
         </div>
-        
-        {#if selectedAnime}
-          <div class="bg-white/5 rounded-lg p-3 flex items-center gap-3">
-            {#if selectedAnime.image}
-              <img src={selectedAnime.image} alt={selectedAnime.title} class="w-16 h-16 rounded object-cover" />
-            {/if}
-            <div>
-              <div class="text-white font-semibold">{selectedAnime.title}</div>
-              {#if selectedAnime.russian && selectedAnime.russian !== selectedAnime.title}
-                <div class="text-white/60 text-sm">{selectedAnime.russian}</div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {#each packSlots as slot, i}
+          <div class="bg-white/5 rounded-lg p-4">
+            <div class="aspect-[3/2] bg-black/30 rounded-lg mb-3 flex items-center justify-center overflow-hidden border border-white/20">
+              {#if slot.file}
+                <img src={URL.createObjectURL(slot.file)} alt="preview" class="w-full h-full object-cover" />
+              {:else}
+                <span class="text-white/60">Выберите файл</span>
               {/if}
-              <div class="text-white/60 text-xs">ID: {selectedAnime.id}</div>
             </div>
+            <input type="file" accept="image/*" class="text-white mb-3" on:change={(e)=>onSlotFile(i,e)} />
+            <input type="text" class="w-full px-3 py-2 rounded-lg bg-white/10 text-white border border-white/20 mb-3" placeholder="Ответ (название аниме)" value={slot.title} on:input={(e)=>onSlotTitle(i,e)} />
+            {#if slot.uploading}
+              <div class="text-white/70 text-sm">Загрузка…</div>
+            {/if}
           </div>
-        {/if}
-        
-        <button 
-          on:click={uploadImage}
-          class="bg-pink-700 hover:bg-pink-600 text-white px-6 py-3 rounded-lg font-semibold transition"
-        >
-          Загрузить
-        </button>
+        {/each}
+      </div>
+      <div class="flex items-center gap-3 mt-4">
+        <button class="bg-pink-700 hover:bg-pink-600 text-white px-5 py-3 rounded-lg font-semibold disabled:opacity-50" disabled={!canSubmitPack} on:click={submitPack}>Отправить пак</button>
+        <button class="bg-white/10 hover:bg-white/20 text-white px-5 py-3 rounded-lg font-semibold border border-white/20" on:click={clearPack}>Очистить</button>
+        <div class="text-white/70 text-sm">Пак будет сохранён на дату {adminUploadDate}. Если дата не сегодня — он попадёт в "предыдущие дни".</div>
       </div>
     </div>
 
@@ -373,7 +388,7 @@
             <div class="bg-white/5 rounded-lg p-4">
               <img src={guess.image} alt={guess.title} class="w-full rounded-lg mb-2" />
               <div class="text-white text-sm font-semibold">{guess.title}</div>
-              <div class="text-white/60 text-xs">Отгадано: {guess.guessedBy.length}</div>
+              <div class="text-white/60 text-xs">Дата: {guess.quizDate || '-'} · Отгадано: {guess.guessedBy.length}</div>
               <button 
                 on:click={() => deleteGuess(guess.id)}
                 class="mt-2 bg-red-700 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"

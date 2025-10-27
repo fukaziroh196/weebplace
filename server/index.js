@@ -471,10 +471,16 @@ app.get('/api/anime-guesses', (req, res) => {
   if (qDate) {
     db.all('SELECT * FROM anime_guesses WHERE quiz_date = ? ORDER BY created_at DESC', [qDate], (err, rows) => send(rows));
   } else {
-    db.get('SELECT quiz_date as d FROM anime_guesses ORDER BY quiz_date DESC LIMIT 1', [], (err, row) => {
-      const latest = row?.d || null;
-      if (!latest) return db.all('SELECT * FROM anime_guesses ORDER BY created_at DESC', [], (e, rows) => send(rows));
-      db.all('SELECT * FROM anime_guesses WHERE quiz_date = ? ORDER BY created_at DESC', [latest], (e, rows) => send(rows));
+    // Prefer today's UTC date when not specified
+    const today = (() => { const t=new Date(); return `${t.getUTCFullYear()}-${String(t.getUTCMonth()+1).padStart(2,'0')}-${String(t.getUTCDate()).padStart(2,'0')}`; })();
+    db.all('SELECT * FROM anime_guesses WHERE quiz_date = ? ORDER BY created_at DESC', [today], (err, rows) => {
+      if (Array.isArray(rows) && rows.length) return send(rows);
+      // Fallback to latest non-empty date
+      db.get('SELECT quiz_date as d FROM anime_guesses WHERE quiz_date IS NOT NULL ORDER BY quiz_date DESC LIMIT 1', [], (e1, row) => {
+        const latest = row?.d || null;
+        if (!latest) return db.all('SELECT * FROM anime_guesses ORDER BY created_at DESC', [], (e2, rows2) => send(rows2));
+        db.all('SELECT * FROM anime_guesses WHERE quiz_date = ? ORDER BY created_at DESC', [latest], (e3, rows3) => send(rows3));
+      });
     });
   }
 });

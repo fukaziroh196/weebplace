@@ -1,5 +1,6 @@
 <script>
   import { availableQuizDates, setQuizDate } from '../stores/quizzes';
+  import { userStats } from '../stores/stats';
   export let open = false;
   export let onClose = () => {};
 
@@ -9,6 +10,18 @@
   $: pages = Math.max(1, Math.ceil(dates.length / pageSize));
   $: page = Math.min(Math.max(1, page), pages);
   $: slice = dates.slice((page - 1) * pageSize, page * pageSize);
+
+  function getCount(d) {
+    try { return ($userStats?.data?.perDayCounts?.[d]) || 0; } catch (_) { return 0; }
+  }
+  function levelColor(d) {
+    const c = getCount(d);
+    if (c <= 0) return 'rgba(162,57,202,.12)';
+    if (c === 1) return 'rgba(162,57,202,.20)';
+    if (c === 2) return 'rgba(162,57,202,.32)';
+    if (c <= 4) return 'rgba(162,57,202,.45)';
+    return 'rgba(162,57,202,.65)';
+  }
 
   function choose(d) {
     setQuizDate(d);
@@ -29,9 +42,12 @@
       <div class="px-6 pb-4">
         <div class="grid grid-cols-2 gap-3 mt-3">
           {#each slice as d}
-            <button class="replay-item" on:click={() => choose(d)}>
-              <span class="dot">●</span>
+            <button class="replay-item" on:click={() => choose(d)} style={`box-shadow: inset 0 0 0 2px ${levelColor(d)};`}>
+              <span class="dot" style={`background:${levelColor(d)}; border-color:${levelColor(d)};`}>●</span>
               <span class="label">{d}</span>
+              {#if getCount(d) > 0}
+                <span class="badge">{getCount(d)}</span>
+              {/if}
             </button>
           {/each}
           {#if slice.length === 0}
@@ -60,6 +76,7 @@
   .replay-item:hover { background: var(--panelStrong); border-color: var(--accent); box-shadow: 0 6px 18px rgba(162,57,202,.25); }
   .dot { font-size:10px; color:var(--accent); border:1px solid var(--accent); border-radius:9999px; padding:2px 6px; line-height:1; background:transparent; }
   .label { font-weight:700; font-size:14px; }
+  .badge { margin-left:auto; font-size:12px; font-weight:800; color:var(--text); background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); padding:2px 8px; border-radius:9999px; }
 </style>
 
 
