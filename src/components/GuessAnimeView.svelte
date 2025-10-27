@@ -9,6 +9,8 @@
   let animeGuesses = [];
   let loading = false;
   let selectedFile = null;
+  let availableDates = [];
+  let selectedDate = '';
   
   // Для админа
   let adminSearchQuery = '';
@@ -25,10 +27,20 @@
   let showAnswer = false;
   
   // Загрузка данных из API
+  async function loadDates() {
+    try {
+      const dates = await apiGuesses.dates();
+      availableDates = Array.isArray(dates) ? dates : [];
+      if (!selectedDate) {
+        selectedDate = availableDates[0] || '';
+      }
+    } catch (_) { availableDates = []; }
+  }
+
   async function fetchAllGuesses() {
     loading = true;
     try {
-      const list = await apiGuesses.getAll();
+      const list = await apiGuesses.getAll(selectedDate);
       animeGuesses = Array.isArray(list) ? list : [];
     } catch (e) {
       console.error('Не удалось загрузить список:', e);
@@ -90,7 +102,7 @@
       return;
     }
     try {
-      const created = await apiGuesses.upload(selectedFile, selectedAnime.title, selectedAnime.id, selectedAnime.__sourceId);
+      const created = await apiGuesses.upload(selectedFile, selectedAnime.title, selectedAnime.id, selectedAnime.__sourceId, selectedDate);
       const normalized = created && !created.image && created.imageUrl ? { ...created, image: created.imageUrl } : created;
       animeGuesses = [...animeGuesses, normalized];
       selectedFile = null;
@@ -180,8 +192,9 @@
   // Import sourceRegistry
   import { sourceRegistry } from '../sources';
   
-  onMount(() => {
-    fetchAllGuesses();
+  onMount(async () => {
+    await loadDates();
+    await fetchAllGuesses();
   });
 </script>
 
@@ -193,6 +206,20 @@
     <div class="bg-purple-900/70 backdrop-blur-md rounded-xl p-6 mb-6 glass-frame">
       <h2 class="text-2xl font-bold text-white mb-4">📤 Загрузить новую картинку</h2>
       
+      <!-- Выбор даты сета -->
+      <div class="flex items-center gap-3 mb-3">
+        <label class="text-white/80">Дата сета:</label>
+        <select class="px-3 py-2 rounded bg-white/80 text-black" bind:value={selectedDate} on:change={() => fetchAllGuesses()}>
+          {#each availableDates as d}
+            <option value={d}>{d}{d === availableDates[0] ? ' (новые)' : ''}</option>
+          {/each}
+          {#if !availableDates.length}
+            <option value="">Сегодня</option>
+          {/if}
+        </select>
+        <button class="bg-white/10 text-white rounded px-3 py-2 hover:bg-white/20" on:click={async()=>{ await loadDates(); await fetchAllGuesses(); }}>Обновить даты</button>
+      </div>
+
       <div class="flex flex-col gap-4">
         <div>
           <label class="block text-white/90 mb-2">Выберите картинку:</label>
@@ -299,6 +326,14 @@
     {:else}
       <div class="bg-purple-900/70 backdrop-blur-md rounded-xl p-6 glass-frame">
         <h2 class="text-2xl font-bold text-white mb-4">Отгадайте, из какого это аниме?</h2>
+        <div class="flex items-center gap-3 mb-3">
+          <label class="text-white/80">Дата сета:</label>
+          <select class="px-3 py-2 rounded bg-white/80 text-black" bind:value={selectedDate} on:change={() => fetchAllGuesses()}>
+            {#each availableDates as d}
+              <option value={d}>{d}{d === availableDates[0] ? ' (новые)' : ''}</option>
+            {/each}
+          </select>
+        </div>
         
         <!-- Выбор картинки для отгадывания -->
         <div class="mb-4">

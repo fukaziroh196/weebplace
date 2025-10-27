@@ -1,5 +1,24 @@
 // API Configuration
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+// Derive API origin (e.g., http://host:port) to prefix relative resources like /uploads/...
+let API_ORIGIN = '';
+try {
+  const u = new URL(API_URL, window?.location?.origin);
+  // If API_URL ends with /api, strip it for origin prefix
+  const origin = `${u.protocol}//${u.host}`;
+  API_ORIGIN = origin;
+} catch (_) {
+  API_ORIGIN = '';
+}
+
+function toAbsoluteUploadUrl(maybePath) {
+  try {
+    const s = String(maybePath || '');
+    if (s.startsWith('http://') || s.startsWith('https://') || !s.startsWith('/')) return s;
+    // prefix relative server path like /uploads/...
+    return API_ORIGIN ? `${API_ORIGIN}${s}` : s;
+  } catch (_) { return maybePath; }
+}
 
 // Get token from localStorage
 function getToken() {
@@ -81,18 +100,24 @@ export const auth = {
 
 // Anime Guesses API
 export const animeGuesses = {
-  async getAll() {
-    return await apiRequest('/anime-guesses');
+  async getAll(date) {
+    const suffix = date ? `?date=${encodeURIComponent(date)}` : '';
+    const list = await apiRequest(`/anime-guesses${suffix}`);
+    return (Array.isArray(list) ? list : []).map((g) => ({
+      ...g,
+      image: toAbsoluteUploadUrl(g.image),
+    }));
   },
 
-  async upload(file, title, animeId, sourceId) {
+  async upload(file, title, animeId, sourceId, quizDate) {
     const formData = new FormData();
     formData.append('image', file);
     formData.append('title', title);
     formData.append('animeId', animeId);
     if (sourceId) formData.append('sourceId', sourceId);
+    if (quizDate) formData.append('quizDate', quizDate);
 
-    return await apiRequest('/anime-guesses', {
+    const created = await apiRequest('/anime-guesses', {
       method: 'POST',
       headers: {
         // Don't set Content-Type, let browser set it for FormData
@@ -100,6 +125,18 @@ export const animeGuesses = {
       },
       body: formData,
     });
+    // Normalize image field and prefix absolute
+    if (created && !created.image && created.imageUrl) {
+      created.image = created.imageUrl;
+    }
+    if (created && created.image) {
+      created.image = toAbsoluteUploadUrl(created.image);
+    }
+    return created;
+  },
+
+  async dates() {
+    return await apiRequest('/anime-guesses/dates');
   },
 
   async delete(id) {

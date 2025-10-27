@@ -34,11 +34,11 @@
     </span>
     {#if !$sidebarCollapsed}<span>Календарь</span>{/if}
   </button>
-  <button class="nav-item" style="justify-content:{ $sidebarCollapsed ? 'center' : 'flex-start' }" on:click={() => import('../stores/ui').then(m=>m.goToGuessAnime())}>
+  <button class="nav-item" style="justify-content:{ $sidebarCollapsed ? 'center' : 'flex-start' }" on:click={() => import('../stores/ui').then(m=>m.goToAniQuiz())}>
     <span class="icon">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
     </span>
-    {#if !$sidebarCollapsed}<span>Угадай аниме</span>{/if}
+    {#if !$sidebarCollapsed}<span>AniQuiz</span>{/if}
   </button>
   <div class="pt-2 border-t border-white/20"></div>
   <button class="nav-item" style="justify-content:{ $sidebarCollapsed ? 'center' : 'flex-start' }" on:click={goToLists}>

@@ -11,6 +11,7 @@
   import { adminImages } from '../stores/sources';
   import CatalogView from './CatalogView.svelte';
   import GuessAnimeView from './GuessAnimeView.svelte';
+  import AniQuizHub from './AniQuizHub.svelte';
 
   function addFav(item) {
     let user; currentUser.subscribe((v) => (user = v))();
@@ -541,6 +542,8 @@
   {/if}
   {:else if $activeView === 'catalog'}
   <CatalogView />
+  {:else if $activeView === 'aniquiz'}
+  <AniQuizHub />
   {:else if $activeView === 'guessAnime'}
   <GuessAnimeView />
   {/if}

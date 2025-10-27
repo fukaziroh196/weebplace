@@ -73,10 +73,17 @@ db.serialize(() => {
     title TEXT NOT NULL,
     anime_id TEXT NOT NULL,
     source_id TEXT,
+    quiz_date TEXT,
     created_at INTEGER NOT NULL,
     guessed_by TEXT,
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`);
+
+  // Migration: ensure quiz_date column exists
+  db.get(`PRAGMA table_info(anime_guesses)`, (err, row) => {
+    // no-op; we'll try to add column blindly, ignore error if exists
+    db.run(`ALTER TABLE anime_guesses ADD COLUMN quiz_date TEXT`, (e) => { /* ignore */ });
+  });
 
   // Таблица для библиотек пользователей
   db.run(`CREATE TABLE IF NOT EXISTS user_libraries (
@@ -202,6 +209,23 @@ app.get('/api/me', authenticateToken, (req, res) => {
 // Загрузка картинки для "Угадай аниме" (только админ)
 app.post('/api/anime-guesses', authenticateToken, requireAdmin, upload.single('image'), (req, res) => {
   const { title, animeId, sourceId } = req.body;
+  let quizDate = (req.body.quizDate || '').trim();
+  // Normalize quizDate to YYYY-MM-DD (UTC)
+  try {
+    if (!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(quizDate)) {
+      const d = new Date();
+      const y = d.getUTCFullYear();
+      const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+      const day = String(d.getUTCDate()).padStart(2, '0');
+      quizDate = `${y}-${m}-${day}`;
+    }
+  } catch (_) {
+    const d = new Date();
+    const y = d.getUTCFullYear();
+    const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    quizDate = `${y}-${m}-${day}`;
+  }
 
   if (!req.file || !title || !animeId) {
     return res.status(400).json({ error: 'Missing required fields' });
@@ -211,8 +235,8 @@ app.post('/api/anime-guesses', authenticateToken, requireAdmin, upload.single('i
   const guessId = Date.now().toString() + Math.random().toString(36).substring(7);
 
   db.run(
-    'INSERT INTO anime_guesses (id, user_id, image_url, title, anime_id, source_id, created_at, guessed_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-    [guessId, req.user.id, imageUrl, title, animeId, sourceId || null, Date.now(), '[]'],
+    'INSERT INTO anime_guesses (id, user_id, image_url, title, anime_id, source_id, quiz_date, created_at, guessed_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    [guessId, req.user.id, imageUrl, title, animeId, sourceId || null, quizDate, Date.now(), '[]'],
     function(err) {
       if (err) {
         return res.status(500).json({ error: err.message });
@@ -224,6 +248,7 @@ app.post('/api/anime-guesses', authenticateToken, requireAdmin, upload.single('i
         title,
         animeId,
         sourceId,
+        quizDate,
         createdAt: Date.now(),
         guessedBy: []
       });
@@ -233,7 +258,8 @@ app.post('/api/anime-guesses', authenticateToken, requireAdmin, upload.single('i
 
 // Получить все картинки для "Угадай аниме"
 app.get('/api/anime-guesses', (req, res) => {
-  db.all('SELECT * FROM anime_guesses ORDER BY created_at DESC', [], (err, guesses) => {
+  const qDate = (req.query.date || '').trim();
+  const send = (guesses) => {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
@@ -244,11 +270,30 @@ app.get('/api/anime-guesses', (req, res) => {
       title: guess.title,
       animeId: guess.anime_id,
       sourceId: guess.source_id,
+      quizDate: guess.quiz_date,
       createdAt: guess.created_at,
       guessedBy: JSON.parse(guess.guessed_by || '[]')
     }));
 
     res.json(parsedGuesses);
+  };
+
+  if (qDate) {
+    db.all('SELECT * FROM anime_guesses WHERE quiz_date = ? ORDER BY created_at DESC', [qDate], (err, rows) => send(rows));
+  } else {
+    db.get('SELECT quiz_date as d FROM anime_guesses ORDER BY quiz_date DESC LIMIT 1', [], (err, row) => {
+      const latest = row?.d || null;
+      if (!latest) return db.all('SELECT * FROM anime_guesses ORDER BY created_at DESC', [], (e, rows) => send(rows));
+      db.all('SELECT * FROM anime_guesses WHERE quiz_date = ? ORDER BY created_at DESC', [latest], (e, rows) => send(rows));
+    });
+  }
+});
+
+// List available quiz dates (desc)
+app.get('/api/anime-guesses/dates', (req, res) => {
+  db.all('SELECT DISTINCT quiz_date as date FROM anime_guesses WHERE quiz_date IS NOT NULL ORDER BY quiz_date DESC', [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json((rows || []).map(r => r.date));
   });
 });
 
