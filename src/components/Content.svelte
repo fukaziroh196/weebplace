@@ -44,6 +44,15 @@
     loadUserStats();
   });
   let showReplay = false;
+  
+  function openReplay() {
+    console.log('[Content] Opening replay modal, dates:', $availableQuizDates);
+    showReplay = true;
+  }
+  function closeReplay() {
+    console.log('[Content] Closing replay modal');
+    showReplay = false;
+  }
   let lb = [
     {name:'KsKsCollective',days:693,rank:1,highlight:true},
     {name:'nyaaia',days:663,rank:2,highlight:true},
@@ -64,19 +73,19 @@
         <div>
           <div class="section-title">АРКАДА</div>
           <div class="stack">
-            <button class="stack-item" on:click={() => import('../stores/ui').then(m=>m.goToGuessAnime())}>
+            <button class="stack-item" on:click={() => { console.log('[Content] GoTo GuessAnime'); activeView.set('guessAnime'); }}>
               <div class="stack-bullet">🎯</div>
               <div>
                 <div class="stack-title">Угадай аниме по случайным кадрам</div>
               </div>
             </button>
-            <button class="stack-item" on:click={() => import('../stores/ui').then(m=>m.goToGuessCharacter())}>
+            <button class="stack-item" on:click={() => { console.log('[Content] GoTo GuessCharacter'); activeView.set('guessCharacter'); }}>
               <div class="stack-bullet">👤</div>
               <div>
                 <div class="stack-title">Угадывай персонажей по портретам</div>
               </div>
             </button>
-            <button class="stack-item" on:click={() => import('../stores/ui').then(m=>m.goToGuessOpening())}>
+            <button class="stack-item" on:click={() => { console.log('[Content] GoTo GuessOpening'); activeView.set('guessOpening'); }}>
               <div class="stack-bullet">🎵</div>
               <div>
                 <div class="stack-title">Угадай аниме по опенингу</div>
@@ -84,7 +93,7 @@
             </button>
           </div>
           <div class="mt-5">
-            <button class="replay-btn" on:click={() => showReplay = true}>↺  ПОВТОРИТЬ ПРЕДЫДУЩИЕ ДНИ</button>
+            <button class="replay-btn" on:click={openReplay}>↺  ПОВТОРИТЬ ПРЕДЫДУЩИЕ ДНИ</button>
           </div>
         </div>
         <!-- Right: leaderboard placeholder -->
@@ -165,7 +174,7 @@
   {:else if $activeView === 'guessOpening'}
   <GuessOpeningView />
   {/if}
-  <ReplayDatesModal onClose={() => showReplay = false} bind:open={showReplay} />
+  <ReplayDatesModal onClose={closeReplay} bind:open={showReplay} />
 </div>
 
 <style>
@@ -178,8 +187,9 @@
   .quiz-title { font-weight: 800; font-size: 18px; margin-bottom: 4px; color: var(--text); }
   .quiz-sub { font-size: 13px; color: rgba(43,45,66,.7); }
   .glass-frame { box-shadow: 0 8px 24px rgba(43,45,66,.08); border: 1px solid rgba(43,45,66,.08); }
-  .replay-btn { display:inline-flex; align-items:center; gap:10px; padding:10px 14px; border:2px solid var(--accent); border-radius:12px; color: var(--accent); background: transparent; font-weight:800; letter-spacing:.3px; box-shadow: none; }
+  .replay-btn { display:inline-flex; align-items:center; gap:10px; padding:10px 14px; border:2px solid var(--accent); border-radius:12px; color: var(--accent); background: transparent; font-weight:800; letter-spacing:.3px; box-shadow: none; cursor: pointer; }
   .replay-btn:hover { background: rgba(255,78,136,.10); }
+  .replay-btn:active { transform: scale(0.98); }
 
   .brand { position:relative; display:inline-block; font-size: 42px; font-weight: 900; letter-spacing: 1.2px; color: var(--text); }
   .brand-k { color: var(--accent2); }
@@ -187,8 +197,9 @@
   .brand-underline { height: 4px; width: 200px; margin: 8px auto 0; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 9999px; box-shadow: 0 0 20px rgba(255,123,172,.25) inset; }
   .section-title { color: var(--text); font-weight:900; letter-spacing:1.2px; margin-bottom: 12px; font-size: 18px; }
   .stack { display:flex; flex-direction:column; gap:14px; }
-  .stack-item { display:flex; align-items:center; gap:14px; width:100%; text-align:left; padding:16px 18px; border-radius:16px; background: var(--panel); color:var(--text); border:1px solid rgba(43,45,66,.18); transition: transform .12s ease, box-shadow .15s ease, border-color .15s ease; box-shadow: 0 6px 18px rgba(43,45,66,.10); }
+  .stack-item { display:flex; align-items:center; gap:14px; width:100%; text-align:left; padding:16px 18px; border-radius:16px; background: var(--panel); color:var(--text); border:1px solid rgba(43,45,66,.18); transition: transform .12s ease, box-shadow .15s ease, border-color .15s ease; box-shadow: 0 6px 18px rgba(43,45,66,.10); cursor: pointer; }
   .stack-item:hover { transform: translateY(-1px); border-color: var(--accent); box-shadow: 0 12px 26px rgba(162,57,202,.30); background: var(--panelStrong); }
+  .stack-item:active { transform: scale(0.98); }
   .stack-title { font-weight:800; margin-bottom:4px; font-size:16px; }
   .stack-sub { color:rgba(43,45,66,.82); font-size: 13px; }
   .stack-bullet { width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:10px; background: linear-gradient(180deg, var(--accent), rgba(162,57,202,.35)); color:#0b1320; box-shadow: 0 4px 12px rgba(162,57,202,.35); }

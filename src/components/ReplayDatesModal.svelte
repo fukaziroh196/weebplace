@@ -24,16 +24,21 @@
   }
 
   function choose(d) {
+    console.log('[ReplayDatesModal] Chosen date:', d);
     setQuizDate(d);
     onClose?.();
+  }
+  
+  $: if (open) {
+    console.log('[ReplayDatesModal] Opened, available dates:', dates.length, dates);
   }
 </script>
 
 <svelte:window on:keydown={(e)=>{ if (e.key === 'Escape') onClose?.(); }} />
 
 {#if open}
-  <div class="fixed inset-0 z-[200] flex items-start justify-center pt-14 bg-[rgba(0,0,0,.45)]" role="dialog" aria-modal="true" on:click={onClose}>
-    <div class="w-[920px] max-w-[92vw] rounded-2xl overflow-hidden" style="background:var(--panel); border:1px solid rgba(255,255,255,.06)", on:click|stopPropagation>
+  <div class="fixed inset-0 z-[200] flex items-start justify-center pt-14 bg-[rgba(0,0,0,.45)]" role="dialog" aria-modal="true" on:click={onClose} on:keydown={(e)=>{ if (e.key === 'Escape') onClose?.(); }}>
+    <div class="w-[920px] max-w-[92vw] rounded-2xl overflow-hidden" style="background:var(--panel); border:1px solid rgba(255,255,255,.06)" on:click|stopPropagation>
       <div class="px-6 py-4 flex items-center justify-between" style="border-bottom:1px solid rgba(255,255,255,.06)">
         <div class="text-2xl font-extrabold" style="color:var(--text)">REPLAY</div>
         <button class="px-3 py-1.5 rounded border-2" style="border-color:var(--accent); color:var(--accent); background:transparent" on:click={onClose}>✕</button>
