@@ -9,14 +9,6 @@
  * @returns {Promise<Response>}
  */
 async function httpGet(url) {
-  try {
-    const { fetch } = await import('@tauri-apps/plugin-http').catch(() => ({ fetch: null }));
-    if (fetch) {
-      return fetch(url, { method: 'GET', headers: { 'Accept': 'application/json, text/html;q=0.9' } });
-    }
-  } catch (_) {
-    // fallthrough to window.fetch
-  }
   return fetch(url, { method: 'GET', headers: { 'Accept': 'application/json, text/html;q=0.9' } });
 }
 

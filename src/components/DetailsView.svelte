@@ -70,18 +70,9 @@
   }
 
   async function httpGetJson(url) {
-    try {
-      const mod = await import('@tauri-apps/plugin-http').catch(() => null);
-      const tFetch = mod?.fetch;
-      if (tFetch) {
-        const r = await tFetch(url, { method: 'GET', headers: { 'Accept': 'application/json' } });
-        return await r.json();
-      }
-    } catch (_) {}
-    // Dev (browser) fallback via Vite proxy to bypass CORS
     const proxied = `/proxy?url=${encodeURIComponent(url)}`;
-    const r2 = await fetch(proxied, { headers: { 'Accept': 'application/json' } });
-    return await r2.json();
+    const r = await fetch(proxied, { headers: { 'Accept': 'application/json' } });
+    return await r.json();
   }
 
   async function tryResolveFromAnilibriaByTitle(title, episode) {

@@ -3,14 +3,16 @@
   import { currentUser } from '../stores/authApi';
   import { fetchSuggestions, suggestions, enabledSourceIds, adminImages } from '../stores/sources';
   import { clickOutside } from '../lib/clickOutside';
-  import { animeGuesses as apiGuesses } from '../lib/api';
+  import { animeGuesses as apiGuesses, getBatchSampleZipUrl } from '../lib/api';
+  import { quizDate, availableQuizDates, refreshQuizDates } from '../stores/quizzes';
   
   // Данные об угадываемых аниме
   let animeGuesses = [];
   let loading = false;
   let selectedFile = null;
-  let availableDates = [];
-  let selectedDate = '';
+  let selectedZip = null;
+  let validateInfo = null;
+  // date is managed globally in AniQuiz
   
   // Для админа
   let adminSearchQuery = '';
@@ -27,20 +29,11 @@
   let showAnswer = false;
   
   // Загрузка данных из API
-  async function loadDates() {
-    try {
-      const dates = await apiGuesses.dates();
-      availableDates = Array.isArray(dates) ? dates : [];
-      if (!selectedDate) {
-        selectedDate = availableDates[0] || '';
-      }
-    } catch (_) { availableDates = []; }
-  }
-
   async function fetchAllGuesses() {
     loading = true;
     try {
-      const list = await apiGuesses.getAll(selectedDate);
+      let d; quizDate.subscribe((v)=> (d = v))();
+      const list = await apiGuesses.getAll(d);
       animeGuesses = Array.isArray(list) ? list : [];
     } catch (e) {
       console.error('Не удалось загрузить список:', e);
@@ -57,6 +50,13 @@
     const file = event.target.files[0];
     if (file && file.type.startsWith('image/')) {
       selectedFile = file;
+    }
+  }
+
+  function handleZipSelect(event) {
+    const file = event.target.files[0];
+    if (file && /\.zip$/i.test(file.name)) {
+      selectedZip = file;
     }
   }
   
@@ -102,7 +102,8 @@
       return;
     }
     try {
-      const created = await apiGuesses.upload(selectedFile, selectedAnime.title, selectedAnime.id, selectedAnime.__sourceId, selectedDate);
+      let d; quizDate.subscribe((v)=> (d = v))();
+      const created = await apiGuesses.upload(selectedFile, selectedAnime.title, selectedAnime.id, selectedAnime.__sourceId, d);
       const normalized = created && !created.image && created.imageUrl ? { ...created, image: created.imageUrl } : created;
       animeGuesses = [...animeGuesses, normalized];
       selectedFile = null;
@@ -113,6 +114,46 @@
     } catch (e) {
       alert('Ошибка загрузки: ' + (e?.message || '')); 
     }
+  }
+
+  async function uploadBatchZip() {
+    if (!selectedZip) { alert('Выберите ZIP-архив'); return; }
+    try {
+      let d; quizDate.subscribe((v)=> (d = v))();
+      const result = await apiGuesses.uploadBatch(selectedZip, d);
+      if (result && Array.isArray(result.items)) {
+        animeGuesses = [...animeGuesses, ...result.items.map(it => ({ ...it, image: it.image }))];
+      }
+      selectedZip = null; const el = document.getElementById('zipInput'); if (el) el.value = '';
+      alert('Загружено: ' + (result?.created || 0));
+    } catch (e) {
+      alert('Ошибка пакетной загрузки: ' + (e?.message || ''));
+    }
+  }
+
+  async function validateZip() {
+    if (!selectedZip) { alert('Выберите ZIP-архив'); return; }
+    try {
+      validateInfo = await apiGuesses.validateBatch(selectedZip);
+    } catch (e) {
+      alert('Ошибка проверки: ' + (e?.message || ''));
+    }
+  }
+
+  function downloadManifestTemplate() {
+    let d; quizDate.subscribe((v)=> (d = v))();
+    const today = d || (() => { const x=new Date(); return `${x.getUTCFullYear()}-${String(x.getUTCMonth()+1).padStart(2,'0')}-${String(x.getUTCDate()).padStart(2,'0')}`; })();
+    const lines = [
+      'filename,title,animeId,sourceId,quizDate',
+      '01.jpg,Fullmetal Alchemist,12345,shikimori,' + today,
+      '02.png,Naruto,20,anilist,' + today
+    ];
+    const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'manifest.csv';
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 0);
   }
   
   async function deleteGuess(id) {
@@ -193,7 +234,7 @@
   import { sourceRegistry } from '../sources';
   
   onMount(async () => {
-    await loadDates();
+    await refreshQuizDates();
     await fetchAllGuesses();
   });
 </script>
@@ -206,19 +247,7 @@
     <div class="bg-purple-900/70 backdrop-blur-md rounded-xl p-6 mb-6 glass-frame">
       <h2 class="text-2xl font-bold text-white mb-4">📤 Загрузить новую картинку</h2>
       
-      <!-- Выбор даты сета -->
-      <div class="flex items-center gap-3 mb-3">
-        <label class="text-white/80">Дата сета:</label>
-        <select class="px-3 py-2 rounded bg-white/80 text-black" bind:value={selectedDate} on:change={() => fetchAllGuesses()}>
-          {#each availableDates as d}
-            <option value={d}>{d}{d === availableDates[0] ? ' (новые)' : ''}</option>
-          {/each}
-          {#if !availableDates.length}
-            <option value="">Сегодня</option>
-          {/if}
-        </select>
-        <button class="bg-white/10 text-white rounded px-3 py-2 hover:bg-white/20" on:click={async()=>{ await loadDates(); await fetchAllGuesses(); }}>Обновить даты</button>
-      </div>
+      <!-- Дата выбранного сета управляется на экране AniQuiz -->
 
       <div class="flex flex-col gap-4">
         <div>
@@ -292,6 +321,45 @@
         </button>
       </div>
     </div>
+
+    <!-- Пакетная загрузка ZIP + manifest.csv -->
+    <div class="bg-purple-900/70 backdrop-blur-md rounded-xl p-6 mb-6 glass-frame">
+      <h2 class="text-2xl font-bold text-white mb-4">📦 Пакетная загрузка (ZIP)</h2>
+      <p class="text-white/80 mb-3 text-sm">В архиве должен быть файл <b>manifest.csv</b> с колонками: <code>filename,title,animeId,sourceId,quizDate</code>. Картинки указывать именами из архива.</p>
+      <div class="mb-3 flex gap-2 items-center flex-wrap">
+        <button on:click={downloadManifestTemplate} class="btn-kristal-ghost px-3 py-2 rounded-lg text-sm">Скачать пример manifest.csv</button>
+        <a class="btn-kristal-ghost px-3 py-2 rounded-lg text-sm" href={getBatchSampleZipUrl($quizDate)} target="_blank" rel="noopener">Скачать пример ZIP</a>
+      </div>
+      <div class="flex items-end gap-4">
+        <div>
+          <label class="block text-white/90 mb-2">Выберите ZIP-архив:</label>
+          <input type="file" id="zipInput" accept=".zip" class="text-white" on:change={handleZipSelect} />
+          {#if selectedZip}
+            <div class="mt-2 text-green-400">✓ {selectedZip.name}</div>
+          {/if}
+        </div>
+        <div class="pb-1 flex gap-2">
+          <button on:click={validateZip} class="bg-white/10 hover:bg-white/20 text-white px-4 py-3 rounded-lg font-semibold transition border border-white/20">Проверить ZIP</button>
+          <button on:click={uploadBatchZip} class="bg-pink-700 hover:bg-pink-600 text-white px-6 py-3 rounded-lg font-semibold transition">Загрузить ZIP</button>
+        </div>
+      </div>
+      {#if validateInfo}
+        <div class="mt-4 text-white/90 text-sm">
+          <div>Всего строк: <b>{validateInfo.total}</b>. Готово к загрузке: <b>{validateInfo.ok}</b>. Отсутствуют файлы: <b>{validateInfo.missing?.length || 0}</b>.</div>
+          {#if validateInfo.missing && validateInfo.missing.length}
+            <div class="mt-2">Первые отсутствующие: {validateInfo.missing.slice(0,5).join(', ')}</div>
+          {/if}
+          {#if validateInfo.sample && validateInfo.sample.length}
+            <div class="mt-2">Пример строк:</div>
+            <div class="bg-white/5 rounded-lg p-2 mt-1">
+              {#each validateInfo.sample as r}
+                <div class="text-white/80 text-xs">{r.filename || r.file || r.image} — {r.title} — {r.animeId || r.anime_id}</div>
+              {/each}
+            </div>
+          {/if}
+        </div>
+      {/if}
+    </div>
     
     <!-- Список всех загруженных картинок -->
     <div class="bg-purple-900/70 backdrop-blur-md rounded-xl p-6 glass-frame">
@@ -326,14 +394,7 @@
     {:else}
       <div class="bg-purple-900/70 backdrop-blur-md rounded-xl p-6 glass-frame">
         <h2 class="text-2xl font-bold text-white mb-4">Отгадайте, из какого это аниме?</h2>
-        <div class="flex items-center gap-3 mb-3">
-          <label class="text-white/80">Дата сета:</label>
-          <select class="px-3 py-2 rounded bg-white/80 text-black" bind:value={selectedDate} on:change={() => fetchAllGuesses()}>
-            {#each availableDates as d}
-              <option value={d}>{d}{d === availableDates[0] ? ' (новые)' : ''}</option>
-            {/each}
-          </select>
-        </div>
+        <!-- Дата выбранного сета управляется на экране AniQuiz -->
         
         <!-- Выбор картинки для отгадывания -->
         <div class="mb-4">

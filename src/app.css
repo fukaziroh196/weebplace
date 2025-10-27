@@ -2,62 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  min-height: 100vh !important;
-  min-width: 100vw !important;
-}
+body { min-height: 100vh !important; min-width: 100vw !important; }
 
-/* Theme: dark */
-body.theme-dark {
-  /* Crystal night: deep navy with cyan/purple aurora */
-  background:
-    radial-gradient(1200px 600px at 15% -10%, rgba(56, 189, 248, 0.10), transparent 60%),
-    radial-gradient(900px 450px at 90% 0%, rgba(129, 140, 248, 0.10), transparent 60%),
-    linear-gradient(180deg, #07080c 0%, #0a0d13 60%, #080a0f 100%) !important;
-  color: #e9eef5 !important;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-}
+/* Pastel theme for both modes */
+/* Pastel Dream (light) */
+:root { --bg:#F6EEF5; --panel:#F9F1F7; --panelStrong:#F0E7F0; --accent:#FF7BAC; --accent2:#8CC6FF; --text:#222635; --muted:#3A3E4F; --extra:#FFD166; }
 
-.glass {
-  /* Crystal glass: cooler transparency with cyan rim */
-  background: rgba(10, 14, 20, 0.38) !important;
-  border-radius: 0px !important;
-  width: 1600px !important;
-  height: 900px !important;
-  box-shadow:
-    0 12px 48px 0 rgba(0, 0, 0, 0.55),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
-    0 0 0 1px rgba(56, 189, 248, 0.24),
-    0 0 80px rgba(129, 140, 248, 0.12) !important;
-  backdrop-filter: blur(28px) saturate(120%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(120%) !important;
-  border: 1px solid rgba(56, 189, 248, 0.28) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  padding: 2.5rem 1.5rem 2.5rem 1.5rem !important;
-  margin: auto !important;
-  overflow: hidden !important;
-}
+body.theme-dark, body.theme-light { background: radial-gradient(1200px 700px at 10% -10%, rgba(162,210,255,.15), transparent 60%), radial-gradient(1000px 600px at 90% -10%, rgba(255,123,172,.12), transparent 60%), var(--bg) !important; color: var(--text) !important; display:flex !important; justify-content:center !important; align-items:center !important; }
+
+.glass { background: var(--panel) !important; border-radius: 0 !important; width:1600px !important; height:900px !important; box-shadow: 0 10px 36px rgba(34,38,53,.14) !important; border:1px solid rgba(34,38,53,.18) !important; display:flex !important; flex-direction:column !important; padding: 2.5rem 1.5rem !important; margin:auto !important; overflow:hidden !important; }
 
 /* Big content workspace frame */
-.workspace-frame {
-  border: 1px solid rgba(56, 189, 248, 0.24) !important;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05), 0 8px 30px rgba(56, 189, 248, 0.22) !important;
-  border-radius: 18px !important;
-  background: rgba(12, 16, 24, 0.32) !important;
-}
+.workspace-frame { border:1px solid rgba(34,38,53,.20) !important; box-shadow: 0 8px 22px rgba(34,38,53,.10) !important; border-radius:18px !important; background: var(--panelStrong) !important; }
 
 /* Sidebar panel frame, same visual as workspace */
-.panel-frame {
-  border: 1px solid rgba(59, 130, 246, 0.24) !important;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05), 0 8px 30px rgba(30, 64, 175, 0.35) !important;
-  border-radius: 18px !important;
-  background: rgba(12, 14, 18, 0.32) !important;
-  transition: width .2s ease, min-width .2s ease, max-width .2s ease, padding .2s ease !important;
-  position: relative;
-}
+.panel-frame { border: 1px solid rgba(34,38,53,.20) !important; box-shadow: 0 8px 22px rgba(34,38,53,.10) !important; border-radius: 18px !important; background: var(--panelStrong) !important; transition: width .2s ease, min-width .2s ease, max-width .2s ease, padding .2s ease !important; position: relative; }
 
 /* Top panel that visually merges with the left sidebar */
 /* removed top/left panel frames — keep only central workspace frame */
@@ -70,16 +29,7 @@ body.theme-dark {
 }
 
 /* Subtle glass-like frame for banners/cards */
-.glass-frame {
-  border: 1px solid rgba(56, 189, 248, 0.22) !important;
-  box-shadow: 0 6px 24px rgba(56, 189, 248, 0.20) !important;
-  background: rgba(14, 18, 26, 0.28) !important;
-  background-clip: padding-box !important;
-  /* Keep rounded shape even when parent is transformed */
-  border-radius: 12px !important;
-  overflow: hidden !important;
-  isolation: isolate;
-}
+.glass-frame { border:1px solid rgba(34,38,53,.20) !important; box-shadow: 0 6px 18px rgba(34,38,53,.10) !important; background: var(--panel) !important; border-radius:12px !important; overflow:hidden !important; isolation:isolate; }
 
 /* Neutral card frame for compact list tiles (less pink glow) */
 .card-frame {
@@ -170,14 +120,7 @@ body.theme-dark {
 /* glint effects removed per design */
 
 /* Menus / dropdowns to match dark glass theme */
-.menu-surface {
-  background: rgba(10, 12, 18, 0.92);
-  color: #e9eef5;
-  border: 1px solid rgba(59, 130, 246, 0.24);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(255,255,255,0.03);
-  backdrop-filter: blur(12px) saturate(120%);
-  -webkit-backdrop-filter: blur(12px) saturate(120%);
-}
+.menu-surface { background: var(--panel); color: var(--text); border:1px solid rgba(34,38,53,.18); box-shadow: 0 12px 30px rgba(34,38,53,.12); }
 
 .menu-item {
   padding: 8px 12px;
@@ -187,14 +130,11 @@ body.theme-dark {
 .menu-divider { border-top: 1px solid rgba(255,255,255,0.08); }
 
 /* Override inputs inside header search to fit dark theme */
-input[type="text"] {
-  background-color: rgba(255, 255, 255, 0.08);
-  color: #e9eef5;
-  border: 1px solid rgba(59,130,246,0.28);
-}
+input[type="text"] { background-color: #FFFFFF; color: var(--text); border:1.5px solid rgba(34,38,53,.28); box-shadow: 0 2px 8px rgba(34,38,53,.10) inset; }
+input[type="text"]::placeholder { color: rgba(43,45,66,.42); }
 
 /* Avatar frame styling depending on theme */
-body.theme-dark .avatar-frame {
+body.theme-dark .avatar-frame, body.theme-light .avatar-frame {
   border: 1px solid rgba(255,255,255,0.10);
   box-shadow: 0 4px 14px rgba(0,0,0,0.35);
 }
@@ -205,34 +145,50 @@ body.theme-light .avatar-frame {
 }
 
 /* Theme: light (обновлено на жёлтый градиент) */
-body.theme-light {
-  background: linear-gradient(135deg, #e0f2fe 0%, #bfdbfe 45%, #93c5fd 100%) !important;
-  color: #111 !important;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-}
+body.theme-light { }
 
-body.theme-light .glass {
-  background: rgba(255, 255, 255, 0.20) !important;
-  border-radius: 0px !important;
-  box-shadow: 0 8px 40px 0 rgba(147, 197, 253, 0.30) !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.25) !important;
-}
+body.theme-light .glass { }
 
-body.theme-light .workspace-frame,
-body.theme-light .panel-frame,
-body.theme-light .glass-frame {
-  border: 1.5px solid rgba(255, 255, 255, 0.28) !important;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12), 0 8px 30px rgba(147, 197, 253, 0.22) !important;
-  background: rgba(255,255,255,0.20) !important;
-}
+body.theme-light .workspace-frame, body.theme-light .panel-frame, body.theme-light .glass-frame { }
 
-body.theme-light input[type="text"] {
-  background-color: #f7c1d3;
-  color: #111;
-  border: 1px solid rgba(255,255,255,0.8);
-}
+body.theme-light input[type="text"] { }
+
+/* Neon Tokyo (dark) */
+/* Mystic Anime palette for dark theme (keep background as now) */
+body.theme-dark { --bg:#161616; --panel:#161616; --panelStrong:#161616; --accent:#A239CA; --accent2:#A239CA; --text:#E7DFDD; --muted:#A0A0A0; --extra:#F4E04D; }
+/* сплошной фон без градиентов */
+body.theme-dark { background: var(--bg) !important; color: var(--text) !important; }
+body.theme-dark .glass { background: var(--bg) !important; border:1px solid rgba(255,255,255,.06) !important; box-shadow: none !important; }
+body.theme-dark .workspace-frame { background: var(--bg) !important; border:1px solid rgba(255,255,255,.06) !important; box-shadow: none !important; }
+body.theme-dark .panel-frame { background: var(--bg) !important; border:1px solid rgba(255,255,255,.06) !important; box-shadow: none !important; }
+body.theme-dark .glass-frame { background: var(--bg) !important; border:1px solid rgba(255,255,255,.06) !important; box-shadow: none !important; }
+body.theme-dark .menu-surface { background: var(--bg) !important; color: var(--text) !important; border:1px solid rgba(255,255,255,.06) !important; box-shadow: none !important; }
+body.theme-dark input[type="text"] { background-color: var(--bg); color: var(--text); border:1px solid rgba(255,255,255,.12); box-shadow: none; }
+body.theme-dark input[type="text"]::placeholder { color: rgba(245,245,245,.45); }
+
+/* Utility remap remains palette-aware via variables */
+
+/* Typography overrides to migrate dark classes to pastel theme */
+.text-white { color: var(--text) !important; }
+.text-white\/90 { color: rgba(43,45,66,.90) !important; }
+.text-white\/80 { color: rgba(43,45,66,.80) !important; }
+.text-white\/70 { color: rgba(43,45,66,.70) !important; }
+.text-white\/60 { color: rgba(43,45,66,.60) !important; }
+.text-white\/50 { color: rgba(43,45,66,.50) !important; }
+.bg-white\/10 { background: rgba(255,255,255,.55) !important; color: var(--text) !important; border-color: rgba(34,38,53,.20) !important; }
+.bg-white\/20 { background: rgba(255,255,255,.75) !important; color: var(--text) !important; }
+.border-white\/20 { border-color: rgba(34,38,53,.22) !important; }
+.border-white\/30 { border-color: rgba(34,38,53,.28) !important; }
+
+/* Buttons/links in header */
+.top-link { color: var(--text); opacity:.75; transition: color .15s ease, opacity .15s ease; }
+.top-link:hover { color: var(--accent); opacity:1; }
+
+/* Old pink utility remap to pastel accents */
+.text-pink-200, .hover\:text-pink-200:hover { color: var(--accent) !important; }
+.text-pink-300 { color: var(--accent) !important; }
+.bg-pink-600, .bg-pink-700, .bg-pink-700\/95 { background-color: var(--accent) !important; }
+.focus\:ring-pink-500\/60:focus { --tw-ring-color: rgba(162,57,202,.6) !important; }
 
 /* Скрытие скроллбара для горизонтального слайдера */
 .scrollbar-hide {

@@ -1,9 +1,9 @@
 <script>
   import { onMount } from 'svelte';
-  import Header from './components/Header.svelte';
   import Sidebar from './components/Sidebar.svelte';
   import Content from './components/Content.svelte';
-  import Player from './components/Player.svelte';
+  import UserMenu from './components/UserMenu.svelte';
+  import { theme, toggleTheme } from './stores/theme';
   import { sidebarCollapsed } from './stores/ui';
   let headerEl;
   let headerHeight = 0;
@@ -43,11 +43,29 @@
 </script>
 
 <div class="app-viewport" style="width: {scaledWidth}px; height: {scaledHeight}px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-  <div class="glass" style="transform: scale({scale}); transform-origin: center center; width: 100%;">
-  <!-- Верхняя панель, визуально сливающаяся с левой -->
-  <div class="sticky top-0 z-10" style="margin-left:0; margin-right:0;">
-    <Header />
-  </div>
+  <div class="glass" style="transform: scale({scale}); transform-origin: center center; width: 100%; position: relative;">
+    <!-- Компактная кнопка авторизации в правом верхнем углу -->
+    <div style="position:absolute; top:12px; right:18px; z-index:20; display:flex; align-items:center; gap:10px;">
+      <button class="relative w-11 h-11 rounded-full flex items-center justify-center bg-white/10 text-white hover:bg-white/20 border border-white/20"
+              title={$theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'} on:click={toggleTheme}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          {#if $theme === 'dark'}
+            <path d="M12 3a9 9 0 0 0 9 9 9 9 0 1 1-9-9z"></path>
+          {:else}
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          {/if}
+        </svg>
+      </button>
+      <UserMenu />
+    </div>
   
   <!-- Основная область с фиксированным Sidebar и прокручиваемым Content -->
   <div class="flex flex-1 gap-6 mt-0 h-full min-h-0" style="width: 100%;">
@@ -78,6 +96,5 @@
       {/if}
     </div>
   </div>
-  <Player />
   </div>
 </div>

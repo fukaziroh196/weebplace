@@ -6,18 +6,6 @@ const GRAPHQL_URL = 'https://graphql.anilist.co';
 
 async function httpPost(url, body) {
   const payload = JSON.stringify(body);
-  try {
-    const { fetch } = await import('@tauri-apps/plugin-http').catch(() => ({ fetch: null }));
-    if (fetch) {
-      return fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: payload
-      });
-    }
-  } catch (_) {
-    // fallthrough
-  }
   return fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },

@@ -10,9 +10,9 @@ function applyToBody(mode) {
 
 const initial = (() => {
   try {
-    return localStorage.getItem('theme') || 'dark';
+    return localStorage.getItem('theme') || 'light';
   } catch (_) {
-    return 'dark';
+    return 'light';
   }
 })();
 

@@ -6,6 +6,7 @@ const fs = require('fs');
 const bcrypt = require('bcryptjs');
 const sqlite3 = require('sqlite3').verbose();
 const jwt = require('jsonwebtoken');
+const AdmZip = require('adm-zip');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -206,6 +207,54 @@ app.get('/api/me', authenticateToken, (req, res) => {
   });
 });
 
+// Статистика пользователя: уникальные дни, текущее/лучшее комбо, распределение по датам
+app.get('/api/stats/me', authenticateToken, (req, res) => {
+  const userId = req.user.id;
+  db.all('SELECT quiz_date, guessed_by FROM anime_guesses WHERE quiz_date IS NOT NULL', [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    const dates = new Set();
+    const counts = {};
+    for (const r of rows || []) {
+      let users = [];
+      try { users = JSON.parse(r.guessed_by || '[]'); } catch (_) { users = []; }
+      if (Array.isArray(users) && users.includes(userId)) {
+        dates.add(r.quiz_date);
+        counts[r.quiz_date] = (counts[r.quiz_date] || 0) + 1;
+      }
+    }
+
+    const list = Array.from(dates).sort();
+    function isNextDay(a, b) { // returns true if b is the next day after a
+      try {
+        const da = new Date(a + 'T00:00:00Z');
+        const dbd = new Date(b + 'T00:00:00Z');
+        const diff = (dbd - da) / (24*3600*1000);
+        return Math.round(diff) === 1;
+      } catch (_) { return false; }
+    }
+    let currentStreak = 0, bestStreak = 0;
+    let prev = null;
+    for (const d of list) {
+      if (prev && isNextDay(prev, d)) currentStreak += 1; else currentStreak = 1;
+      if (currentStreak > bestStreak) bestStreak = currentStreak;
+      prev = d;
+    }
+
+    // todayGuessed: if today's UTC date exists in list
+    const today = (() => { const t=new Date(); return `${t.getUTCFullYear()}-${String(t.getUTCMonth()+1).padStart(2,'0')}-${String(t.getUTCDate()).padStart(2,'0')}`; })();
+    const todayGuessed = dates.has(today);
+
+    res.json({
+      totalDays: list.length,
+      currentStreak,
+      bestStreak,
+      todayGuessed,
+      perDayCounts: counts
+    });
+  });
+});
+
 // Загрузка картинки для "Угадай аниме" (только админ)
 app.post('/api/anime-guesses', authenticateToken, requireAdmin, upload.single('image'), (req, res) => {
   const { title, animeId, sourceId } = req.body;
@@ -256,6 +305,147 @@ app.post('/api/anime-guesses', authenticateToken, requireAdmin, upload.single('i
   );
 });
 
+// Пакетная загрузка: ZIP с картинками и manifest.csv (filename,title,animeId,sourceId,quizDate)
+app.post('/api/anime-guesses/batch', authenticateToken, requireAdmin, upload.single('archive'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'archive is required' });
+
+    const defaultQuizDate = (req.body.quizDate || '').trim();
+    const zipPath = path.join(uploadsDir, req.file.filename);
+    fs.renameSync(path.join(uploadsDir, req.file.filename), zipPath); // already in uploadsDir
+
+    const zip = new AdmZip(zipPath);
+    const entries = zip.getEntries();
+
+    let manifestCsv = null;
+    for (const e of entries) {
+      if (/manifest\.csv$/i.test(e.entryName)) { manifestCsv = e.getData().toString('utf8'); break; }
+    }
+    if (!manifestCsv) return res.status(400).json({ error: 'manifest.csv not found in archive' });
+
+    function parseCsv(text) {
+      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      if (!lines.length) return [];
+      const header = lines[0].replace(/;/g, ',').split(',').map(h => h.trim());
+      const rows = [];
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].replace(/;/g, ',').split(',');
+        const row = {};
+        header.forEach((h, idx) => row[h] = (cols[idx] || '').trim());
+        rows.push(row);
+      }
+      return rows;
+    }
+
+    const items = parseCsv(manifestCsv);
+    if (!items.length) return res.status(400).json({ error: 'manifest.csv is empty' });
+
+    let created = 0;
+    const createdItems = [];
+    for (const it of items) {
+      const filename = it.filename || it.file || it.image || '';
+      const title = it.title || '';
+      const animeId = it.animeId || it.anime_id || '';
+      const sourceId = it.sourceId || it.source_id || null;
+      let quizDate = (it.quizDate || it.quiz_date || defaultQuizDate || '').trim();
+      if (!filename || !title || !animeId) continue;
+
+      // Normalize quizDate
+      try {
+        if (!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(quizDate)) {
+          const d = new Date();
+          quizDate = `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+        }
+      } catch (_) {}
+
+      // Extract image entry
+      const entry = entries.find(e => path.basename(e.entryName) === filename);
+      if (!entry) continue;
+      const buf = entry.getData();
+      const uniqueName = Date.now().toString() + '-' + Math.round(Math.random() * 1e9) + path.extname(filename);
+      const outPath = path.join(uploadsDir, uniqueName);
+      fs.writeFileSync(outPath, buf);
+      const imageUrl = `/uploads/${uniqueName}`;
+
+      const guessId = Date.now().toString() + Math.random().toString(36).substring(7);
+      await new Promise((resolve, reject) => {
+        db.run(
+          'INSERT INTO anime_guesses (id, user_id, image_url, title, anime_id, source_id, quiz_date, created_at, guessed_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+          [guessId, req.user.id, imageUrl, title, animeId, sourceId || null, quizDate, Date.now(), '[]'],
+          function(err) { if (err) reject(err); else resolve(); }
+        );
+      });
+      created++;
+      createdItems.push({ id: guessId, imageUrl, title, animeId, sourceId, quizDate });
+    }
+
+    // Remove uploaded zip to save space
+    try { fs.unlinkSync(zipPath); } catch (_) {}
+
+    res.json({ created, items: createdItems });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Валидация ZIP перед загрузкой: возвращает разобранный manifest и отсутствующие файлы
+app.post('/api/anime-guesses/batch/validate', authenticateToken, requireAdmin, upload.single('archive'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'archive is required' });
+    const zipPath = path.join(uploadsDir, req.file.filename);
+    fs.renameSync(path.join(uploadsDir, req.file.filename), zipPath);
+
+    const zip = new AdmZip(zipPath);
+    const entries = zip.getEntries();
+    let manifestCsv = null;
+    for (const e of entries) { if (/manifest\.csv$/i.test(e.entryName)) { manifestCsv = e.getData().toString('utf8'); break; } }
+    if (!manifestCsv) { try { fs.unlinkSync(zipPath); } catch(_){}; return res.status(400).json({ error: 'manifest.csv not found' }); }
+
+    const lines = manifestCsv.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    const header = lines[0].replace(/;/g, ',').split(',').map(h => h.trim());
+    const items = [];
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].replace(/;/g, ',').split(',');
+      const row = {}; header.forEach((h, idx) => row[h] = (cols[idx] || '').trim());
+      if (Object.keys(row).length) items.push(row);
+    }
+    const filesInZip = new Set(entries.map(e => path.basename(e.entryName)));
+    const missingFiles = [];
+    let ok = 0;
+    for (const it of items) {
+      const f = (it.filename || it.file || it.image || '').trim();
+      if (!f || !filesInZip.has(f)) missingFiles.push(f || '(empty)'); else ok++;
+    }
+    try { fs.unlinkSync(zipPath); } catch(_){}
+    res.json({ total: items.length, ok, missing: missingFiles.slice(0, 100), sample: items.slice(0, 10) });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Пример ZIP с manifest.csv
+app.get('/api/anime-guesses/batch/sample', (req, res) => {
+  try {
+    const date = (req.query.date || '').trim();
+    const d = date || (() => { const x=new Date(); return `${x.getUTCFullYear()}-${String(x.getUTCMonth()+1).padStart(2,'0')}-${String(x.getUTCDate()).padStart(2,'0')}`; })();
+    const zip = new AdmZip();
+    const manifest = [
+      'filename,title,animeId,sourceId,quizDate',
+      `01.jpg,Fullmetal Alchemist,12345,shikimori,${d}`,
+      `02.png,Naruto,20,anilist,${d}`
+    ].join('\n');
+    zip.addFile('manifest.csv', Buffer.from(manifest, 'utf8'));
+    const readme = 'Добавьте свои изображения 01.jpg, 02.png и обновите manifest.csv. Дата может быть разной по строкам.';
+    zip.addFile('README.txt', Buffer.from(readme, 'utf8'));
+    const buf = zip.toBuffer();
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', 'attachment; filename="aniguess-batch-sample.zip"');
+    res.send(buf);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
 // Получить все картинки для "Угадай аниме"
 app.get('/api/anime-guesses', (req, res) => {
   const qDate = (req.query.date || '').trim();
@@ -294,6 +484,79 @@ app.get('/api/anime-guesses/dates', (req, res) => {
   db.all('SELECT DISTINCT quiz_date as date FROM anime_guesses WHERE quiz_date IS NOT NULL ORDER BY quiz_date DESC', [], (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json((rows || []).map(r => r.date));
+  });
+});
+
+// Leaderboard: count distinct quiz dates where user guessed at least one image
+app.get('/api/leaderboard', (req, res) => {
+  const limit = Math.max(1, Math.min(200, parseInt(req.query.limit || '50', 10)));
+  const period = String(req.query.period || 'all'); // 'all' | 'week' | 'day'
+  const dayParam = (req.query.date || '').trim();
+
+  db.all('SELECT quiz_date, guessed_by FROM anime_guesses WHERE quiz_date IS NOT NULL', [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    // Determine latest date if needed
+    const allDates = Array.from(new Set((rows || []).map(r => r.quiz_date).filter(Boolean))).sort();
+    const latest = allDates[allDates.length - 1] || null;
+
+    const inWeekRange = (d, end) => {
+      try {
+        const endDate = new Date(end + 'T00:00:00Z');
+        const startDate = new Date(endDate);
+        startDate.setUTCDate(startDate.getUTCDate() - 6);
+        const cur = new Date(d + 'T00:00:00Z');
+        return cur >= startDate && cur <= endDate;
+      } catch (_) { return false; }
+    };
+
+    if (period === 'day') {
+      const day = dayParam || latest;
+      const userIdToGuesses = new Map();
+      for (const r of rows || []) {
+        if (r.quiz_date !== day) continue;
+        let users = [];
+        try { users = JSON.parse(r.guessed_by || '[]'); } catch (_) { users = []; }
+        if (!Array.isArray(users)) continue;
+        for (const uid of users) {
+          if (!uid) continue;
+          userIdToGuesses.set(uid, (userIdToGuesses.get(uid) || 0) + 1);
+        }
+      }
+      const results = Array.from(userIdToGuesses.entries()).map(([userId, guesses]) => ({ userId, guesses }));
+      results.sort((a, b) => b.guesses - a.guesses);
+      db.all('SELECT id, username FROM users', [], (e2, users) => {
+        if (e2) return res.status(500).json({ error: e2.message });
+        const idToName = new Map((users || []).map(u => [u.id, u.username]));
+        const top = results.slice(0, limit).map((r, idx) => ({ rank: idx + 1, userId: r.userId, username: idToName.get(r.userId) || 'user', guesses: r.guesses, metric: 'guesses', date: day }));
+        res.json(top);
+      });
+      return;
+    }
+
+    // week or all
+    const userIdToDates = new Map();
+    for (const r of rows || []) {
+      const d = r.quiz_date;
+      if (!d) continue;
+      if (period === 'week' && latest && !inWeekRange(d, latest)) continue;
+      let users = [];
+      try { users = JSON.parse(r.guessed_by || '[]'); } catch (_) { users = []; }
+      if (!Array.isArray(users)) continue;
+      for (const uid of users) {
+        if (!uid) continue;
+        if (!userIdToDates.has(uid)) userIdToDates.set(uid, new Set());
+        userIdToDates.get(uid).add(d);
+      }
+    }
+    const results = Array.from(userIdToDates.entries()).map(([userId, dates]) => ({ userId, days: (dates ? dates.size : 0) }));
+    results.sort((a, b) => b.days - a.days);
+    db.all('SELECT id, username FROM users', [], (e2, users) => {
+      if (e2) return res.status(500).json({ error: e2.message });
+      const idToName = new Map((users || []).map(u => [u.id, u.username]));
+      const top = results.slice(0, limit).map((r, idx) => ({ rank: idx + 1, userId: r.userId, username: idToName.get(r.userId) || 'user', days: r.days, metric: 'days' }));
+      res.json(top);
+    });
   });
 });
 

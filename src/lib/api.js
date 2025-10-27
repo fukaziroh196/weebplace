@@ -98,6 +98,13 @@ export const auth = {
   },
 };
 
+// Stats API
+export const stats = {
+  async me() {
+    return await apiRequest('/stats/me');
+  }
+};
+
 // Anime Guesses API
 export const animeGuesses = {
   async getAll(date) {
@@ -135,6 +142,32 @@ export const animeGuesses = {
     return created;
   },
 
+  async uploadBatch(zipFile, quizDate) {
+    const formData = new FormData();
+    formData.append('archive', zipFile);
+    if (quizDate) formData.append('quizDate', quizDate);
+    const result = await apiRequest('/anime-guesses/batch', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${getToken()}` },
+      body: formData,
+    });
+    // normalize images
+    if (result && Array.isArray(result.items)) {
+      result.items = result.items.map((it) => ({ ...it, image: toAbsoluteUploadUrl(it.imageUrl || it.image) }));
+    }
+    return result;
+  },
+
+  async validateBatch(zipFile) {
+    const formData = new FormData();
+    formData.append('archive', zipFile);
+    return await apiRequest('/anime-guesses/batch/validate', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${getToken()}` },
+      body: formData,
+    });
+  },
+
   async dates() {
     return await apiRequest('/anime-guesses/dates');
   },
@@ -152,6 +185,20 @@ export const animeGuesses = {
     });
   },
 };
+
+// Leaderboard API
+export const leaderboard = {
+  async list(limit = 50, period = 'all', date) {
+    const params = new URLSearchParams({ limit: String(limit), period });
+    if (date) params.set('date', date);
+    return await apiRequest(`/leaderboard?${params.toString()}`);
+  }
+};
+
+export function getBatchSampleZipUrl(date) {
+  const q = date ? `?date=${encodeURIComponent(date)}` : '';
+  return `${API_URL}/anime-guesses/batch/sample${q}`;
+}
 
 // Library API
 export const library = {

@@ -5,6 +5,7 @@
   import UserMenu from './UserMenu.svelte';
   import { currentUser, notifications } from '../stores/authApi';
   import { unreadTotal } from '../stores/messages';
+  import { theme, toggleTheme } from '../stores/theme';
   
   let searchQuery = '';
   const search = () => {
@@ -29,19 +30,16 @@
 </script>
 
 <div class="grid grid-cols-[auto_1fr_auto] items-center gap-6" style="min-height:72px; padding: 0 16px;">
-  <div class="flex items-center gap-8" style="margin-left: 110px;">
-    <!-- Clickable logo (acts as Home) -->
-    <button class="select-none cursor-pointer" title="На главную" on:click={goHome} style="background: transparent; border: none; margin-left: -80px;">
-      <span class="font-extrabold text-2xl tracking-wide"
-            style="background: linear-gradient(90deg,#a5f3fc,#38bdf8,#818cf8); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: 0 2px 12px rgba(56,189,248,0.45);">
-        kristal
-      </span>
+  <div class="flex items-center gap-8" style="margin-left: 20px;">
+    <!-- clickable home (icon only) -->
+    <button class="select-none cursor-pointer" title="На главную" on:click={goHome} style="background: transparent; border: none;">
+      <span class="sr-only">Домой</span>
     </button>
     
     <!-- Navigation -->
     <div class="flex gap-8 text-lg font-semibold whitespace-nowrap" style="margin-left: 118px;">
       <!-- "Главная" убрана; функция на логотипе -->
-      <button class="text-white/80 hover:text-pink-200 transition-colors" on:click={() => import('../stores/ui').then(m=>m.goToLists())} style="--tw-text-opacity:0.8;color:#cfd9e6">Мои списки</button>
+      <button class="top-link" on:click={() => import('../stores/ui').then(m=>m.goToLists())}>Мои списки</button>
     </div>
   </div>
   
@@ -91,6 +89,25 @@
 
   <!-- Right: Avatar -->
   <div class="flex items-center gap-4 justify-self-end pr-8">
+    <!-- Theme toggle -->
+    <button class="relative w-11 h-11 rounded-full flex items-center justify-center bg-white/10 text-white hover:bg-white/20 border border-white/20"
+            title={$theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'} on:click={toggleTheme}>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        {#if $theme === 'dark'}
+          <path d="M12 3a9 9 0 0 0 9 9 9 9 0 1 1-9-9z"></path>
+        {:else}
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        {/if}
+      </svg>
+    </button>
     <!-- Notifications bell -->
     <div class="relative" use:clickOutside={{ enabled: showNotifications, callback: () => showNotifications = false }}>
       <button class="relative w-11 h-11 rounded-full flex items-center justify-center bg-white/10 text-white hover:bg-white/20 border border-white/20"

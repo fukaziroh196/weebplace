@@ -2,15 +2,8 @@
 // Docs: https://api.anilibria.tv/docs
 
 async function httpGet(url) {
-  try {
-    const mod = await import('@tauri-apps/plugin-http').catch(() => null);
-    const fetchTauri = mod?.fetch;
-    if (fetchTauri) {
-      return fetchTauri(url, { method: 'GET', headers: { 'Accept': 'application/json' } });
-    }
-  } catch (_) { /* fallthrough */ }
-  const proxied = typeof url === 'string' ? `/proxy?url=${encodeURIComponent(url)}` : url;
-  return fetch(proxied, { method: 'GET', headers: { 'Accept': 'application/json' } });
+  // Use native fetch. If you need to bypass CORS in production, proxy via your backend/nginx.
+  return fetch(url, { method: 'GET', headers: { 'Accept': 'application/json' } });
 }
 
 const API = 'https://api.anilibria.tv/v3';

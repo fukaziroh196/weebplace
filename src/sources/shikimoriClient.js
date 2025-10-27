@@ -25,20 +25,6 @@ async function request(path, query) {
     'Accept': 'application/json'
   };
 
-  // Try plugin HTTP fetch first to avoid potential CORS limitations
-  try {
-    const { fetch } = await import('@tauri-apps/plugin-http').catch(() => ({ fetch: null }));
-    if (fetch) {
-      // On plugin HTTP we can pass User-Agent safely
-      const pluginHeaders = { ...baseHeaders, 'User-Agent': 'projgp/0.1.0 (tauri)' };
-      const res = await fetch(url.toString(), { method: 'GET', headers: pluginHeaders });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.json();
-    }
-  } catch (_) {
-    // fall through to window.fetch
-  }
-
   const res = await fetch(url.toString(), { method: 'GET', headers: baseHeaders });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();

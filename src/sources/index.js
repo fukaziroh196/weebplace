@@ -88,16 +88,8 @@ function makeUserSource(spec) {
     return { info, ...fns };
   }
   const endpoints = spec.endpoints || {};
-  // Prefer tauri plugin-http when available to bypass CORS in desktop app.
-  // In dev browser, transparently route via local proxy to avoid CORS.
+  // In web, use native fetch; in dev, route through local proxy to avoid CORS
   async function httpGet(url) {
-    try {
-      const mod = await import('@tauri-apps/plugin-http').catch(() => null);
-      const fetchTauri = mod?.fetch;
-      if (fetchTauri) {
-        return fetchTauri(url, { method: 'GET', headers: { 'Accept': 'application/json' } });
-      }
-    } catch (_) { /* fallthrough */ }
     const proxied = typeof url === 'string' ? `/proxy?url=${encodeURIComponent(url)}` : url;
     return fetch(proxied, { method: 'GET', headers: { 'Accept': 'application/json' } });
   }
@@ -136,20 +128,13 @@ function makeUserSource(spec) {
 function createScriptSource(scriptText) {
   // scriptText is expected to define functions: search, getById, getStreams
   // executed in a sandboxed Function with limited globals
-  const fetchWithTauri = (url, init) => (async () => {
-    try {
-      const mod = await import('@tauri-apps/plugin-http').catch(() => null);
-      const tFetch = mod?.fetch;
-      if (tFetch) {
-        return tFetch(url, init || {});
-      }
-    } catch (_) {}
+  const fetchThroughProxy = (url, init) => (async () => {
     const finalUrl = (typeof url === 'string' && /^https?:/i.test(url))
       ? `/proxy?url=${encodeURIComponent(url)}`
       : url;
     return fetch(finalUrl, init);
   })();
-  const sandbox = { fetch: fetchWithTauri };
+  const sandbox = { fetch: fetchThroughProxy };
   const factory = new Function('sandbox', `with (sandbox) { ${scriptText}; return { search, getById, getStreams }; }`);
   const fns = factory(sandbox);
   return {

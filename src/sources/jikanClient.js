@@ -7,12 +7,6 @@ const BASE = 'https://api.jikan.moe/v4';
 
 async function httpGet(path) {
   const url = path.startsWith('http') ? path : `${BASE}${path}`;
-  try {
-    const { fetch } = await import('@tauri-apps/plugin-http').catch(() => ({ fetch: null }));
-    if (fetch) {
-      return fetch(url, { method: 'GET', headers: { 'Accept': 'application/json' } });
-    }
-  } catch (_) { /* fallthrough */ }
   return fetch(url, { method: 'GET', headers: { 'Accept': 'application/json' } });
 }
 
