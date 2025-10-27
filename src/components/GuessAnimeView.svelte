@@ -31,25 +31,46 @@
     if (f && f.type.startsWith('image/')) { packSlots[i].file = f; packSlots = [...packSlots]; }
   }
   function onSlotTitle(i, e) { packSlots[i].title = e.currentTarget.value; packSlots = [...packSlots]; }
-  $: canSubmitPack = (packSlots || []).every(s => !!s.file && !!s.title?.trim()) && !!adminUploadDate;
+  let packUploading = false;
+  let packUploadError = '';
+  $: canSubmitPack = (packSlots || []).every(s => !!s.file && !!s.title?.trim()) && !!adminUploadDate && !packUploading;
+  
   async function submitPack() {
-    if (!adminUploadDate) { alert('Выберите дату сета'); return; }
-    if (!canSubmitPack) { alert('Заполните все 4 изображения и ответы'); return; }
+    packUploadError = '';
+    
+    if (!adminUploadDate) { 
+      packUploadError = 'Выберите дату сета';
+      return; 
+    }
+    if (!canSubmitPack) { 
+      packUploadError = 'Заполните все 4 изображения и ответы';
+      return; 
+    }
+    
     try {
-      for (let i = 0; i < packSlots.length; i++) {
-        const s = packSlots[i];
-        s.uploading = true; packSlots = [...packSlots];
-        const manualId = generateManualAnimeId(s.title);
-        await apiGuesses.upload(s.file, s.title.trim(), manualId, 'manual', adminUploadDate);
-        s.uploading = false; packSlots = [...packSlots];
-      }
-      // очистить и обновить список
+      packUploading = true;
+      console.log(`[submitPack] Starting upload for ${adminUploadDate}`);
+      
+      const slots = packSlots.map((s) => ({ file: s.file, title: s.title.trim() }));
+      const result = await apiGuesses.uploadPack(slots, adminUploadDate);
+      
+      console.log('[submitPack] Upload success:', result);
+      
+      // очистить форму
       packSlots = Array.from({ length: 4 }, () => ({ file: null, title: '', uploading: false }));
-      setQuizDate(adminUploadDate);
+      
+      // переключить на загруженную дату и обновить список
+      await setQuizDate(adminUploadDate);
+      await refreshQuizDates();
       await fetchAllGuesses(adminUploadDate);
-      alert('Пак загружен на дату ' + adminUploadDate);
+      
+      alert(`✓ Пак успешно загружен на дату ${adminUploadDate}!\n${result.created || 4} изображений добавлено.`);
     } catch (e) {
-      alert('Ошибка загрузки пака: ' + (e?.message || ''));
+      console.error('[submitPack] Error:', e);
+      packUploadError = `Ошибка загрузки: ${e?.message || 'Network error'}`;
+      alert(packUploadError);
+    } finally {
+      packUploading = false;
     }
   }
   function clearPack() { packSlots = Array.from({ length: 4 }, () => ({ file: null, title: '', uploading: false })); }
@@ -330,10 +351,37 @@
           </div>
         {/each}
       </div>
-      <div class="flex items-center gap-3 mt-4">
-        <button class="bg-pink-700 hover:bg-pink-600 text-white px-5 py-3 rounded-lg font-semibold disabled:opacity-50" disabled={!canSubmitPack} on:click={submitPack}>Отправить пак</button>
-        <button class="bg-white/10 hover:bg-white/20 text-white px-5 py-3 rounded-lg font-semibold border border-white/20" on:click={clearPack}>Очистить</button>
-        <div class="text-white/70 text-sm">Пак будет сохранён на дату {adminUploadDate}. Если дата не сегодня — он попадёт в "предыдущие дни".</div>
+      <div class="flex flex-col gap-3 mt-4">
+        <div class="flex items-center gap-3">
+          <button 
+            class="bg-pink-700 hover:bg-pink-600 text-white px-5 py-3 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition" 
+            disabled={!canSubmitPack} 
+            on:click={submitPack}
+          >
+            {packUploading ? '⏳ Загрузка...' : 'Отправить пак'}
+          </button>
+          <button 
+            class="bg-white/10 hover:bg-white/20 text-white px-5 py-3 rounded-lg font-semibold border border-white/20 disabled:opacity-50" 
+            disabled={packUploading}
+            on:click={clearPack}
+          >
+            Очистить
+          </button>
+        </div>
+        {#if packUploadError}
+          <div class="bg-red-500/20 border border-red-500/50 rounded-lg px-4 py-3 text-red-200">
+            ❌ {packUploadError}
+          </div>
+        {:else}
+          <div class="text-white/70 text-sm">
+            Пак будет сохранён на дату <b class="text-pink-400">{adminUploadDate}</b>. 
+            {#if adminUploadDate !== todayStr()}
+              Это прошедшая дата — пак попадёт в "предыдущие дни".
+            {:else}
+              Это сегодняшняя дата — пак будет активен сразу.
+            {/if}
+          </div>
+        {/if}
       </div>
     </div>
 

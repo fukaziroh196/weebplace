@@ -32,7 +32,7 @@
 <svelte:window on:keydown={(e)=>{ if (e.key === 'Escape') onClose?.(); }} />
 
 {#if open}
-  <div class="fixed inset-0 z-50 flex items-start justify-center pt-14 bg-[rgba(0,0,0,.45)]" role="dialog" aria-modal="true" on:click={onClose}>
+  <div class="fixed inset-0 z-[200] flex items-start justify-center pt-14 bg-[rgba(0,0,0,.45)]" role="dialog" aria-modal="true" on:click={onClose}>
     <div class="w-[920px] max-w-[92vw] rounded-2xl overflow-hidden" style="background:var(--panel); border:1px solid rgba(255,255,255,.06)", on:click|stopPropagation>
       <div class="px-6 py-4 flex items-center justify-between" style="border-bottom:1px solid rgba(255,255,255,.06)">
         <div class="text-2xl font-extrabold" style="color:var(--text)">REPLAY</div>

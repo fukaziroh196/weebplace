@@ -449,7 +449,7 @@ app.get('/api/anime-guesses/batch/sample', (req, res) => {
 // Получить все картинки для "Угадай аниме"
 app.get('/api/anime-guesses', (req, res) => {
   const qDate = (req.query.date || '').trim();
-  const send = (guesses) => {
+  const send = (err, guesses) => {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
@@ -469,17 +469,18 @@ app.get('/api/anime-guesses', (req, res) => {
   };
 
   if (qDate) {
-    db.all('SELECT * FROM anime_guesses WHERE quiz_date = ? ORDER BY created_at DESC', [qDate], (err, rows) => send(rows));
+    db.all('SELECT * FROM anime_guesses WHERE quiz_date = ? ORDER BY created_at DESC', [qDate], (err, rows) => send(err, rows));
   } else {
     // Prefer today's UTC date when not specified
     const today = (() => { const t=new Date(); return `${t.getUTCFullYear()}-${String(t.getUTCMonth()+1).padStart(2,'0')}-${String(t.getUTCDate()).padStart(2,'0')}`; })();
     db.all('SELECT * FROM anime_guesses WHERE quiz_date = ? ORDER BY created_at DESC', [today], (err, rows) => {
-      if (Array.isArray(rows) && rows.length) return send(rows);
+      if (err) return send(err);
+      if (Array.isArray(rows) && rows.length) return send(null, rows);
       // Fallback to latest non-empty date
       db.get('SELECT quiz_date as d FROM anime_guesses WHERE quiz_date IS NOT NULL ORDER BY quiz_date DESC LIMIT 1', [], (e1, row) => {
         const latest = row?.d || null;
-        if (!latest) return db.all('SELECT * FROM anime_guesses ORDER BY created_at DESC', [], (e2, rows2) => send(rows2));
-        db.all('SELECT * FROM anime_guesses WHERE quiz_date = ? ORDER BY created_at DESC', [latest], (e3, rows3) => send(rows3));
+        if (!latest) return db.all('SELECT * FROM anime_guesses ORDER BY created_at DESC', [], (e2, rows2) => send(e2, rows2));
+        db.all('SELECT * FROM anime_guesses WHERE quiz_date = ? ORDER BY created_at DESC', [latest], (e3, rows3) => send(e3, rows3));
       });
     });
   }
@@ -490,6 +491,126 @@ app.get('/api/anime-guesses/dates', (req, res) => {
   db.all('SELECT DISTINCT quiz_date as date FROM anime_guesses WHERE quiz_date IS NOT NULL ORDER BY quiz_date DESC', [], (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json((rows || []).map(r => r.date));
+  });
+});
+
+// === Atomic pack upload (exactly 4 images for a specific date) ===
+// fields: image1..image4, title1..title4, optional animeId1..4, sourceId1..4, required quizDate
+app.post('/api/packs', authenticateToken, requireAdmin, upload.fields([
+  { name: 'image1', maxCount: 1 },
+  { name: 'image2', maxCount: 1 },
+  { name: 'image3', maxCount: 1 },
+  { name: 'image4', maxCount: 1 },
+]), (req, res) => {
+  console.log('[/api/packs] New pack upload request');
+  
+  // Validate quiz date
+  let quizDate = String(req.body.quizDate || '').trim();
+  if (!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(quizDate)) {
+    console.error('[/api/packs] Invalid quizDate:', quizDate);
+    return res.status(400).json({ error: 'quizDate (YYYY-MM-DD) is required' });
+  }
+  
+  // Validate images and titles
+  const images = [req.files?.image1?.[0], req.files?.image2?.[0], req.files?.image3?.[0], req.files?.image4?.[0]];
+  const titles = [req.body.title1, req.body.title2, req.body.title3, req.body.title4].map((t) => String(t || '').trim());
+  
+  for (let i = 0; i < 4; i++) {
+    if (!images[i]) {
+      console.error(`[/api/packs] Missing image${i+1}`);
+      return res.status(400).json({ error: `Missing image${i+1}` });
+    }
+    if (!titles[i]) {
+      console.error(`[/api/packs] Missing title${i+1}`);
+      return res.status(400).json({ error: `Missing title${i+1}` });
+    }
+  }
+
+  console.log(`[/api/packs] Date: ${quizDate}, Images: ${images.map(f => f.filename).join(', ')}`);
+  console.log(`[/api/packs] Titles: ${titles.join(' | ')}`);
+
+  // Start transaction: replace pack for this date atomically
+  db.serialize(() => {
+    db.run('BEGIN TRANSACTION', (beginErr) => {
+      if (beginErr) {
+        console.error('[/api/packs] BEGIN error:', beginErr);
+        return res.status(500).json({ error: 'Transaction start failed' });
+      }
+
+      // Step 1: Delete old entries for this date
+      db.run('DELETE FROM anime_guesses WHERE quiz_date = ?', [quizDate], function (delErr) {
+        if (delErr) {
+          console.error('[/api/packs] DELETE error:', delErr);
+          db.run('ROLLBACK');
+          return res.status(500).json({ error: `Failed to clear old pack: ${delErr.message}` });
+        }
+
+        console.log(`[/api/packs] Deleted ${this.changes} old entries for ${quizDate}`);
+
+        // Step 2: Insert new 4 entries
+        const createdItems = [];
+        let errorOccurred = null;
+        let remaining = 4;
+
+        images.forEach((img, idx) => {
+          const imageUrl = `/uploads/${img.filename}`;
+          const guessId = Date.now().toString() + Math.random().toString(36).substring(7) + '-' + idx;
+          const title = titles[idx];
+          const animeId = String(req.body[`animeId${idx + 1}`] || `manual-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Date.now()}`);
+          const sourceId = req.body[`sourceId${idx + 1}`] || 'manual';
+
+          db.run(
+            'INSERT INTO anime_guesses (id, user_id, image_url, title, anime_id, source_id, quiz_date, created_at, guessed_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [guessId, req.user.id, imageUrl, title, animeId, sourceId, quizDate, Date.now(), '[]'],
+            function (insertErr) {
+              if (insertErr && !errorOccurred) {
+                console.error(`[/api/packs] INSERT error for ${title}:`, insertErr);
+                errorOccurred = insertErr;
+              } else if (!insertErr) {
+                console.log(`[/api/packs] ✓ Inserted ${idx+1}/4: ${title}`);
+                createdItems.push({ 
+                  id: guessId, 
+                  imageUrl, 
+                  image: imageUrl,
+                  title, 
+                  animeId, 
+                  sourceId, 
+                  quizDate,
+                  guessedBy: []
+                });
+              }
+
+              remaining -= 1;
+
+              // All 4 inserts finished
+              if (remaining === 0) {
+                if (errorOccurred) {
+                  console.error('[/api/packs] Rolling back due to insert errors');
+                  db.run('ROLLBACK', () => {
+                    res.status(500).json({ error: `Insert failed: ${errorOccurred.message}` });
+                  });
+                } else {
+                  db.run('COMMIT', (commitErr) => {
+                    if (commitErr) {
+                      console.error('[/api/packs] COMMIT error:', commitErr);
+                      db.run('ROLLBACK');
+                      return res.status(500).json({ error: `Commit failed: ${commitErr.message}` });
+                    }
+                    console.log(`[/api/packs] ✓✓✓ Successfully committed pack for ${quizDate} ✓✓✓`);
+                    res.json({ 
+                      success: true,
+                      created: createdItems.length, 
+                      items: createdItems,
+                      quizDate
+                    });
+                  });
+                }
+              }
+            }
+          );
+        });
+      });
+    });
   });
 });
 

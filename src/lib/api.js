@@ -158,6 +158,66 @@ export const animeGuesses = {
     return result;
   },
 
+  async uploadPack(slots, quizDate) {
+    // slots: [{ file, title } x4]
+    if (!Array.isArray(slots) || slots.length !== 4) {
+      throw new Error('Exactly 4 slots required');
+    }
+    if (!quizDate || !/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(quizDate)) {
+      throw new Error('Valid quizDate (YYYY-MM-DD) required');
+    }
+    
+    const formData = new FormData();
+    formData.append('quizDate', quizDate);
+    
+    for (let i = 0; i < 4; i++) {
+      const slot = slots[i];
+      if (!slot.file) {
+        throw new Error(`Missing file for slot ${i + 1}`);
+      }
+      if (!slot.title || !slot.title.trim()) {
+        throw new Error(`Missing title for slot ${i + 1}`);
+      }
+      formData.append(`image${i + 1}`, slot.file);
+      formData.append(`title${i + 1}`, slot.title.trim());
+    }
+
+    console.log(`[uploadPack] Uploading pack for ${quizDate}...`);
+    
+    try {
+      const url = `${API_URL}/packs`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${getToken()}`
+          // Don't set Content-Type - browser will set it with boundary for FormData
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
+        throw new Error(error.error || `HTTP ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('[uploadPack] Success:', result);
+      
+      // Normalize image URLs
+      if (result && Array.isArray(result.items)) {
+        result.items = result.items.map((it) => ({ 
+          ...it, 
+          image: toAbsoluteUploadUrl(it.imageUrl || it.image) 
+        }));
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('[uploadPack] Error:', error);
+      throw error;
+    }
+  },
+
   async validateBatch(zipFile) {
     const formData = new FormData();
     formData.append('archive', zipFile);
