@@ -1,5 +1,6 @@
 import { writable, derived } from 'svelte/store';
-import { currentUser, users } from './auth';
+import { currentUser } from './authApi';
+import { users } from './auth';
 
 // All direct messages stored locally. This is a simple local-only MVP.
 // Message: { id, fromId, toId, text, createdAt, readBy: string[] }

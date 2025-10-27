@@ -3,7 +3,7 @@
   import { clickOutside } from '../lib/clickOutside';
   import { goToSearch, goHome, goToDetails, goToMessages, goToProfile } from '../stores/ui';
   import UserMenu from './UserMenu.svelte';
-  import { currentUser, notifications } from '../stores/auth';
+  import { currentUser, notifications } from '../stores/authApi';
   import { unreadTotal } from '../stores/messages';
   
   let searchQuery = '';

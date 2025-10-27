@@ -1,5 +1,6 @@
 <script>
-  import { currentUser, watched, favorites, comments, login, register, addComment, removeFromFavorites, promoteToAdmin, setCurrentUserAvatar, clearCurrentUserAvatar, users, friends, friendRequestsIncoming, friendRequestsOutgoing } from '../stores/auth';
+  import { currentUser, login, register } from '../stores/authApi';
+  import { watched, favorites, comments, addComment, removeFromFavorites, promoteToAdmin, setCurrentUserAvatar, clearCurrentUserAvatar, users, friends, friendRequestsIncoming, friendRequestsOutgoing } from '../stores/auth';
   import { sendFriendRequest, acceptFriendRequest, declineFriendRequest, removeFriend, refreshFriendState } from '../stores/auth';
   import AvatarCropper from './AvatarCropper.svelte';
   let mode = 'login';

@@ -1,8 +1,9 @@
 <script>
   import { onMount } from 'svelte';
-  import { currentUser } from '../stores/auth';
+  import { currentUser } from '../stores/authApi';
   import { fetchSuggestions, suggestions, enabledSourceIds, adminImages } from '../stores/sources';
   import { clickOutside } from '../lib/clickOutside';
+  import { animeGuesses as apiGuesses } from '../lib/api';
   
   // Данные об угадываемых аниме
   let animeGuesses = [];
@@ -23,27 +24,17 @@
   let currentImageIndex = 0;
   let showAnswer = false;
   
-  // Загрузить данные из localStorage
-  function loadAnimeGuesses() {
+  // Загрузка данных из API
+  async function fetchAllGuesses() {
+    loading = true;
     try {
-      const saved = localStorage.getItem('animeGuesses');
-      if (saved) {
-        animeGuesses = JSON.parse(saved);
-      } else {
-        animeGuesses = [];
-      }
+      const list = await apiGuesses.getAll();
+      animeGuesses = Array.isArray(list) ? list : [];
     } catch (e) {
-      console.error('Ошибка загрузки:', e);
+      console.error('Не удалось загрузить список:', e);
       animeGuesses = [];
-    }
-  }
-  
-  // Сохранить данные в localStorage
-  function saveAnimeGuesses() {
-    try {
-      localStorage.setItem('animeGuesses', JSON.stringify(animeGuesses));
-    } catch (e) {
-      console.error('Ошибка сохранения:', e);
+    } finally {
+      loading = false;
     }
   }
   
@@ -93,39 +84,32 @@
     showAdminSuggestions = false;
   }
   
-  function uploadImage() {
+  async function uploadImage() {
     if (!selectedFile || !selectedAnime) {
       alert('Выберите картинку и аниме из списка');
       return;
     }
-    
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const newGuess = {
-        id: Date.now().toString(),
-        image: e.target.result,
-        title: selectedAnime.title,
-        animeId: selectedAnime.id,
-        sourceId: selectedAnime.__sourceId,
-        createdAt: Date.now(),
-        guessedBy: []
-      };
-      
-      animeGuesses = [...animeGuesses, newGuess];
-      saveAnimeGuesses();
+    try {
+      const created = await apiGuesses.upload(selectedFile, selectedAnime.title, selectedAnime.id, selectedAnime.__sourceId);
+      const normalized = created && !created.image && created.imageUrl ? { ...created, image: created.imageUrl } : created;
+      animeGuesses = [...animeGuesses, normalized];
       selectedFile = null;
       selectedAnime = null;
       adminSearchQuery = '';
-      document.getElementById('fileInput').value = '';
+      const el = document.getElementById('fileInput'); if (el) el.value = '';
       alert('Картинка загружена!');
-    };
-    reader.readAsDataURL(selectedFile);
+    } catch (e) {
+      alert('Ошибка загрузки: ' + (e?.message || '')); 
+    }
   }
   
-  function deleteGuess(id) {
-    if (confirm('Удалить эту картинку?')) {
+  async function deleteGuess(id) {
+    if (!confirm('Удалить эту картинку?')) return;
+    try {
+      await apiGuesses.delete(id);
       animeGuesses = animeGuesses.filter(g => g.id !== id);
-      saveAnimeGuesses();
+    } catch (e) {
+      alert('Не удалось удалить: ' + (e?.message || ''));
     }
   }
   
@@ -164,26 +148,24 @@
     showUserSuggestions = false;
   }
   
-  function checkAnswer() {
+  async function checkAnswer() {
     const guessId = animeGuesses[currentImageIndex]?.id;
     if (!guessId || !userAnswer.trim()) return;
-    
-    const guess = animeGuesses.find(g => g.id === guessId);
-    if (!guess) return;
-    
-    const correct = userAnswer.toLowerCase().trim() === guess.title.toLowerCase().trim();
-    
-    if (correct) {
-      // Проверяем, не отгадывал ли уже этот пользователь
-      const userId = $currentUser?.id;
-      if (userId && !guess.guessedBy.includes(userId)) {
-        guess.guessedBy.push(userId);
-        saveAnimeGuesses();
+    try {
+      const res = await apiGuesses.checkAnswer(guessId, userAnswer.trim());
+      if (res?.correct) {
+        const userId = $currentUser?.id;
+        const guess = animeGuesses.find(g => g.id === guessId);
+        if (guess && userId && Array.isArray(guess.guessedBy) && !guess.guessedBy.includes(userId)) {
+          guess.guessedBy.push(userId);
+        }
+        alert('Правильно! 🎉');
+        userAnswer = '';
+      } else {
+        alert('Неправильно! Попробуйте еще раз.');
       }
-      alert('Правильно! 🎉');
-      userAnswer = '';
-    } else {
-      alert('Неправильно! Попробуйте еще раз.');
+    } catch (e) {
+      alert('Ошибка проверки: ' + (e?.message || ''));
     }
   }
   
@@ -199,7 +181,7 @@
   import { sourceRegistry } from '../sources';
   
   onMount(() => {
-    loadAnimeGuesses();
+    fetchAllGuesses();
   });
 </script>
 

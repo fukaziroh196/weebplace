@@ -1,5 +1,5 @@
 <script>
-  import { currentUser, login, register, logout } from '../stores/auth';
+  import { currentUser, login, register, logout } from '../stores/authApi';
   import { goToProfile, goToAdmin, goToMessages } from '../stores/ui';
   import { clickOutside } from '../lib/clickOutside';
   import { unreadTotal } from '../stores/messages';

@@ -15,13 +15,11 @@ function setToken(token) {
   }
 }
 
-// Get auth headers
+// Get auth headers (without forcing Content-Type)
 function getAuthHeaders() {
   const token = getToken();
-  const headers = { 'Content-Type': 'application/json' };
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
+  const headers = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
   return headers;
 }
 
@@ -31,13 +29,14 @@ async function apiRequest(endpoint, options = {}) {
   const headers = getAuthHeaders();
 
   try {
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        ...headers,
-        ...options.headers,
-      },
-    });
+    // Auto-apply JSON Content-Type only when body is plain object/string, not FormData
+    const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+    const finalHeaders = { ...headers, ...(options.headers || {}) };
+    if (!isFormData && options.body != null && !('Content-Type' in finalHeaders)) {
+      finalHeaders['Content-Type'] = 'application/json';
+    }
+
+    const response = await fetch(url, { ...options, headers: finalHeaders });
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: 'Network error' }));

@@ -1,5 +1,5 @@
 <script>
-  import { currentUser } from '../stores/auth';
+  import { currentUser } from '../stores/authApi';
   import { adminImages, addUserSource, userSources, enabledSourceIds, playbackSourceId, setPlaybackSource } from '../stores/sources';
   import { goHome } from '../stores/ui';
   let customImageAnimeId = '';
