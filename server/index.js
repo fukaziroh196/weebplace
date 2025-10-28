@@ -129,9 +129,12 @@ function authenticateToken(req, res, next) {
 
 // Проверка админа
 function requireAdmin(req, res, next) {
+  console.log('[requireAdmin] Checking user:', req.user);
   if (!req.user.isAdmin) {
+    console.log('[requireAdmin] Access denied: isAdmin =', req.user.isAdmin);
     return res.status(403).json({ error: 'Admin access required' });
   }
+  console.log('[requireAdmin] Access granted');
   next();
 }
 
