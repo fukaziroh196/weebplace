@@ -1,5 +1,5 @@
 <script>
-  import { activeView, goHome, goToCatalog, goToAniQuiz, goToLists, goToAdminQuiz, sidebarCollapsed, toggleSidebar } from '../stores/ui';
+  import { activeView, goHome, goToCatalog, goToAniQuiz, goToLists, goToAdminQuiz } from '../stores/ui';
   import { currentUser } from '../stores/authApi';
 
   function isActive(view) {
@@ -12,53 +12,40 @@
   $: isAdmin = $currentUser?.role === 'admin' || $currentUser?.is_admin === 1 || $currentUser?.isAdmin === true;
 </script>
 
-<div class="sidebar flex flex-col h-full gap-3 text-white text-[15px] font-medium pt-1 overflow-hidden"
-     style="align-items:{ $sidebarCollapsed ? 'center' : 'stretch' }">
-  <button class="self-end mr-1 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center border border-white/20"
-          title={$sidebarCollapsed ? 'Развернуть' : 'Свернуть'}
-          on:click={toggleSidebar}>
-    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      {#if $sidebarCollapsed}
-        <polyline points="9 18 15 12 9 6"></polyline>
-      {:else}
-        <polyline points="15 18 9 12 15 6"></polyline>
-      {/if}
-    </svg>
-  </button>
-
-  <button class="nav-item {isActive('home') ? 'is-active' : ''}" style="justify-content:{ $sidebarCollapsed ? 'center' : 'flex-start' }" on:click={goHome}>
+<div class="sidebar flex flex-col h-full gap-3 text-white text-[15px] font-medium pt-1 overflow-hidden">
+  <button class="nav-item {isActive('home') ? 'is-active' : ''}" on:click={goHome}>
     <span class="icon">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19a2 2 0 0 1-2-2V5h16v12a2 2 0 0 1-2 2H4z"></path><path d="M16 8H6"></path><path d="M16 12H6"></path><path d="M10 16H6"></path></svg>
     </span>
-    {#if !$sidebarCollapsed}<span>Новости</span>{/if}
+    <span>Новости</span>
   </button>
-  <button class="nav-item {isActive('catalog') ? 'is-active' : ''}" style="justify-content:{ $sidebarCollapsed ? 'center' : 'flex-start' }" on:click={goToCatalog}>
+  <button class="nav-item {isActive('catalog') ? 'is-active' : ''}" on:click={goToCatalog}>
     <span class="icon">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/></svg>
     </span>
-    {#if !$sidebarCollapsed}<span>Каталог</span>{/if}
+    <span>Каталог</span>
   </button>
-  <button class="nav-item {isActive('aniquiz') ? 'is-active' : ''}" style="justify-content:{ $sidebarCollapsed ? 'center' : 'flex-start' }" on:click={goToAniQuiz}>
+  <button class="nav-item {isActive('aniquiz') ? 'is-active' : ''}" on:click={goToAniQuiz}>
     <span class="icon">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
     </span>
-    {#if !$sidebarCollapsed}<span>AniQuiz</span>{/if}
+    <span>AniQuiz</span>
   </button>
   <div class="pt-2 border-t border-white/20"></div>
-  <button class="nav-item {isActive('lists') ? 'is-active' : ''}" style="justify-content:{ $sidebarCollapsed ? 'center' : 'flex-start' }" on:click={goToLists}>
+  <button class="nav-item {isActive('lists') ? 'is-active' : ''}" on:click={goToLists}>
     <span class="icon">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"></path><path d="M8 12h13"></path><path d="M8 18h13"></path><path d="M3 6h.01"></path><path d="M3 12h.01"></path><path d="M3 18h.01"></path></svg>
     </span>
-    {#if !$sidebarCollapsed}<span>Мои списки</span>{/if}
+    <span>Мои списки</span>
   </button>
 
   {#if isAdmin}
     <div class="pt-2 border-t border-white/20"></div>
-    <button class="nav-item {isActive('adminQuiz') ? 'is-active' : ''}" style="justify-content:{ $sidebarCollapsed ? 'center' : 'flex-start' }" on:click={goToAdminQuiz}>
+    <button class="nav-item {isActive('adminQuiz') ? 'is-active' : ''}" on:click={goToAdminQuiz}>
       <span class="icon">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
       </span>
-      {#if !$sidebarCollapsed}<span>Админ панель</span>{/if}
+      <span>Админ панель</span>
     </button>
   {/if}
 

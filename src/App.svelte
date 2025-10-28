@@ -2,9 +2,7 @@
   import Sidebar from './components/Sidebar.svelte';
   import Content from './components/Content.svelte';
   import UserMenu from './components/UserMenu.svelte';
-  import { sidebarCollapsed } from './stores/ui';
   
-  $: sidebarW = $sidebarCollapsed ? 64 : 190;
   let showTop = false;
   let scrollEl;
 </script>
@@ -23,7 +21,7 @@
   <!-- Основная область -->
   <div class="main-layout">
     <!-- Sidebar -->
-    <div class="sidebar-container" style="width: {sidebarW}px;">
+    <div class="sidebar-container">
       <Sidebar />
     </div>
     
@@ -105,6 +103,7 @@
   
   .sidebar-container {
     flex-shrink: 0;
+    width: 190px;
     height: 100%;
     overflow: hidden;
     padding: 16px 12px;
