@@ -67,9 +67,31 @@
 
 <style>
   .sidebar { padding-top: 4px; }
-  .nav-item { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:12px; transition: background .18s, border-color .18s, box-shadow .18s; color: rgba(231,223,221,0.92); border:1px solid transparent; }
-  .nav-item:hover { background: rgba(162,57,202,0.10); border-color: rgba(162,57,202,0.35); box-shadow: inset 0 0 0 1px rgba(162,57,202,0.18); }
-  .nav-item.is-active { background: rgba(162,57,202,0.16); border-color: rgba(162,57,202,0.50); box-shadow: 0 0 0 1px rgba(162,57,202,0.35) inset; }
+  .nav-item { 
+    display:flex; 
+    align-items:center; 
+    gap:12px; 
+    padding:10px 12px; 
+    border-radius:12px; 
+    transition: all .2s cubic-bezier(0.4, 0, 0.2, 1); 
+    color: rgba(231,223,221,0.7); 
+    border:1px solid rgba(162,57,202,0.15); 
+    background: rgba(22,22,22,0.6);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .nav-item:hover { 
+    background: rgba(162,57,202,0.15); 
+    border-color: rgba(162,57,202,0.5); 
+    color: rgba(231,223,221,0.95);
+    transform: translateX(2px);
+  }
+  .nav-item.is-active { 
+    background: rgba(162,57,202,0.25); 
+    border-color: rgba(162,57,202,0.7); 
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(162,57,202,0.3);
+  }
   .icon { display:flex; width:24px; height:24px; align-items:center; justify-content:center; }
   .theme-switch {
     appearance: none;

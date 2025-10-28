@@ -266,37 +266,24 @@
   
   .quiz-card {
     position: relative;
-    background: var(--panel);
-    border: 2px solid rgba(162, 57, 202, 0.2);
-    border-radius: 20px;
-    padding: 3rem 2rem;
+    background: rgba(22, 22, 22, 0.8);
+    border: 2px solid rgba(162, 57, 202, 0.35);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
   }
   
-  .quiz-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(162, 57, 202, 0.05), transparent);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  
-  .quiz-card:hover::before {
-    opacity: 1;
-  }
-  
   .quiz-card:hover {
-    transform: translateY(-8px);
-    border-color: var(--accent);
-    box-shadow: 0 16px 40px rgba(162, 57, 202, 0.3);
+    transform: translateY(-4px);
+    border-color: rgba(162, 57, 202, 0.7);
+    background: rgba(162, 57, 202, 0.15);
+    box-shadow: 0 8px 24px rgba(162, 57, 202, 0.4);
   }
   
   .quiz-card:active {
-    transform: translateY(-4px) scale(0.98);
+    transform: translateY(-2px) scale(0.98);
   }
   
   .card-content {
@@ -319,26 +306,26 @@
     justify-content: center;
     gap: 0.75rem;
     padding: 1rem 2rem;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border: none;
-    border-radius: 16px;
-    color: #fff;
+    background: transparent;
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    color: var(--accent);
     font-size: 1rem;
     font-weight: 800;
     letter-spacing: 0.05em;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 8px 24px rgba(162, 57, 202, 0.4);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     margin: 0 auto;
   }
   
   .replay-btn-new:hover {
+    background: rgba(162, 57, 202, 0.15);
+    border-color: rgba(162, 57, 202, 0.8);
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(162, 57, 202, 0.5);
   }
   
   .replay-btn-new:active {
-    transform: scale(0.95);
+    transform: scale(0.96);
   }
   
   .replay-icon {
@@ -353,11 +340,10 @@
   
   /* Leaderboard sidebar */
   .leaderboard-sidebar {
-    background: var(--panel);
-    border: 2px solid rgba(162, 57, 202, 0.15);
-    border-radius: 20px;
+    background: rgba(22, 22, 22, 0.6);
+    border: 2px solid rgba(162, 57, 202, 0.3);
+    border-radius: 16px;
     padding: 1.5rem;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     position: sticky;
     top: 2rem;
   }
@@ -400,21 +386,22 @@
     flex: 1;
     padding: 0.5rem 0.6rem;
     background: transparent;
-    border: 1px solid rgba(162, 57, 202, 0.3);
+    border: 2px solid rgba(162, 57, 202, 0.3);
     border-radius: 10px;
-    color: var(--text);
-    font-weight: 600;
+    color: rgba(231, 223, 221, 0.7);
+    font-weight: 700;
     font-size: 0.65rem;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.03em;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
     text-transform: uppercase;
   }
   
   .lb-tab-new:hover {
-    background: rgba(162, 57, 202, 0.1);
-    border-color: var(--accent);
+    background: rgba(162, 57, 202, 0.12);
+    border-color: rgba(162, 57, 202, 0.5);
+    color: rgba(231, 223, 221, 0.9);
   }
   
   .lb-tab-new.active {
@@ -437,19 +424,21 @@
     align-items: center;
     gap: 0.6rem;
     padding: 0.6rem;
-    background: var(--panelStrong);
+    background: rgba(22, 22, 22, 0.4);
+    border: 1px solid rgba(162, 57, 202, 0.2);
     border-radius: 10px;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .lb-item:hover {
-    background: rgba(162, 57, 202, 0.1);
-    transform: translateX(4px);
+    background: rgba(162, 57, 202, 0.12);
+    border-color: rgba(162, 57, 202, 0.4);
+    transform: translateX(2px);
   }
   
   .lb-item.top-three {
-    background: linear-gradient(90deg, rgba(162, 57, 202, 0.15), transparent);
-    border: 1px solid rgba(162, 57, 202, 0.3);
+    background: rgba(162, 57, 202, 0.15);
+    border: 2px solid rgba(162, 57, 202, 0.5);
   }
   
   .lb-position {
