@@ -54,27 +54,24 @@
     <div class="main-container">
       <!-- Center: Quiz cards -->
       <div class="quiz-cards-section">
-        <h1 class="main-title">УГАДАЙ АНИМЕ</h1>
+        <h1 class="main-title">otakuz.fun</h1>
         
         <div class="quiz-cards">
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessAnime'); activeView.set('guessAnime'); }}>
             <div class="card-content">
-              <h3 class="card-title">... со скриншотом</h3>
-              <p class="card-subtitle">Угадай аниме по случайным кадрам</p>
+              <h3 class="card-title">Угадай аниме по случайным кадрам</h3>
             </div>
           </button>
           
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessCharacter'); activeView.set('guessCharacter'); }}>
             <div class="card-content">
-              <h3 class="card-title">... персонажей</h3>
-              <p class="card-subtitle">Угадывай персонажей по портретам</p>
+              <h3 class="card-title">Угадывай персонажей по портретам</h3>
             </div>
           </button>
           
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessOpening'); activeView.set('guessOpening'); }}>
             <div class="card-content">
-              <h3 class="card-title">... с опенингом</h3>
-              <p class="card-subtitle">Угадай аниме по опенингу</p>
+              <h3 class="card-title">Угадай аниме по опенингу</h3>
             </div>
           </button>
         </div>
@@ -309,17 +306,11 @@
   }
   
   .card-title {
-    font-size: clamp(1.5rem, 3vw, 2rem);
-    font-weight: 800;
+    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+    font-weight: 700;
     color: var(--text);
-    margin-bottom: 0.75rem;
     letter-spacing: 0.01em;
-  }
-  
-  .card-subtitle {
-    font-size: clamp(0.9rem, 1.5vw, 1rem);
-    color: rgba(255, 255, 255, 0.7);
-    font-weight: 500;
+    line-height: 1.4;
   }
   
   .replay-btn-new {
@@ -379,10 +370,11 @@
   }
   
   .lb-title {
-    font-size: 1.25rem;
+    font-size: 1rem;
     font-weight: 800;
     color: var(--text);
     letter-spacing: 0.03em;
+    text-transform: uppercase;
   }
   
   .streak-badge {
@@ -406,17 +398,18 @@
   
   .lb-tab-new {
     flex: 1;
-    padding: 0.6rem 0.8rem;
+    padding: 0.5rem 0.6rem;
     background: transparent;
     border: 1px solid rgba(162, 57, 202, 0.3);
-    border-radius: 12px;
+    border-radius: 10px;
     color: var(--text);
-    font-weight: 700;
-    font-size: 0.75rem;
-    letter-spacing: 0.03em;
+    font-weight: 600;
+    font-size: 0.65rem;
+    letter-spacing: 0.02em;
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
+    text-transform: uppercase;
   }
   
   .lb-tab-new:hover {
@@ -440,12 +433,12 @@
   
   .lb-item {
     display: grid;
-    grid-template-columns: 40px 40px 1fr;
+    grid-template-columns: 32px 36px 1fr;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem;
+    gap: 0.6rem;
+    padding: 0.6rem;
     background: var(--panelStrong);
-    border-radius: 12px;
+    border-radius: 10px;
     transition: all 0.2s ease;
   }
   
@@ -460,8 +453,8 @@
   }
   
   .lb-position {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -469,7 +462,7 @@
     border-radius: 8px;
     font-weight: 800;
     color: var(--accent);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
   }
   
   .lb-item.top-three .lb-position {
@@ -478,8 +471,8 @@
   }
   
   .lb-avatar {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
   }
   
   .avatar-placeholder {
@@ -500,14 +493,14 @@
   .lb-username {
     font-weight: 700;
     color: var(--text);
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
   
   .lb-score {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--accent);
     font-weight: 600;
   }
