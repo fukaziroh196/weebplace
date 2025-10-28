@@ -193,15 +193,15 @@
   }
   
   .main-container {
-    display: grid;
-    grid-template-columns: auto 420px;
+    display: flex;
     gap: 2rem;
     align-items: start;
+    justify-content: center;
   }
   
   @media (max-width: 1200px) {
     .main-container {
-      grid-template-columns: 1fr;
+      flex-direction: column;
       gap: 2rem;
     }
   }
