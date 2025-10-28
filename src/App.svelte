@@ -31,6 +31,14 @@
 <svelte:window on:click={handleClickOutside} />
 
 <div class="app-container">
+  <!-- Верхняя бегущая строка -->
+  <div class="marquee-top">
+    <div class="marquee-content">
+      <span>WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • </span>
+      <span>WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • </span>
+    </div>
+  </div>
+
   <!-- Шапка -->
   <header class="app-header">
     <div class="header-content">
@@ -78,6 +86,14 @@
           ↑
         </button>
       {/if}
+    </div>
+  </div>
+  
+  <!-- Нижняя бегущая строка -->
+  <div class="marquee-bottom">
+    <div class="marquee-content">
+      <span>WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • </span>
+      <span>WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • </span>
     </div>
   </div>
 </div>
@@ -272,5 +288,49 @@
   .scroll-top-btn:hover {
     background: var(--accent2, #8B2FC9);
     transform: translateY(-2px);
+  }
+  
+  /* Бегущие строки */
+  .marquee-top,
+  .marquee-bottom {
+    width: 100%;
+    height: 24px;
+    background: var(--accent);
+    color: white;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    z-index: 200;
+  }
+  
+  .marquee-top {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .marquee-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .marquee-content {
+    display: flex;
+    white-space: nowrap;
+    animation: marquee 30s linear infinite;
+  }
+  
+  .marquee-content span {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 0 20px;
+    line-height: 24px;
+  }
+  
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
   }
 </style>
