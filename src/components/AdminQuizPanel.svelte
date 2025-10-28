@@ -504,8 +504,8 @@
 
   /* === ФОРМА ОПЕНИНГА === */
   .openings-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: 20px;
     margin-bottom: 20px;
   }
