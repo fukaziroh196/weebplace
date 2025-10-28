@@ -792,14 +792,9 @@
   
   .score-display {
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
-    padding: 12px 18px;
-    background: rgba(162, 57, 202, 0.15);
-    border: 2px solid var(--accent);
-    border-radius: 12px;
-    min-width: 120px;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
     position: absolute;
     right: 0;
     top: 0;
@@ -814,7 +809,7 @@
   }
   
   .score-label {
-    font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+    font-size: clamp(1rem, 2vw, 1.2rem);
     color: rgba(255, 255, 255, 0.6);
     text-transform: uppercase;
     letter-spacing: 0.1em;
