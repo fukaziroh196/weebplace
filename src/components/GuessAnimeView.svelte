@@ -89,6 +89,10 @@
   let currentImageIndex = 0;
   let showAnswer = false;
   
+  // Система подсказок (как на aniguessr)
+  let unlockedClues = []; // массив разблокированных подсказок для текущей картинки
+  let showTitle = false;
+  
   // Загрузка данных из API
   async function fetchAllGuesses(dateOverride) {
     loading = true;
@@ -286,14 +290,54 @@
         if (guess && userId && Array.isArray(guess.guessedBy) && !guess.guessedBy.includes(userId)) {
           guess.guessedBy.push(userId);
         }
-        alert('Правильно! 🎉');
-        userAnswer = '';
+        
+        // Переход к следующей картинке
+        if (currentImageIndex < animeGuesses.length - 1) {
+          setTimeout(() => {
+            currentImageIndex++;
+            userAnswer = '';
+            unlockedClues = [];
+            showTitle = false;
+          }, 800);
+        } else {
+          alert('🎉 Поздравляем! Вы отгадали все картинки сегодняшнего сета!');
+          userAnswer = '';
+        }
       } else {
-        alert('Неправильно! Попробуйте еще раз.');
+        alert('❌ Неправильно! Попробуйте еще раз.');
       }
     } catch (e) {
       alert('Ошибка проверки: ' + (e?.message || ''));
     }
+  }
+  
+  function unlockClue(clueIndex) {
+    if (!unlockedClues.includes(clueIndex)) {
+      unlockedClues = [...unlockedClues, clueIndex];
+    }
+  }
+  
+  function unlockTitleClue() {
+    showTitle = true;
+  }
+  
+  // Генерация подсказок на основе названия аниме
+  function getFirstClue(title) {
+    if (!title) return '';
+    const words = title.split(/\s+/);
+    return words[0] || '';
+  }
+  
+  function getSecondClue(title) {
+    if (!title) return '';
+    const len = title.length;
+    return title.substring(0, Math.ceil(len / 2));
+  }
+  
+  function getTitleClue(title) {
+    if (!title) return '';
+    // Маскируем каждую вторую букву
+    return title.split('').map((c, i) => i % 2 === 1 ? '_' : c).join('');
   }
   
   function showHint(guess) {
@@ -451,43 +495,84 @@
   {:else}
     <!-- Интерфейс для обычных пользователей -->
     {#if animeGuesses.length === 0}
-      <div class="bg-purple-900/70 backdrop-blur-md rounded-xl p-6 glass-frame text-center">
+      <div class="quiz-container text-center">
         <div class="text-white/80 text-lg">Пока нет картинок для угадывания 😔</div>
       </div>
     {:else}
-      <div class="bg-purple-900/70 backdrop-blur-md rounded-xl p-6 glass-frame">
-        <h2 class="text-2xl font-bold text-white mb-4">Отгадайте, из какого это аниме?</h2>
-        <!-- Дата выбранного сета управляется на экране AniQuiz -->
-        
-        <!-- Выбор картинки для отгадывания -->
-        <div class="mb-4">
-          <label class="block text-white/90 mb-2">Выберите картинку:</label>
-          <div class="grid grid-cols-4 gap-2">
-            {#each animeGuesses as guess, idx}
-              <button
-                on:click={() => { currentImageIndex = idx; userAnswer = ''; }}
-                class="relative aspect-[3/4] rounded-lg overflow-hidden bg-white/5 border-2 transition {idx === currentImageIndex ? 'border-pink-500' : 'border-white/20'}"
-              >
-                <img 
-                  src={guess.image} 
-                  alt={guess.title}
-                  class="w-full h-full object-cover rounded-lg"
-                />
-                <div class="absolute top-2 left-2 bg-black/60 text-white px-2 py-0.5 rounded text-xs">
-                  {idx + 1}
-                </div>
-              </button>
-            {/each}
+      <div class="quiz-container">
+        <!-- Заголовок с раундом -->
+        <div class="quiz-header">
+          <h1 class="quiz-title">GUESS THE ANIME</h1>
+          <div class="round-badge">
+            <span class="round-text">Round {currentImageIndex + 1}</span>
+            <span class="difficulty-badge">Easy</span>
           </div>
         </div>
         
-        <div class="relative mb-4" use:clickOutside={{ enabled: showUserSuggestions, callback: () => showUserSuggestions = false }}>
+        <!-- Большая картинка по центру -->
+        <div class="image-container">
+          <img 
+            src={animeGuesses[currentImageIndex].image} 
+            alt="Guess the anime"
+            class="quiz-image"
+          />
+        </div>
+        
+        <!-- Кнопки разблокировки подсказок -->
+        <div class="clues-container">
+          <button 
+            class="clue-btn {unlockedClues.includes(0) ? 'unlocked' : 'locked'}"
+            on:click={() => unlockClue(0)}
+            disabled={unlockedClues.includes(0)}
+          >
+            <span class="clue-icon">🔒</span>
+            <span class="clue-text">
+              {#if unlockedClues.includes(0)}
+                {getFirstClue(animeGuesses[currentImageIndex].title)}
+              {:else}
+                UNLOCK FIRST CLUE
+              {/if}
+            </span>
+          </button>
+          
+          <button 
+            class="clue-btn {unlockedClues.includes(1) ? 'unlocked' : 'locked'}"
+            on:click={() => unlockClue(1)}
+            disabled={unlockedClues.includes(1)}
+          >
+            <span class="clue-icon">🔒</span>
+            <span class="clue-text">
+              {#if unlockedClues.includes(1)}
+                {getSecondClue(animeGuesses[currentImageIndex].title)}
+              {:else}
+                UNLOCK SECOND CLUE
+              {/if}
+            </span>
+          </button>
+          
+          <button 
+            class="clue-btn {showTitle ? 'unlocked' : 'locked'}"
+            on:click={unlockTitleClue}
+            disabled={showTitle}
+          >
+            <span class="clue-icon">🔒</span>
+            <span class="clue-text">
+              {#if showTitle}
+                {getTitleClue(animeGuesses[currentImageIndex].title)}
+              {:else}
+                UNLOCK TITLE CLUE
+              {/if}
+            </span>
+          </button>
+        </div>
+        
+        <!-- Поле ввода ответа -->
+        <div class="answer-container" use:clickOutside={{ enabled: showUserSuggestions, callback: () => showUserSuggestions = false }}>
           <input 
             type="text" 
-            id="userGuess"
             bind:value={userAnswer}
-            placeholder="Введите название аниме для картинки #{currentImageIndex + 1}..."
-            class="w-full px-4 py-3 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-pink-500"
+            placeholder="Type your answer here"
+            class="answer-input"
             on:input={onUserAnswerInput}
             on:keydown={(e) => { 
               if (e.key === 'Enter') {
@@ -499,22 +584,28 @@
             autocomplete="off"
           />
           
+          <button 
+            on:click={checkAnswer}
+            class="guess-btn"
+          >
+            GUESS
+          </button>
+          
           {#if showUserSuggestions && userSuggestions.length > 0}
-            <div class="absolute left-0 right-0 mt-2 rounded-xl overflow-hidden z-20 menu-surface" style="max-height: 300px; overflow-y: auto;">
+            <div class="suggestions-dropdown">
               {#each userSuggestions as s}
-                <div class="px-3 py-2 cursor-pointer flex items-center gap-2 menu-item hover:bg-white/10"
-                     on:click={() => selectUserAnswer(s)}>
+                <div class="suggestion-item" on:click={() => selectUserAnswer(s)}>
                   {#if s.image}
-                    <img src={s.image} alt="" class="w-10 h-10 rounded object-cover" />
+                    <img src={s.image} alt="" class="suggestion-image" />
                   {/if}
-                  <div class="flex-1">
-                    <div class="text-white truncate">{s.title}</div>
+                  <div class="suggestion-content">
+                    <div class="suggestion-title">{s.title}</div>
                     {#if s.russian && s.russian !== s.title}
-                      <div class="text-white/60 text-xs truncate">{s.russian}</div>
+                      <div class="suggestion-subtitle">{s.russian}</div>
                     {/if}
                   </div>
                   {#if s.score}
-                    <span class="ml-auto text-sm text-white/90">★ {s.score}</span>
+                    <span class="suggestion-score">★ {s.score}</span>
                   {/if}
                 </div>
               {/each}
@@ -522,21 +613,14 @@
           {/if}
         </div>
         
-        <div class="flex gap-2">
-          <button 
-            on:click={checkAnswer}
-            class="flex-1 bg-pink-700 hover:bg-pink-600 text-white px-6 py-3 rounded-lg font-semibold transition"
-          >
-            Проверить ответ
-          </button>
-          {#if animeGuesses[currentImageIndex]}
-          <button 
-            on:click={() => showHint(animeGuesses[currentImageIndex])}
-            class="bg-yellow-600 hover:bg-yellow-500 text-black px-6 py-3 rounded-lg font-semibold transition"
-          >
-            Подсказка для #{currentImageIndex + 1}
-          </button>
-          {/if}
+        <!-- Прогресс -->
+        <div class="progress-container">
+          <div class="progress-dots">
+            {#each animeGuesses as _, idx}
+              <div class="progress-dot {idx < currentImageIndex ? 'completed' : idx === currentImageIndex ? 'active' : ''}"></div>
+            {/each}
+          </div>
+          <div class="progress-text">{currentImageIndex + 1} / {animeGuesses.length}</div>
         </div>
       </div>
     {/if}
@@ -560,5 +644,267 @@
   
   .menu-item:hover {
     background: rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Quiz Interface Styles (aniguessr-like) */
+  .quiz-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .quiz-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .quiz-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: white;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+    text-shadow: 0 0 20px rgba(162, 57, 202, 0.5);
+  }
+  
+  .round-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .round-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+  }
+  
+  .difficulty-badge {
+    background: #FF1744;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+  
+  .image-container {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto 30px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  }
+  
+  .quiz-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    min-height: 400px;
+    object-fit: cover;
+  }
+  
+  .clues-container {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+  }
+  
+  .clue-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.875rem;
+    transition: all 0.3s;
+    cursor: pointer;
+    border: 2px solid;
+  }
+  
+  .clue-btn.locked {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .clue-btn.locked:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(162, 57, 202, 0.5);
+    transform: translateY(-2px);
+  }
+  
+  .clue-btn.unlocked {
+    background: rgba(162, 57, 202, 0.2);
+    border-color: #A239CA;
+    color: white;
+  }
+  
+  .clue-btn:disabled {
+    cursor: default;
+  }
+  
+  .clue-icon {
+    font-size: 1rem;
+  }
+  
+  .clue-text {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .answer-container {
+    position: relative;
+    max-width: 720px;
+    margin: 0 auto 30px;
+    display: flex;
+    gap: 10px;
+  }
+  
+  .answer-input {
+    flex: 1;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s;
+  }
+  
+  .answer-input:focus {
+    outline: none;
+    border-color: #A239CA;
+    background: rgba(255, 255, 255, 0.08);
+  }
+  
+  .answer-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+  
+  .guess-btn {
+    padding: 16px 40px;
+    background: #FF1068;
+    color: white;
+    font-weight: 900;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    letter-spacing: 1px;
+  }
+  
+  .guess-btn:hover {
+    background: #FF1744;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 16, 104, 0.4);
+  }
+  
+  .guess-btn:active {
+    transform: translateY(0);
+  }
+  
+  .suggestions-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 120px;
+    margin-top: 8px;
+    background: rgba(30, 30, 40, 0.98);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 50;
+  }
+  
+  .suggestion-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .suggestion-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .suggestion-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+  
+  .suggestion-content {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .suggestion-title {
+    color: white;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .suggestion-subtitle {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .suggestion-score {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.875rem;
+  }
+  
+  .progress-container {
+    text-align: center;
+  }
+  
+  .progress-dots {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+  
+  .progress-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: all 0.3s;
+  }
+  
+  .progress-dot.completed {
+    background: #A239CA;
+    box-shadow: 0 0 10px rgba(162, 57, 202, 0.5);
+  }
+  
+  .progress-dot.active {
+    background: #FF1068;
+    box-shadow: 0 0 10px rgba(255, 16, 104, 0.5);
+    transform: scale(1.3);
+  }
+  
+  .progress-text {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+    font-size: 0.875rem;
   }
 </style>
