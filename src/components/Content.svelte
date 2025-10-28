@@ -12,8 +12,8 @@
   import GuessOpeningView from './GuessOpeningView.svelte';
   import AdminQuizPanel from './AdminQuizPanel.svelte';
   import { availableQuizDates, refreshQuizDates } from '../stores/quizzes';
-  import { leaderboard as leaderboardApi } from '../lib/api';
   import { userStats, loadUserStats } from '../stores/stats';
+  import { leaderboard, leaderboardPeriod, refreshLeaderboard } from '../stores/leaderboard';
   import ReplayDatesModal from './ReplayDatesModal.svelte';
 
   // Quizzes-first app: remove anime viewing and banners; home shows quiz menu.
@@ -30,26 +30,9 @@
     { title: "Сериал 3", rating: "9.3", year: "2023" }
   ];
   
-  let lbPeriod = 'all'; // 'all' | 'week' | 'day'
-  async function loadLeaderboard() {
-    try {
-      const top = await leaderboardApi.list(20, lbPeriod);
-      if (Array.isArray(top) && top.length) {
-        lb = top.map((r) => ({ 
-          name: r.username, 
-          days: r.score ?? r.days ?? r.guesses ?? 0, 
-          metric: r.metric || (lbPeriod === 'day' ? 'guesses' : 'days'), 
-          rank: r.rank || 0, 
-          highlight: r.rank <= 3 
-        }));
-      }
-    } catch (e) { 
-      console.error('[loadLeaderboard] Error:', e);
-    }
-  }
   onMount(async () => {
     refreshQuizDates();
-    await loadLeaderboard();
+    await refreshLeaderboard($leaderboardPeriod);
     loadUserStats();
   });
   let showReplay = false;
@@ -62,7 +45,6 @@
     console.log('[Content] Closing replay modal');
     showReplay = false;
   }
-  let lb = [];
   
   // No-op mounts for quizzes home
 </script>
@@ -107,12 +89,12 @@
             {/if}
           </div>
           <div class="lb-tabs">
-            <button class="lb-tab {lbPeriod==='day'?'active':''}" on:click={() => { lbPeriod='day'; loadLeaderboard(); }}>Сегодня</button>
-            <button class="lb-tab {lbPeriod==='week'?'active':''}" on:click={() => { lbPeriod='week'; loadLeaderboard(); }}>Неделя</button>
-            <button class="lb-tab {lbPeriod==='all'?'active':''}" on:click={() => { lbPeriod='all'; loadLeaderboard(); }}>Всё время</button>
+            <button class="lb-tab {$leaderboardPeriod==='day'?'active':''}" on:click={() => { leaderboardPeriod.set('day'); refreshLeaderboard('day'); }}>Сегодня</button>
+            <button class="lb-tab {$leaderboardPeriod==='week'?'active':''}" on:click={() => { leaderboardPeriod.set('week'); refreshLeaderboard('week'); }}>Неделя</button>
+            <button class="lb-tab {$leaderboardPeriod==='all'?'active':''}" on:click={() => { leaderboardPeriod.set('all'); refreshLeaderboard('all'); }}>Всё время</button>
           </div>
           <div class="lb">
-            {#each lb as r}
+            {#each $leaderboard as r}
               <div class="lb-row {r.highlight ? 'lb-row--hot' : ''}">
                 <div class="lb-rank">{r.rank}</div>
                 <div class="lb-name">{r.name}</div>

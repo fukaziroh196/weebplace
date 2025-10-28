@@ -5,6 +5,7 @@
   import { clickOutside } from '../lib/clickOutside';
   import { animeGuesses as apiGuesses, getBatchSampleZipUrl } from '../lib/api';
   import { quizDate, availableQuizDates, refreshQuizDates, setQuizDate } from '../stores/quizzes';
+  import { refreshLeaderboard, leaderboardPeriod } from '../stores/leaderboard';
   
   // Данные об угадываемых аниме
   let animeGuesses = [];
@@ -361,11 +362,16 @@
           }, 800);
         } else {
           // Все раунды пройдены - показываем финальные результаты
-          setTimeout(() => {
+          setTimeout(async () => {
             userAnswer = '';
             answerFeedback = '';
             isChecking = false;
             showFinalResults = true;
+            
+            // Обновить лидерборд после завершения квиза
+            let period;
+            leaderboardPeriod.subscribe(v => period = v)();
+            await refreshLeaderboard(period || 'all');
           }, 800);
         }
       } else {
@@ -390,11 +396,16 @@
           }, 800);
         } else {
           // Все раунды пройдены - показываем финальные результаты
-          setTimeout(() => {
+          setTimeout(async () => {
             userAnswer = '';
             answerFeedback = '';
             isChecking = false;
             showFinalResults = true;
+            
+            // Обновить лидерборд после завершения квиза
+            let period;
+            leaderboardPeriod.subscribe(v => period = v)();
+            await refreshLeaderboard(period || 'all');
           }, 800);
         }
       }
