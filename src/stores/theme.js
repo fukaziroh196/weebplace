@@ -1,38 +1,23 @@
 import { writable } from 'svelte/store';
 
-function applyToBody(mode) {
+function applyToBody() {
   try {
     const body = document.body;
-    body.classList.remove('theme-dark', 'theme-light');
-    body.classList.add(mode === 'light' ? 'theme-light' : 'theme-dark');
+    body.classList.remove('theme-light');
+    body.classList.add('theme-dark');
   } catch (_) {}
 }
 
-const initial = (() => {
-  try {
-    return localStorage.getItem('theme') || 'light';
-  } catch (_) {
-    return 'light';
-  }
-})();
+// Always dark theme
+export const theme = writable('dark');
+applyToBody();
 
-export const theme = writable(initial);
-applyToBody(initial);
-
-theme.subscribe((m) => {
-  try { localStorage.setItem('theme', m); } catch (_) {}
-  applyToBody(m);
-});
-
-export function setTheme(mode) {
-  theme.set(mode === 'light' ? 'light' : 'dark');
+export function setTheme() {
+  // Always dark
 }
 
 export function toggleTheme() {
-  let current;
-  const unsub = theme.subscribe((v) => (current = v));
-  unsub();
-  theme.set(current === 'light' ? 'dark' : 'light');
+  // Always dark
 }
 
 

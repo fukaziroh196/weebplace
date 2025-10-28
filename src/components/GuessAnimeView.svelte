@@ -580,17 +580,18 @@
       </div>
     {:else}
       <div class="quiz-container">
-        <!-- Заголовок с раундом -->
+        <!-- Заголовок с раундом и очками -->
         <div class="quiz-header">
           <div class="header-left">
             <h1 class="quiz-title">УГАДАЙ АНИМЕ</h1>
-            <div class="score-display-inline">
-              <span class="score-value">{totalScore.toLocaleString()}</span> очков
+            <div class="round-badge">
+              <span class="round-text">Раунд {currentImageIndex + 1}</span>
+              <span class="difficulty-badge">Легко</span>
             </div>
           </div>
-          <div class="round-badge">
-            <span class="round-text">Раунд {currentImageIndex + 1}</span>
-            <span class="difficulty-badge">Легко</span>
+          <div class="score-display">
+            <span class="score-value">{totalScore.toLocaleString()}</span>
+            <span class="score-label">очков</span>
           </div>
         </div>
         
@@ -743,18 +744,16 @@
   
   .quiz-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     margin-bottom: 15px;
-    flex-wrap: wrap;
     gap: 15px;
   }
   
   .header-left {
     display: flex;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 10px;
   }
   
   .quiz-title {
@@ -764,12 +763,6 @@
     letter-spacing: 2px;
     margin: 0;
     text-shadow: 0 0 20px rgba(162, 57, 202, 0.5);
-  }
-  
-  .score-display-inline {
-    font-size: clamp(1rem, 3vw, 1.5rem);
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.8);
   }
   
   .round-badge {
@@ -794,10 +787,31 @@
     font-weight: 700;
   }
   
+  .score-display {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    padding: 12px 18px;
+    background: rgba(162, 57, 202, 0.15);
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    min-width: 120px;
+  }
+  
   .score-value {
-    color: #FFD700;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
     font-weight: 900;
+    color: #FFD700;
+    line-height: 1;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  }
+  
+  .score-label {
+    font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
   }
   
   .image-container {
