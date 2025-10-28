@@ -733,19 +733,18 @@
 {#if showFinalResults}
   <div class="final-results-overlay" on:click={() => showFinalResults = false}>
     <div class="final-results-modal" on:click|stopPropagation>
-      <h2 class="final-title">Final Score</h2>
+      <h2 class="final-title">Финальный счёт</h2>
       
       <div class="final-score-box">
         <div class="final-score-value">{totalScore.toLocaleString()}</div>
-        <div class="community-average">Community average score: 9,610</div>
       </div>
       
       <div class="rounds-breakdown">
         {#each animeGuesses as guess, idx}
           <div class="round-item">
             <div class="round-header">
-              <span class="round-label">Round {idx + 1}</span>
-              <span class="round-points">{roundScores[idx]?.toLocaleString() || 0} pts</span>
+              <span class="round-label">Раунд {idx + 1}</span>
+              <span class="round-points">{roundScores[idx]?.toLocaleString() || 0} очков</span>
             </div>
             <div class="round-content">
               <img src={guess.image} alt={guess.title} class="round-thumb" />
@@ -1160,11 +1159,11 @@
   .final-results-modal {
     background: #1a1a1a;
     border-radius: 16px;
-    max-width: 800px;
+    max-width: 600px;
     width: 100%;
-    max-height: 90vh;
+    max-height: 85vh;
     overflow-y: auto;
-    padding: 32px;
+    padding: 24px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     animation: slideUp 0.4s;
   }
@@ -1182,47 +1181,40 @@
   
   .final-title {
     text-align: center;
-    font-size: clamp(2rem, 5vw, 3rem);
+    font-size: clamp(1.5rem, 4vw, 2rem);
     font-weight: 900;
     color: white;
-    margin: 0 0 24px 0;
+    margin: 0 0 16px 0;
     letter-spacing: 1px;
   }
   
   .final-score-box {
     background: linear-gradient(135deg, #ff6b9d 0%, #c06c84 100%);
     border-radius: 12px;
-    padding: 24px;
+    padding: 20px;
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
   }
   
   .final-score-value {
-    font-size: clamp(3rem, 8vw, 5rem);
+    font-size: clamp(2.5rem, 6vw, 4rem);
     font-weight: 900;
     color: white;
     line-height: 1;
-    margin-bottom: 8px;
-  }
-  
-  .community-average {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: clamp(0.9rem, 2vw, 1.1rem);
-    font-weight: 600;
   }
   
   .rounds-breakdown {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    margin-bottom: 24px;
+    gap: 10px;
+    margin-bottom: 16px;
   }
   
   .round-item {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 16px;
+    border-radius: 8px;
+    padding: 12px;
     transition: background 0.2s;
   }
   
@@ -1234,32 +1226,32 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
   
   .round-label {
     color: #ff6b9d;
     font-weight: 700;
-    font-size: clamp(0.9rem, 2vw, 1rem);
+    font-size: clamp(0.85rem, 1.8vw, 0.95rem);
   }
   
   .round-points {
     color: white;
     font-weight: 700;
-    font-size: clamp(0.9rem, 2vw, 1rem);
+    font-size: clamp(0.85rem, 1.8vw, 0.95rem);
   }
   
   .round-content {
     display: flex;
-    gap: 16px;
+    gap: 12px;
     align-items: center;
   }
   
   .round-thumb {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     object-fit: cover;
-    border-radius: 8px;
+    border-radius: 6px;
     flex-shrink: 0;
   }
   
@@ -1270,20 +1262,25 @@
   
   .round-anime-title {
     color: white;
-    font-weight: 700;
-    font-size: clamp(0.95rem, 2.2vw, 1.1rem);
-    margin-bottom: 4px;
+    font-weight: 600;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
   
   .close-results-btn {
     width: 100%;
-    padding: 16px;
+    padding: 14px;
     background: var(--accent, #A239CA);
     color: white;
     font-weight: 900;
-    font-size: 1.1rem;
+    font-size: 1rem;
     border: none;
-    border-radius: 12px;
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s;
     text-transform: uppercase;
@@ -1302,12 +1299,45 @@
   
   @media (max-width: 768px) {
     .final-results-modal {
-      padding: 24px 16px;
+      padding: 20px 16px;
+      max-height: 90vh;
+    }
+    
+    .final-title {
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+    }
+    
+    .final-score-box {
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    
+    .final-score-value {
+      font-size: 2.5rem;
+    }
+    
+    .rounds-breakdown {
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    
+    .round-item {
+      padding: 10px;
     }
     
     .round-thumb {
-      width: 60px;
-      height: 60px;
+      width: 50px;
+      height: 50px;
+    }
+    
+    .round-anime-title {
+      font-size: 0.85rem;
+    }
+    
+    .close-results-btn {
+      padding: 12px;
+      font-size: 0.9rem;
     }
   }
 </style>
