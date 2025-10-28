@@ -10,6 +10,7 @@
   import GuessAnimeView from './GuessAnimeView.svelte';
   import GuessCharacterView from './GuessCharacterView.svelte';
   import GuessOpeningView from './GuessOpeningView.svelte';
+  import AdminQuizPanel from './AdminQuizPanel.svelte';
   import { availableQuizDates, refreshQuizDates } from '../stores/quizzes';
   import { leaderboard as leaderboardApi } from '../lib/api';
   import { userStats, loadUserStats } from '../stores/stats';
@@ -173,6 +174,8 @@
   <GuessCharacterView />
   {:else if $activeView === 'guessOpening'}
   <GuessOpeningView />
+  {:else if $activeView === 'adminQuiz'}
+  <AdminQuizPanel />
   {/if}
   <ReplayDatesModal onClose={closeReplay} bind:open={showReplay} />
 </div>

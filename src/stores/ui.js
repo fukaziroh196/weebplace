@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 
-// Possible values: 'home' | 'search' | 'details' | 'profile' | 'admin' | 'lists' | 'messages' | 'catalog' | 'aniquiz' | 'guessAnime' | 'guessCharacter' | 'guessOpening'
+// Possible values: 'home' | 'search' | 'details' | 'profile' | 'admin' | 'lists' | 'messages' | 'catalog' | 'aniquiz' | 'guessAnime' | 'guessCharacter' | 'guessOpening' | 'adminQuiz'
 export const activeView = writable('home');
 export const detailsItem = writable(null); // { id, __sourceId, title?, image?, description? }
 export const sidebarCollapsed = writable(false);
@@ -57,6 +57,10 @@ export function goToGuessCharacter() {
 
 export function goToGuessOpening() {
   activeView.set('guessOpening');
+}
+
+export function goToAdminQuiz() {
+  activeView.set('adminQuiz');
 }
 
 

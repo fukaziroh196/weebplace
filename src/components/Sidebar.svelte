@@ -1,5 +1,6 @@
 <script>
-  import { activeView, goHome, goToCatalog, goToAniQuiz, goToLists, sidebarCollapsed, toggleSidebar } from '../stores/ui';
+  import { activeView, goHome, goToCatalog, goToAniQuiz, goToLists, goToAdminQuiz, sidebarCollapsed, toggleSidebar } from '../stores/ui';
+  import { currentUser } from '../stores/authApi';
 
   function isActive(view) {
     let v;
@@ -7,6 +8,8 @@
     unsub();
     return v === view;
   }
+
+  $: isAdmin = $currentUser?.role === 'admin' || $currentUser?.is_admin === 1 || $currentUser?.isAdmin === true;
 </script>
 
 <div class="sidebar flex flex-col h-full gap-3 text-white text-[15px] font-medium pt-1 overflow-hidden"
@@ -48,6 +51,16 @@
     </span>
     {#if !$sidebarCollapsed}<span>Мои списки</span>{/if}
   </button>
+
+  {#if isAdmin}
+    <div class="pt-2 border-t border-white/20"></div>
+    <button class="nav-item {isActive('adminQuiz') ? 'is-active' : ''}" style="justify-content:{ $sidebarCollapsed ? 'center' : 'flex-start' }" on:click={goToAdminQuiz}>
+      <span class="icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+      </span>
+      {#if !$sidebarCollapsed}<span>Админ панель</span>{/if}
+    </button>
+  {/if}
 
   <div class="mt-auto"></div>
 </div>
