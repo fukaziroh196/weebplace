@@ -67,6 +67,7 @@
 
   // === Загрузка опенинга ===
   let newOpening = {
+    title: '',
     youtubeUrl: '',
     startTime: 0,
     endTime: 20
@@ -79,6 +80,11 @@
     
     if (!adminUploadDate) {
       openingUploadError = 'Выберите дату сета';
+      return;
+    }
+    
+    if (!newOpening.title.trim()) {
+      openingUploadError = 'Введите название аниме';
       return;
     }
     
@@ -99,6 +105,7 @@
         },
         body: JSON.stringify({
           quizDate: adminUploadDate,
+          title: newOpening.title.trim(),
           youtubeUrl: newOpening.youtubeUrl.trim(),
           startTime: newOpening.startTime || 0,
           endTime: newOpening.endTime || 20
@@ -113,7 +120,7 @@
       console.log('[submitOpening] Success:', result);
       
       // Очистить форму
-      newOpening = { youtubeUrl: '', startTime: 0, endTime: 20 };
+      newOpening = { title: '', youtubeUrl: '', startTime: 0, endTime: 20 };
       
       alert(`✓ Опенинг успешно добавлен на дату ${adminUploadDate}!`);
     } catch (e) {
@@ -219,6 +226,16 @@
       
       <div class="opening-form">
         <div class="form-group">
+          <label>Название аниме (правильный ответ):</label>
+          <input 
+            type="text" 
+            bind:value={newOpening.title}
+            placeholder="Например: Attack on Titan"
+            class="form-input"
+          />
+        </div>
+        
+        <div class="form-group">
           <label>Ссылка на YouTube:</label>
           <input 
             type="text" 
@@ -257,7 +274,7 @@
         <button 
           class="submit-btn"
           on:click={submitOpening}
-          disabled={!newOpening.youtubeUrl.trim() || openingUploading}
+          disabled={!newOpening.title.trim() || !newOpening.youtubeUrl.trim() || openingUploading}
         >
           {openingUploading ? '⏳ Загрузка...' : '✓ Загрузить опенинг'}
         </button>

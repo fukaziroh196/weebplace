@@ -35,9 +35,17 @@
     try {
       const top = await leaderboardApi.list(20, lbPeriod);
       if (Array.isArray(top) && top.length) {
-        lb = top.map((r) => ({ name: r.username, days: r.days ?? r.guesses, metric: r.metric || (lbPeriod === 'day' ? 'guesses' : 'days'), rank: r.rank || 0, highlight: r.rank <= 3 }));
+        lb = top.map((r) => ({ 
+          name: r.username, 
+          days: r.score ?? r.days ?? r.guesses ?? 0, 
+          metric: r.metric || (lbPeriod === 'day' ? 'guesses' : 'days'), 
+          rank: r.rank || 0, 
+          highlight: r.rank <= 3 
+        }));
       }
-    } catch (_) { /* keep placeholder */ }
+    } catch (e) { 
+      console.error('[loadLeaderboard] Error:', e);
+    }
   }
   onMount(async () => {
     refreshQuizDates();

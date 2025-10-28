@@ -98,6 +98,7 @@ db.serialize(() => {
   // Таблица для опенингов
   db.run(`CREATE TABLE IF NOT EXISTS openings (
     id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
     youtube_url TEXT NOT NULL,
     start_time INTEGER DEFAULT 0,
     end_time INTEGER DEFAULT 20,
@@ -815,7 +816,7 @@ app.get('/api/library', authenticateToken, (req, res) => {
 app.get('/api/openings', (req, res) => {
   const { date } = req.query;
   
-  let query = 'SELECT id, youtube_url, start_time, end_time, quiz_date, created_at FROM openings';
+  let query = 'SELECT id, title, youtube_url, start_time, end_time, quiz_date, created_at FROM openings';
   let params = [];
   
   if (date) {
@@ -836,10 +837,10 @@ app.get('/api/openings', (req, res) => {
 
 // POST /api/openings - Добавить опенинг (только для админа)
 app.post('/api/openings', authenticateToken, requireAdmin, (req, res) => {
-  const { quizDate, youtubeUrl, startTime, endTime } = req.body;
+  const { quizDate, title, youtubeUrl, startTime, endTime } = req.body;
 
-  if (!quizDate || !youtubeUrl) {
-    return res.status(400).json({ error: 'Quiz date and YouTube URL are required' });
+  if (!quizDate || !title || !youtubeUrl) {
+    return res.status(400).json({ error: 'Quiz date, title and YouTube URL are required' });
   }
 
   if (!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(quizDate)) {
@@ -856,8 +857,8 @@ app.post('/api/openings', authenticateToken, requireAdmin, (req, res) => {
     }
 
     db.run(
-      'INSERT INTO openings (id, youtube_url, start_time, end_time, quiz_date, created_at, created_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [id, youtubeUrl, startTime || 0, endTime || 20, quizDate, createdAt, req.user.id],
+      'INSERT INTO openings (id, title, youtube_url, start_time, end_time, quiz_date, created_at, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [id, title, youtubeUrl, startTime || 0, endTime || 20, quizDate, createdAt, req.user.id],
       function (err) {
         if (err) {
           console.error('[POST /api/openings] Error:', err);
@@ -868,6 +869,7 @@ app.post('/api/openings', authenticateToken, requireAdmin, (req, res) => {
           success: true,
           opening: {
             id,
+            title,
             youtube_url: youtubeUrl,
             start_time: startTime || 0,
             end_time: endTime || 20,
