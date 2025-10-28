@@ -875,48 +875,37 @@ app.post('/api/openings', authenticateToken, requireAdmin, (req, res) => {
   const createdAt = Date.now();
   const userId = req.user?.id || null;
 
-  console.log('[POST /api/openings] Attempting to delete old opening for date:', quizDate);
-  
-  // Удалить старый опенинг для этой даты (только один опенинг на день)
-  db.run('DELETE FROM openings WHERE quiz_date = ?', [quizDate], (delErr) => {
-    if (delErr) {
-      console.error('[POST /api/openings] DELETE error:', delErr);
-    } else {
-      console.log('[POST /api/openings] Old opening deleted (if existed)');
-    }
-
-    console.log('[POST /api/openings] Inserting new opening:', {
-      id, title, youtubeUrl, startTime, endTime, quizDate, userId
-    });
-
-    db.run(
-      'INSERT INTO openings (id, title, youtube_url, start_time, end_time, quiz_date, created_at, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [id, title, youtubeUrl, startTime || 0, endTime || 20, quizDate, createdAt, userId],
-      function (err) {
-        if (err) {
-          console.error('[POST /api/openings] INSERT Error:', err);
-          console.error('[POST /api/openings] Error message:', err.message);
-          console.error('[POST /api/openings] Error stack:', err.stack);
-          return res.status(500).json({ error: err.message || 'Database error' });
-        }
-
-        console.log('[POST /api/openings] Success! Opening created with ID:', id);
-        
-        res.json({
-          success: true,
-          opening: {
-            id,
-            title,
-            youtube_url: youtubeUrl,
-            start_time: startTime || 0,
-            end_time: endTime || 20,
-            quiz_date: quizDate,
-            created_at: createdAt
-          }
-        });
-      }
-    );
+  console.log('[POST /api/openings] Inserting new opening:', {
+    id, title, youtubeUrl, startTime, endTime, quizDate, userId
   });
+
+  db.run(
+    'INSERT INTO openings (id, title, youtube_url, start_time, end_time, quiz_date, created_at, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+    [id, title, youtubeUrl, startTime || 0, endTime || 20, quizDate, createdAt, userId],
+    function (err) {
+      if (err) {
+        console.error('[POST /api/openings] INSERT Error:', err);
+        console.error('[POST /api/openings] Error message:', err.message);
+        console.error('[POST /api/openings] Error stack:', err.stack);
+        return res.status(500).json({ error: err.message || 'Database error' });
+      }
+
+      console.log('[POST /api/openings] Success! Opening created with ID:', id);
+      
+      res.json({
+        success: true,
+        opening: {
+          id,
+          title,
+          youtube_url: youtubeUrl,
+          start_time: startTime || 0,
+          end_time: endTime || 20,
+          quiz_date: quizDate,
+          created_at: createdAt
+        }
+      });
+    }
+  );
 });
 
 // DELETE /api/openings/:id - Удалить опенинг (только для админа)
