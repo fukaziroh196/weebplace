@@ -840,34 +840,52 @@ app.get('/api/openings', (req, res) => {
 
 // POST /api/openings - Добавить опенинг (только для админа)
 app.post('/api/openings', authenticateToken, requireAdmin, (req, res) => {
+  console.log('[POST /api/openings] Request body:', req.body);
+  console.log('[POST /api/openings] User:', req.user);
+  
   const { quizDate, title, youtubeUrl, startTime, endTime } = req.body;
 
   if (!quizDate || !title || !youtubeUrl) {
+    console.error('[POST /api/openings] Missing required fields');
     return res.status(400).json({ error: 'Quiz date, title and YouTube URL are required' });
   }
 
   if (!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(quizDate)) {
+    console.error('[POST /api/openings] Invalid date format:', quizDate);
     return res.status(400).json({ error: 'Invalid date format (YYYY-MM-DD required)' });
   }
 
   const id = Date.now().toString() + Math.random().toString(36).substring(7);
   const createdAt = Date.now();
+  const userId = req.user?.id || null;
 
+  console.log('[POST /api/openings] Attempting to delete old opening for date:', quizDate);
+  
   // Удалить старый опенинг для этой даты (только один опенинг на день)
   db.run('DELETE FROM openings WHERE quiz_date = ?', [quizDate], (delErr) => {
     if (delErr) {
       console.error('[POST /api/openings] DELETE error:', delErr);
+    } else {
+      console.log('[POST /api/openings] Old opening deleted (if existed)');
     }
+
+    console.log('[POST /api/openings] Inserting new opening:', {
+      id, title, youtubeUrl, startTime, endTime, quizDate, userId
+    });
 
     db.run(
       'INSERT INTO openings (id, title, youtube_url, start_time, end_time, quiz_date, created_at, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [id, title, youtubeUrl, startTime || 0, endTime || 20, quizDate, createdAt, req.user.id],
+      [id, title, youtubeUrl, startTime || 0, endTime || 20, quizDate, createdAt, userId],
       function (err) {
         if (err) {
-          console.error('[POST /api/openings] Error:', err);
-          return res.status(500).json({ error: err.message });
+          console.error('[POST /api/openings] INSERT Error:', err);
+          console.error('[POST /api/openings] Error message:', err.message);
+          console.error('[POST /api/openings] Error stack:', err.stack);
+          return res.status(500).json({ error: err.message || 'Database error' });
         }
 
+        console.log('[POST /api/openings] Success! Opening created with ID:', id);
+        
         res.json({
           success: true,
           opening: {
