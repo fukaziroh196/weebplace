@@ -2,18 +2,44 @@
   import Sidebar from './components/Sidebar.svelte';
   import Content from './components/Content.svelte';
   import UserMenu from './components/UserMenu.svelte';
+  import { currentUser } from './stores/authApi';
   
   let showTop = false;
   let scrollEl;
+  let showProfileMenu = false;
+  
+  function toggleProfileMenu() {
+    showProfileMenu = !showProfileMenu;
+  }
+  
+  function closeProfileMenu() {
+    showProfileMenu = false;
+  }
 </script>
 
 <div class="app-container">
   <!-- Шапка -->
   <header class="app-header">
     <div class="header-content">
-      <div></div>
+      <div class="header-left">
+        <button class="profile-btn" on:click={toggleProfileMenu}>
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+          </svg>
+          {#if $currentUser}
+            <span class="username-text">{$currentUser.username || 'Профиль'}</span>
+          {:else}
+            <span class="username-text">Профиль</span>
+          {/if}
+        </button>
+        
+        {#if showProfileMenu}
+          <div class="profile-dropdown" on:click={closeProfileMenu}>
+            <UserMenu />
+          </div>
+        {/if}
+      </div>
       <div class="header-controls">
-        <UserMenu />
       </div>
     </div>
   </header>
@@ -69,6 +95,63 @@
     justify-content: space-between;
   }
   
+  .header-left {
+    position: relative;
+  }
+  
+  .profile-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 12px;
+    color: var(--accent);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  
+  .profile-btn:hover {
+    background: var(--extra);
+    color: #FFFFFF;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(139, 164, 127, 0.3);
+  }
+  
+  .username-text {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .profile-dropdown {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    background: var(--panelStrong);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    padding: 8px;
+    min-width: 200px;
+    z-index: 1000;
+    animation: fadeInDown 0.2s ease;
+  }
+  
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
   @media (max-width: 768px) {
     .app-header {
       height: 60px;
@@ -76,6 +159,17 @@
     
     .header-content {
       padding: 0 16px;
+    }
+    
+    .username-text {
+      display: none;
+    }
+    
+    .profile-btn {
+      padding: 8px;
+      width: 40px;
+      height: 40px;
+      justify-content: center;
     }
   }
   
