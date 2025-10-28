@@ -744,15 +744,17 @@
   
   .quiz-header {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
+    align-items: center;
+    justify-content: center;
     margin-bottom: 15px;
     gap: 15px;
+    position: relative;
   }
   
   .header-left {
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 10px;
   }
   
@@ -762,6 +764,7 @@
     color: white;
     letter-spacing: 2px;
     margin: 0;
+    text-align: center;
     text-shadow: 0 0 20px rgba(162, 57, 202, 0.5);
   }
   
@@ -797,6 +800,9 @@
     border: 2px solid var(--accent);
     border-radius: 12px;
     min-width: 120px;
+    position: absolute;
+    right: 0;
+    top: 0;
   }
   
   .score-value {
