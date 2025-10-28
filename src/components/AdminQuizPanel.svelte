@@ -17,6 +17,10 @@
   let packSlots = Array.from({ length: 4 }, () => ({ file: null, title: '', uploading: false }));
   let packUploading = false;
   let packUploadError = '';
+  
+  // Автодополнение для картинок
+  let imageSuggestions = Array(4).fill([]);
+  let imageShowSuggestions = Array(4).fill(false);
 
   $: canSubmitPack = packSlots.every((s) => s.file && s.title.trim());
 
@@ -74,6 +78,10 @@
   }));
   let openingPackUploading = false;
   let openingPackError = '';
+  
+  // Автодополнение для опенингов
+  let openingSuggestions = Array(3).fill([]);
+  let openingShowSuggestions = Array(3).fill(false);
 
   $: canSubmitOpeningPack = openingSlots.every((s) => s.title.trim() && s.youtubeUrl.trim());
 
@@ -222,6 +230,67 @@
     }
   }
 
+  // === Поиск аниме для автодополнения ===
+  let searchTimeout;
+  
+  async function searchAnime(query, index, type) {
+    if (!query || query.length < 2) {
+      if (type === 'image') {
+        imageSuggestions[index] = [];
+        imageShowSuggestions[index] = false;
+      } else {
+        openingSuggestions[index] = [];
+        openingShowSuggestions[index] = false;
+      }
+      return;
+    }
+    
+    // Debounce
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(async () => {
+      try {
+        const response = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=10&sfw=true`);
+        const data = await response.json();
+        
+        if (data.data) {
+          const suggestions = data.data.map(anime => ({
+            title: anime.title,
+            titleEnglish: anime.title_english,
+            titleJapanese: anime.title_japanese
+          }));
+          
+          if (type === 'image') {
+            imageSuggestions[index] = suggestions;
+            imageShowSuggestions[index] = true;
+            imageSuggestions = [...imageSuggestions];
+            imageShowSuggestions = [...imageShowSuggestions];
+          } else {
+            openingSuggestions[index] = suggestions;
+            openingShowSuggestions[index] = true;
+            openingSuggestions = [...openingSuggestions];
+            openingShowSuggestions = [...openingShowSuggestions];
+          }
+        }
+      } catch (e) {
+        console.error('[searchAnime] Error:', e);
+      }
+    }, 300);
+  }
+  
+  function selectImageSuggestion(index, title) {
+    packSlots[index].title = title;
+    packSlots = [...packSlots];
+    imageShowSuggestions[index] = false;
+    imageShowSuggestions = [...imageShowSuggestions];
+  }
+  
+  function selectOpeningSuggestion(index, title) {
+    openingSlots[index].title = title;
+    openingSlots = [...openingSlots];
+    openingShowSuggestions[index] = false;
+    openingShowSuggestions = [...openingShowSuggestions];
+  }
+
   // === Вспомогательные функции ===
   function setDateToToday() {
     adminUploadDate = new Date().toISOString().split('T')[0];
@@ -292,12 +361,34 @@
               {/if}
             </label>
             
-            <input 
-              type="text" 
-              bind:value={slot.title}
-              placeholder="Название аниме"
-              class="title-input"
-            />
+            <div class="autocomplete-wrapper">
+              <input 
+                type="text" 
+                bind:value={slot.title}
+                on:input={() => searchAnime(slot.title, idx, 'image')}
+                on:focus={() => { if (imageSuggestions[idx]?.length > 0) imageShowSuggestions[idx] = true; imageShowSuggestions = [...imageShowSuggestions]; }}
+                on:blur={() => setTimeout(() => { imageShowSuggestions[idx] = false; imageShowSuggestions = [...imageShowSuggestions]; }, 200)}
+                placeholder="Название аниме"
+                class="title-input"
+                autocomplete="off"
+              />
+              {#if imageShowSuggestions[idx] && imageSuggestions[idx]?.length > 0}
+                <div class="suggestions-dropdown">
+                  {#each imageSuggestions[idx] as suggestion}
+                    <button 
+                      type="button"
+                      class="suggestion-item"
+                      on:click={() => selectImageSuggestion(idx, suggestion.title)}
+                    >
+                      <div class="suggestion-title">{suggestion.title}</div>
+                      {#if suggestion.titleEnglish && suggestion.titleEnglish !== suggestion.title}
+                        <div class="suggestion-alt">{suggestion.titleEnglish}</div>
+                      {/if}
+                    </button>
+                  {/each}
+                </div>
+              {/if}
+            </div>
           </div>
         {/each}
       </div>
@@ -326,12 +417,34 @@
             
             <div class="form-group">
               <label>Название аниме:</label>
-              <input 
-                type="text" 
-                bind:value={slot.title}
-                placeholder="Attack on Titan"
-                class="form-input"
-              />
+              <div class="autocomplete-wrapper">
+                <input 
+                  type="text" 
+                  bind:value={slot.title}
+                  on:input={() => searchAnime(slot.title, idx, 'opening')}
+                  on:focus={() => { if (openingSuggestions[idx]?.length > 0) openingShowSuggestions[idx] = true; openingShowSuggestions = [...openingShowSuggestions]; }}
+                  on:blur={() => setTimeout(() => { openingShowSuggestions[idx] = false; openingShowSuggestions = [...openingShowSuggestions]; }, 200)}
+                  placeholder="Attack on Titan"
+                  class="form-input"
+                  autocomplete="off"
+                />
+                {#if openingShowSuggestions[idx] && openingSuggestions[idx]?.length > 0}
+                  <div class="suggestions-dropdown">
+                    {#each openingSuggestions[idx] as suggestion}
+                      <button 
+                        type="button"
+                        class="suggestion-item"
+                        on:click={() => selectOpeningSuggestion(idx, suggestion.title)}
+                      >
+                        <div class="suggestion-title">{suggestion.title}</div>
+                        {#if suggestion.titleEnglish && suggestion.titleEnglish !== suggestion.title}
+                          <div class="suggestion-alt">{suggestion.titleEnglish}</div>
+                        {/if}
+                      </button>
+                    {/each}
+                  </div>
+                {/if}
+              </div>
             </div>
             
             <div class="form-group">
@@ -879,6 +992,57 @@
     border-color: #f44336;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+  }
+
+  /* === АВТОДОПОЛНЕНИЕ === */
+  .autocomplete-wrapper {
+    position: relative;
+  }
+
+  .suggestions-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 300px;
+    overflow-y: auto;
+    background: var(--panelStrong);
+    border: 2px solid var(--accent);
+    border-radius: 8px;
+    margin-top: 4px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+  }
+
+  .suggestion-item {
+    width: 100%;
+    padding: 12px 16px;
+    text-align: left;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .suggestion-item:last-child {
+    border-bottom: none;
+  }
+
+  .suggestion-item:hover {
+    background: rgba(91, 117, 83, 0.2);
+  }
+
+  .suggestion-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .suggestion-alt {
+    font-size: 0.85rem;
+    color: var(--muted);
   }
 
   .error-message {
