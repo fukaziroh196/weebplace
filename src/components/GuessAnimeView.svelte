@@ -365,13 +365,36 @@
       } else {
         // Неправильный ответ
         answerFeedback = 'incorrect';
-        console.log('[checkAnswer] Incorrect answer');
+        const correctAnswer = animeGuesses[currentImageIndex]?.title || 'Неизвестно';
+        console.log('[checkAnswer] Incorrect answer. Correct:', correctAnswer);
         
-        // Сбрасываем через 1 секунду
+        // Начисляем 0 очков
+        roundScores[currentImageIndex] = 0;
+        roundScores = [...roundScores];
+        
+        // Показываем правильный ответ
         setTimeout(() => {
-          answerFeedback = '';
-          isChecking = false;
-        }, 1000);
+          alert(`❌ Неправильно! 0 очков\n\nПравильный ответ: ${correctAnswer}\n\nВсего очков: ${totalScore.toLocaleString()}`);
+        }, 100);
+        
+        // Переход к следующей картинке
+        if (currentImageIndex < animeGuesses.length - 1) {
+          setTimeout(() => {
+            currentImageIndex++;
+            userAnswer = '';
+            unlockedClues = [];
+            showTitle = false;
+            answerFeedback = '';
+            isChecking = false;
+          }, 1200);
+        } else {
+          setTimeout(() => {
+            alert(`🎯 Квиз завершён!\n\n🏆 Итоговый счёт: ${totalScore.toLocaleString()} очков`);
+            userAnswer = '';
+            answerFeedback = '';
+            isChecking = false;
+          }, 1200);
+        }
       }
     } catch (e) {
       console.error('[checkAnswer] Error:', e);
