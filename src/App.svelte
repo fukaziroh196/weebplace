@@ -11,10 +11,10 @@
 </script>
 
 <div class="app-container">
-  <!-- Шапка с названием -->
+  <!-- Шапка -->
   <header class="app-header">
     <div class="header-content">
-      <h1 class="site-title">AniQuiz</h1>
+      <div></div>
       <div class="header-controls">
         <button class="control-btn theme-btn" title={$theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'} on:click={toggleTheme}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -77,8 +77,7 @@
     width: 100%;
     height: 70px;
     flex-shrink: 0;
-    background: rgba(255, 255, 255, 0.02);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: transparent;
     z-index: 100;
   }
   
@@ -88,18 +87,6 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-  }
-  
-  .site-title {
-    font-size: 28px;
-    font-weight: 900;
-    color: white;
-    margin: 0;
-    letter-spacing: 1px;
-    background: linear-gradient(135deg, #A239CA, #FF1068);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
   }
   
   .header-controls {
