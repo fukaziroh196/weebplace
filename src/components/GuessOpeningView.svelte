@@ -24,6 +24,12 @@
   let userAnswer = '';
   let isChecking = false;
   let answerFeedback = ''; // 'correct' | 'incorrect' | ''
+  
+  // === Система очков ===
+  let totalScore = 0;
+  let roundScores = []; // Массив очков для каждого раунда
+  let hintUsed = false; // Использована ли подсказка в текущем раунде
+  let showFinalResults = false;
 
   $: currentOpening = openings[currentIndex] || null;
 
@@ -185,12 +191,14 @@
 
   function showHint() {
     state = 'blur';
+    hintUsed = true; // Отметить что подсказка использована
   }
 
   function reset() {
     state = 'idle';
     userAnswer = '';
     answerFeedback = '';
+    hintUsed = false;
     if (player && playerReady) {
       player.stopVideo();
     }
@@ -204,12 +212,22 @@
     answerFeedback = '';
 
     try {
-      // Простая проверка: сравниваем с title (можно сделать через API)
+      // Простая проверка: сравниваем с title
       const correct = userAnswer.trim().toLowerCase() === currentOpening.title.toLowerCase();
       
+      let roundScore = 0;
+      
       if (correct) {
+        // Правильный ответ
         answerFeedback = 'correct';
         state = 'revealed';
+        
+        // Начисление очков: 10000 без подсказки, 2500 с подсказкой
+        roundScore = hintUsed ? 2500 : 10000;
+        roundScores.push(roundScore);
+        totalScore += roundScore;
+        
+        console.log(`[checkAnswer] Correct! Score: ${roundScore}, Total: ${totalScore}`);
         
         setTimeout(() => {
           // Переход к следующему опенингу
@@ -218,14 +236,32 @@
             reset();
             initPlayer();
           } else {
-            alert('Все опенинги пройдены! 🎉');
+            // Все опенинги отгаданы - показать финальные результаты
+            console.log('[checkAnswer] All openings completed!');
+            showFinalResults = true;
           }
-        }, 2000);
+        }, 1500);
       } else {
+        // Неправильный ответ
         answerFeedback = 'incorrect';
+        roundScores.push(0);
+        
+        console.log(`[checkAnswer] Incorrect! Score: 0`);
+        
         setTimeout(() => {
           answerFeedback = '';
-        }, 1000);
+          
+          // Переход к следующему опенингу даже при неправильном ответе
+          if (currentIndex < openings.length - 1) {
+            currentIndex++;
+            reset();
+            initPlayer();
+          } else {
+            // Все опенинги пройдены - показать финальные результаты
+            console.log('[checkAnswer] All openings completed!');
+            showFinalResults = true;
+          }
+        }, 1500);
       }
     } catch (e) {
       console.error('[checkAnswer] Error:', e);
@@ -325,6 +361,39 @@
             🔄 Сбросить
           </button>
         {/if}
+      </div>
+    </div>
+  {/if}
+  
+  <!-- === ФИНАЛЬНЫЕ РЕЗУЛЬТАТЫ === -->
+  {#if showFinalResults}
+    <div class="final-modal-overlay" on:click={() => { showFinalResults = false; goHome(); }}>
+      <div class="final-modal-content" on:click|stopPropagation>
+        <div class="final-header">
+          <h2 class="final-title">РЕЗУЛЬТАТЫ</h2>
+          <button class="final-close-btn" on:click={() => { showFinalResults = false; goHome(); }}>×</button>
+        </div>
+        
+        <div class="final-score-box">
+          <div class="final-score-label">ИТОГО</div>
+          <div class="final-score-value">{totalScore.toLocaleString()}</div>
+          <div class="final-score-suffix">ОЧКОВ</div>
+        </div>
+        
+        <div class="rounds-summary">
+          {#each roundScores as score, idx}
+            <div class="round-item">
+              <div class="round-label">Раунд {idx + 1}</div>
+              <div class="round-score {score > 0 ? 'correct' : 'incorrect'}">
+                {score > 0 ? '✓' : '✗'} {score.toLocaleString()} очков
+              </div>
+            </div>
+          {/each}
+        </div>
+        
+        <button class="final-done-btn" on:click={() => { showFinalResults = false; goHome(); }}>
+          ЗАВЕРШИТЬ
+        </button>
       </div>
     </div>
   {/if}
@@ -616,6 +685,180 @@
     background: rgba(255, 255, 255, 0.2);
   }
 
+  /* === ФИНАЛЬНЫЕ РЕЗУЛЬТАТЫ === */
+  .final-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .final-modal-content {
+    background: var(--panelStrong);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.4s ease;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .final-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .final-title {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .final-close-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.2);
+    border: none;
+    color: var(--text);
+    font-size: 2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  .final-close-btn:hover {
+    background: rgba(0, 0, 0, 0.4);
+    transform: rotate(90deg);
+  }
+
+  .final-score-box {
+    text-align: center;
+    padding: 32px 20px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 12px;
+    margin-bottom: 24px;
+  }
+
+  .final-score-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .final-score-value {
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: white;
+    line-height: 1;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .final-score-suffix {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+
+  .rounds-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .round-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    transition: all 0.2s ease;
+  }
+
+  .round-item:hover {
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  .round-label {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .round-score {
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .round-score.correct {
+    color: #4CAF50;
+  }
+
+  .round-score.incorrect {
+    color: #f44336;
+  }
+
+  .final-done-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--accent);
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+  }
+
+  .final-done-btn:hover {
+    background: var(--extra);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(91, 117, 83, 0.4);
+  }
+
   /* === Адаптивность === */
   @media (max-width: 768px) {
     .guess-opening-container {
@@ -637,6 +880,14 @@
 
     .form-row {
       grid-template-columns: 1fr;
+    }
+    
+    .final-modal-content {
+      padding: 24px;
+    }
+    
+    .final-score-value {
+      font-size: 2.5rem;
     }
   }
 </style>
