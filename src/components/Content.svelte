@@ -65,7 +65,7 @@
           
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessCharacter'); activeView.set('guessCharacter'); }}>
             <div class="card-content">
-              <h3 class="card-title">Угадывай персонажей по портретам</h3>
+              <h3 class="card-title">Угадай персонажа по силуэту</h3>
             </div>
           </button>
           
@@ -233,9 +233,9 @@
   }
   
   .quiz-cards {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 1.5rem;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
   
   @media (max-width: 768px) {
@@ -245,7 +245,6 @@
     }
     
     .quiz-cards {
-      grid-template-columns: 1fr;
       gap: 1rem;
     }
   }
