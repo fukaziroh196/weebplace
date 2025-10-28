@@ -339,11 +339,6 @@
         
         console.log('[checkAnswer] Correct! Score:', score, 'Total:', totalScore);
         
-        // Показываем уведомление с очками
-        setTimeout(() => {
-          alert(`✅ Правильно! +${score.toLocaleString()} очков\n\nВсего очков: ${totalScore.toLocaleString()}`);
-        }, 100);
-        
         // Переход к следующей картинке
         if (currentImageIndex < animeGuesses.length - 1) {
           setTimeout(() => {
@@ -353,14 +348,13 @@
             showTitle = false;
             answerFeedback = '';
             isChecking = false;
-          }, 1200);
+          }, 800);
         } else {
           setTimeout(() => {
-            alert(`🎉 Поздравляем! Вы отгадали все картинки!\n\n🏆 Итоговый счёт: ${totalScore.toLocaleString()} очков`);
             userAnswer = '';
             answerFeedback = '';
             isChecking = false;
-          }, 1200);
+          }, 800);
         }
       } else {
         // Неправильный ответ
@@ -372,11 +366,6 @@
         roundScores[currentImageIndex] = 0;
         roundScores = [...roundScores];
         
-        // Показываем правильный ответ
-        setTimeout(() => {
-          alert(`❌ Неправильно! 0 очков\n\nПравильный ответ: ${correctAnswer}\n\nВсего очков: ${totalScore.toLocaleString()}`);
-        }, 100);
-        
         // Переход к следующей картинке
         if (currentImageIndex < animeGuesses.length - 1) {
           setTimeout(() => {
@@ -386,14 +375,13 @@
             showTitle = false;
             answerFeedback = '';
             isChecking = false;
-          }, 1200);
+          }, 800);
         } else {
           setTimeout(() => {
-            alert(`🎯 Квиз завершён!\n\n🏆 Итоговый счёт: ${totalScore.toLocaleString()} очков`);
             userAnswer = '';
             answerFeedback = '';
             isChecking = false;
-          }, 1200);
+          }, 800);
         }
       }
     } catch (e) {
@@ -594,16 +582,16 @@
       <div class="quiz-container">
         <!-- Заголовок с раундом -->
         <div class="quiz-header">
-          <h1 class="quiz-title">УГАДАЙ АНИМЕ</h1>
+          <div class="header-left">
+            <h1 class="quiz-title">УГАДАЙ АНИМЕ</h1>
+            <div class="score-display-inline">
+              <span class="score-value">{totalScore.toLocaleString()}</span> очков
+            </div>
+          </div>
           <div class="round-badge">
             <span class="round-text">Раунд {currentImageIndex + 1}</span>
             <span class="difficulty-badge">Легко</span>
           </div>
-          {#if totalScore > 0}
-            <div class="score-display">
-              🏆 Очки: <span class="score-value">{totalScore.toLocaleString()}</span>
-            </div>
-          {/if}
         </div>
         
         <!-- Большая картинка по центру -->
@@ -754,8 +742,19 @@
   }
   
   .quiz-header {
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
   }
   
   .quiz-title {
@@ -763,16 +762,21 @@
     font-weight: 900;
     color: white;
     letter-spacing: 2px;
-    margin-bottom: 10px;
+    margin: 0;
     text-shadow: 0 0 20px rgba(162, 57, 202, 0.5);
   }
   
+  .score-display-inline {
+    font-size: clamp(1rem, 3vw, 1.5rem);
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  
   .round-badge {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
-    justify-content: center;
   }
   
   .round-text {
@@ -790,16 +794,10 @@
     font-weight: 700;
   }
   
-  .score-display {
-    margin-top: 10px;
-    font-size: clamp(1rem, 3vw, 1.25rem);
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.9);
-  }
-  
   .score-value {
     color: #FFD700;
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    font-weight: 900;
   }
   
   .image-container {
