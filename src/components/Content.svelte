@@ -62,14 +62,7 @@
     console.log('[Content] Closing replay modal');
     showReplay = false;
   }
-  let lb = [
-    {name:'KsKsCollective',days:693,rank:1,highlight:true},
-    {name:'nyaaia',days:663,rank:2,highlight:true},
-    {name:'Hi_Leaflit_o7',days:559,rank:3,highlight:true},
-    {name:'Moo',days:518,rank:4},
-    {name:'Catdog1900',days:506,rank:5},
-    {name:'DancoreDanny',days:504,rank:6}
-  ];
+  let lb = [];
   
   // No-op mounts for quizzes home
 </script>
