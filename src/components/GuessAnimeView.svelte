@@ -594,7 +594,7 @@
           <div class="progress-text">{currentImageIndex + 1} / {animeGuesses.length}</div>
         </div>
       </div>
-    {/if}
+    </div>
   {/if}
 </div>
 
