@@ -194,8 +194,8 @@
   
   .main-container {
     display: grid;
-    grid-template-columns: 1fr 420px;
-    gap: 3rem;
+    grid-template-columns: auto 420px;
+    gap: 2rem;
     align-items: start;
   }
   
