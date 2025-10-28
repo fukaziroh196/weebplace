@@ -94,6 +94,18 @@ db.serialize(() => {
     PRIMARY KEY (user_id, data_type),
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`);
+
+  // Таблица для опенингов
+  db.run(`CREATE TABLE IF NOT EXISTS openings (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    youtube_url TEXT NOT NULL,
+    start_time INTEGER DEFAULT 0,
+    end_time INTEGER DEFAULT 20,
+    created_at INTEGER NOT NULL,
+    created_by TEXT,
+    FOREIGN KEY (created_by) REFERENCES users(id)
+  )`);
 });
 
 // Middleware для проверки JWT
@@ -794,6 +806,76 @@ app.get('/api/library', authenticateToken, (req, res) => {
     });
 
     res.json(library);
+  });
+});
+
+// ==================== OPENINGS ENDPOINTS ====================
+
+// GET /api/openings - Получить все опенинги
+app.get('/api/openings', (req, res) => {
+  db.all(
+    'SELECT id, title, youtube_url, start_time, end_time, created_at FROM openings ORDER BY created_at DESC',
+    [],
+    (err, rows) => {
+      if (err) {
+        console.error('[GET /api/openings] Error:', err);
+        return res.status(500).json({ error: err.message });
+      }
+      res.json(rows || []);
+    }
+  );
+});
+
+// POST /api/openings - Добавить опенинг (только для админа)
+app.post('/api/openings', authenticateToken, requireAdmin, (req, res) => {
+  const { title, youtubeUrl, startTime, endTime } = req.body;
+
+  if (!title || !youtubeUrl) {
+    return res.status(400).json({ error: 'Title and YouTube URL are required' });
+  }
+
+  const id = Date.now().toString() + Math.random().toString(36).substring(7);
+  const createdAt = Date.now();
+
+  db.run(
+    'INSERT INTO openings (id, title, youtube_url, start_time, end_time, created_at, created_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    [id, title, youtubeUrl, startTime || 0, endTime || 20, createdAt, req.user.id],
+    function (err) {
+      if (err) {
+        console.error('[POST /api/openings] Error:', err);
+        return res.status(500).json({ error: err.message });
+      }
+
+      res.json({
+        success: true,
+        opening: {
+          id,
+          title,
+          youtube_url: youtubeUrl,
+          start_time: startTime || 0,
+          end_time: endTime || 20,
+          created_at: createdAt
+        }
+      });
+    }
+  );
+});
+
+// DELETE /api/openings/:id - Удалить опенинг (только для админа)
+app.delete('/api/openings/:id', authenticateToken, requireAdmin, (req, res) => {
+  const { id } = req.params;
+
+  db.run('DELETE FROM openings WHERE id = ?', [id], function (err) {
+    if (err) {
+      console.error('[DELETE /api/openings] Error:', err);
+      return res.status(500).json({ error: err.message });
+    }
+
+    if (this.changes === 0) {
+      return res.status(404).json({ error: 'Opening not found' });
+    }
+
+    res.json({ success: true, deleted: this.changes });
   });
 });
 
