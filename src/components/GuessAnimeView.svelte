@@ -1189,7 +1189,7 @@
   }
   
   .final-score-box {
-    background: linear-gradient(135deg, #ff6b9d 0%, #c06c84 100%);
+    background: linear-gradient(135deg, var(--accent, #A239CA) 0%, var(--accent2, #8B2FC9) 100%);
     border-radius: 12px;
     padding: 20px;
     text-align: center;
@@ -1230,7 +1230,7 @@
   }
   
   .round-label {
-    color: #ff6b9d;
+    color: var(--accent, #A239CA);
     font-weight: 700;
     font-size: clamp(0.85rem, 1.8vw, 0.95rem);
   }
