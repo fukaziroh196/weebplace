@@ -361,12 +361,14 @@
     position: sticky;
     top: 2rem;
     box-shadow: 0 4px 12px rgba(91, 117, 83, 0.12);
+    margin-top: calc(clamp(2.5rem, 5vw, 4rem) + 1rem + 2rem);
   }
   
   @media (max-width: 768px) {
     .leaderboard-sidebar {
       padding: 1rem;
       position: static;
+      margin-top: 0;
     }
   }
   
