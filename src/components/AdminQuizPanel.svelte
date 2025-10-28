@@ -249,14 +249,14 @@
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(async () => {
       try {
-        const response = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=10&sfw=true`);
+        // Используем Shikimori API (русские названия)
+        const response = await fetch(`https://shikimori.one/api/animes?search=${encodeURIComponent(query)}&limit=10&order=popularity`);
         const data = await response.json();
         
-        if (data.data) {
-          const suggestions = data.data.map(anime => ({
-            title: anime.title,
-            titleEnglish: anime.title_english,
-            titleJapanese: anime.title_japanese
+        if (data && data.length > 0) {
+          const suggestions = data.map(anime => ({
+            title: anime.russian || anime.name,  // Русское название в приоритете
+            titleAlt: anime.name !== anime.russian ? anime.name : null  // Оригинальное название
           }));
           
           if (type === 'image') {
@@ -381,8 +381,8 @@
                       on:click={() => selectImageSuggestion(idx, suggestion.title)}
                     >
                       <div class="suggestion-title">{suggestion.title}</div>
-                      {#if suggestion.titleEnglish && suggestion.titleEnglish !== suggestion.title}
-                        <div class="suggestion-alt">{suggestion.titleEnglish}</div>
+                      {#if suggestion.titleAlt}
+                        <div class="suggestion-alt">{suggestion.titleAlt}</div>
                       {/if}
                     </button>
                   {/each}
@@ -437,8 +437,8 @@
                         on:click={() => selectOpeningSuggestion(idx, suggestion.title)}
                       >
                         <div class="suggestion-title">{suggestion.title}</div>
-                        {#if suggestion.titleEnglish && suggestion.titleEnglish !== suggestion.title}
-                          <div class="suggestion-alt">{suggestion.titleEnglish}</div>
+                        {#if suggestion.titleAlt}
+                          <div class="suggestion-alt">{suggestion.titleAlt}</div>
                         {/if}
                       </button>
                     {/each}
