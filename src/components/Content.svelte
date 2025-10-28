@@ -63,15 +63,15 @@
             </div>
           </button>
           
-          <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessCharacter'); activeView.set('guessCharacter'); }}>
-            <div class="card-content">
-              <h3 class="card-title">Угадай персонажа по силуэту</h3>
-            </div>
-          </button>
-          
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessOpening'); activeView.set('guessOpening'); }}>
             <div class="card-content">
               <h3 class="card-title">Угадай аниме по опенингу</h3>
+            </div>
+          </button>
+          
+          <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessCharacter'); activeView.set('guessCharacter'); }}>
+            <div class="card-content">
+              <h3 class="card-title">Угадай персонажа по силуэту</h3>
             </div>
           </button>
         </div>
@@ -344,12 +344,6 @@
   
   .replay-icon {
     font-size: 1.5rem;
-    animation: rotate 2s linear infinite;
-  }
-  
-  @keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
   }
   
   /* Leaderboard sidebar */
