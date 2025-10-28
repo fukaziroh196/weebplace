@@ -96,6 +96,7 @@
   // Система очков
   let totalScore = 0;
   let roundScores = []; // очки за каждый раунд
+  let showFinalResults = false;
   
   // Визуальная обратная связь
   let answerFeedback = ''; // 'correct' | 'incorrect' | ''
@@ -282,7 +283,9 @@
   }
   
   function selectUserAnswer(anime) {
-    userAnswer = anime.title;
+    console.log('[selectUserAnswer] Selected anime:', anime);
+    userAnswer = String(anime.title || anime.russian || '').trim();
+    console.log('[selectUserAnswer] Set userAnswer to:', userAnswer);
     userSuggestions = [];
     showUserSuggestions = false;
   }
@@ -301,6 +304,13 @@
   
   async function checkAnswer() {
     const guessId = animeGuesses[currentImageIndex]?.id;
+    
+    // Ensure userAnswer is a string
+    if (typeof userAnswer !== 'string') {
+      console.error('[checkAnswer] userAnswer is not a string:', userAnswer);
+      userAnswer = String(userAnswer || '');
+    }
+    
     const answer = userAnswer.trim();
     
     if (!guessId || !answer) {
@@ -316,7 +326,7 @@
     isChecking = true;
     answerFeedback = '';
     
-    console.log('[checkAnswer] Checking:', { guessId, answer, title: animeGuesses[currentImageIndex]?.title });
+    console.log('[checkAnswer] Checking:', { guessId, answer, title: animeGuesses[currentImageIndex]?.title, userAnswerType: typeof userAnswer });
     
     try {
       const res = await apiGuesses.checkAnswer(guessId, answer);
@@ -350,10 +360,12 @@
             isChecking = false;
           }, 800);
         } else {
+          // Все раунды пройдены - показываем финальные результаты
           setTimeout(() => {
             userAnswer = '';
             answerFeedback = '';
             isChecking = false;
+            showFinalResults = true;
           }, 800);
         }
       } else {
@@ -377,10 +389,12 @@
             isChecking = false;
           }, 800);
         } else {
+          // Все раунды пройдены - показываем финальные результаты
           setTimeout(() => {
             userAnswer = '';
             answerFeedback = '';
             isChecking = false;
+            showFinalResults = true;
           }, 800);
         }
       }
@@ -714,6 +728,41 @@
     {/if}
   {/if}
 </div>
+
+<!-- Модальное окно с финальными результатами -->
+{#if showFinalResults}
+  <div class="final-results-overlay" on:click={() => showFinalResults = false}>
+    <div class="final-results-modal" on:click|stopPropagation>
+      <h2 class="final-title">Final Score</h2>
+      
+      <div class="final-score-box">
+        <div class="final-score-value">{totalScore.toLocaleString()}</div>
+        <div class="community-average">Community average score: 9,610</div>
+      </div>
+      
+      <div class="rounds-breakdown">
+        {#each animeGuesses as guess, idx}
+          <div class="round-item">
+            <div class="round-header">
+              <span class="round-label">Round {idx + 1}</span>
+              <span class="round-points">{roundScores[idx]?.toLocaleString() || 0} pts</span>
+            </div>
+            <div class="round-content">
+              <img src={guess.image} alt={guess.title} class="round-thumb" />
+              <div class="round-info">
+                <div class="round-anime-title">{guess.title}</div>
+              </div>
+            </div>
+          </div>
+        {/each}
+      </div>
+      
+      <button class="close-results-btn" on:click={() => showFinalResults = false}>
+        Закрыть
+      </button>
+    </div>
+  </div>
+{/if}
 
 <style>
   .glass-frame {
@@ -1084,5 +1133,181 @@
     color: rgba(255, 255, 255, 0.7);
     font-weight: 600;
     font-size: 0.875rem;
+  }
+  
+  /* Модальное окно финальных результатов */
+  .final-results-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    animation: fadeIn 0.3s;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .final-results-modal {
+    background: #1a1a1a;
+    border-radius: 16px;
+    max-width: 800px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 32px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.4s;
+  }
+  
+  @keyframes slideUp {
+    from {
+      transform: translateY(30px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  .final-title {
+    text-align: center;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 900;
+    color: white;
+    margin: 0 0 24px 0;
+    letter-spacing: 1px;
+  }
+  
+  .final-score-box {
+    background: linear-gradient(135deg, #ff6b9d 0%, #c06c84 100%);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  
+  .final-score-value {
+    font-size: clamp(3rem, 8vw, 5rem);
+    font-weight: 900;
+    color: white;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  
+  .community-average {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    font-weight: 600;
+  }
+  
+  .rounds-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .round-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 16px;
+    transition: background 0.2s;
+  }
+  
+  .round-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+  
+  .round-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  
+  .round-label {
+    color: #ff6b9d;
+    font-weight: 700;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+  }
+  
+  .round-points {
+    color: white;
+    font-weight: 700;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+  }
+  
+  .round-content {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  
+  .round-thumb {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  
+  .round-info {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .round-anime-title {
+    color: white;
+    font-weight: 700;
+    font-size: clamp(0.95rem, 2.2vw, 1.1rem);
+    margin-bottom: 4px;
+  }
+  
+  .close-results-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--accent, #A239CA);
+    color: white;
+    font-weight: 900;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .close-results-btn:hover {
+    background: var(--accent2, #8B2FC9);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(162, 57, 202, 0.4);
+  }
+  
+  .close-results-btn:active {
+    transform: translateY(0);
+  }
+  
+  @media (max-width: 768px) {
+    .final-results-modal {
+      padding: 24px 16px;
+    }
+    
+    .round-thumb {
+      width: 60px;
+      height: 60px;
+    }
   }
 </style>
