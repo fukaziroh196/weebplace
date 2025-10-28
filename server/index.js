@@ -107,6 +107,22 @@ db.serialize(() => {
     created_by TEXT,
     FOREIGN KEY (created_by) REFERENCES users(id)
   )`);
+  
+  // Migration: ensure quiz_date column exists in openings table
+  db.get(`PRAGMA table_info(openings)`, (err) => {
+    if (err) {
+      console.error('[Migration] Error checking openings table:', err);
+      return;
+    }
+    // Try to add quiz_date column if it doesn't exist
+    db.run(`ALTER TABLE openings ADD COLUMN quiz_date TEXT`, (alterErr) => {
+      if (alterErr && !alterErr.message.includes('duplicate column')) {
+        console.error('[Migration] Error adding quiz_date to openings:', alterErr);
+      } else if (!alterErr) {
+        console.log('[Migration] Added quiz_date column to openings table');
+      }
+    });
+  });
 });
 
 // Middleware для проверки JWT
