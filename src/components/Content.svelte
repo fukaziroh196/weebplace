@@ -52,37 +52,7 @@
   <div class="aniguessr-layout">
   {#if $activeView === 'home' || $activeView === 'aniquiz'}
     <div class="main-container">
-      <!-- Center: Quiz cards -->
-      <div class="quiz-cards-section">
-        <h1 class="main-title">otakuz.fun</h1>
-        
-        <div class="quiz-cards">
-          <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessAnime'); activeView.set('guessAnime'); }}>
-            <div class="card-content">
-              <h3 class="card-title">Угадай аниме по случайным кадрам</h3>
-            </div>
-          </button>
-          
-          <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessCharacter'); activeView.set('guessCharacter'); }}>
-            <div class="card-content">
-              <h3 class="card-title">Угадай персонажа по силуэту</h3>
-            </div>
-          </button>
-          
-          <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessOpening'); activeView.set('guessOpening'); }}>
-            <div class="card-content">
-              <h3 class="card-title">Угадай аниме по опенингу</h3>
-            </div>
-          </button>
-        </div>
-        
-        <button class="replay-btn-new" on:click={openReplay}>
-          <span class="replay-icon">↺</span>
-          ПОВТОРИТЬ ПРЕДЫДУЩИЕ ДНИ
-        </button>
-      </div>
-      
-      <!-- Right sidebar: Leaderboard -->
+      <!-- Left sidebar: Leaderboard -->
       <aside class="leaderboard-sidebar">
         <div class="lb-header">
           <h2 class="lb-title">ЛИДЕРБОРД</h2>
@@ -118,6 +88,36 @@
           {/each}
         </div>
       </aside>
+      
+      <!-- Right: Quiz cards -->
+      <div class="quiz-cards-section">
+        <h1 class="main-title">otakuz.fun</h1>
+        
+        <div class="quiz-cards">
+          <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessAnime'); activeView.set('guessAnime'); }}>
+            <div class="card-content">
+              <h3 class="card-title">Угадай аниме по случайным кадрам</h3>
+            </div>
+          </button>
+          
+          <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessCharacter'); activeView.set('guessCharacter'); }}>
+            <div class="card-content">
+              <h3 class="card-title">Угадай персонажа по силуэту</h3>
+            </div>
+          </button>
+          
+          <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessOpening'); activeView.set('guessOpening'); }}>
+            <div class="card-content">
+              <h3 class="card-title">Угадай аниме по опенингу</h3>
+            </div>
+          </button>
+        </div>
+        
+        <button class="replay-btn-new" on:click={openReplay}>
+          <span class="replay-icon">↺</span>
+          ПОВТОРИТЬ ПРЕДЫДУЩИЕ ДНИ
+        </button>
+      </div>
     </div>
   {:else if $activeView === 'search'}
   <!-- Search View -->
@@ -194,7 +194,7 @@
   
   .main-container {
     display: grid;
-    grid-template-columns: 1fr 420px;
+    grid-template-columns: 420px 1fr;
     gap: 3rem;
     align-items: start;
   }
