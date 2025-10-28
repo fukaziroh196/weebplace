@@ -683,13 +683,13 @@
   .quiz-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 10px;
+    padding: 5px 10px;
     width: 100%;
   }
   
   .quiz-header {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
   }
   
   .quiz-title {
@@ -716,7 +716,7 @@
   }
   
   .difficulty-badge {
-    background: #FF1744;
+    background: var(--accent, #A239CA);
     color: white;
     padding: 4px 12px;
     border-radius: 20px;
@@ -740,7 +740,7 @@
     position: relative;
     width: 100%;
     max-width: 900px;
-    margin: 0 auto 20px;
+    margin: 0 auto 12px;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
@@ -750,24 +750,24 @@
     width: 100%;
     height: auto;
     display: block;
-    max-height: 60vh;
-    min-height: 300px;
+    max-height: 45vh;
+    min-height: 250px;
     object-fit: contain;
     background: #000;
   }
   
   @media (max-width: 768px) {
     .quiz-image {
-      min-height: 200px;
-      max-height: 50vh;
+      min-height: 180px;
+      max-height: 35vh;
     }
   }
   
   .clues-container {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     flex-wrap: wrap;
     padding: 0 10px;
   }
@@ -827,7 +827,7 @@
   .answer-container {
     position: relative;
     max-width: 720px;
-    margin: 0 auto 20px;
+    margin: 0 auto 12px;
     display: flex;
     gap: 8px;
     padding: 0 10px;
@@ -857,7 +857,7 @@
   
   .guess-btn {
     padding: 14px 30px;
-    background: #FF1068;
+    background: var(--accent, #A239CA);
     color: white;
     font-weight: 900;
     font-size: clamp(0.875rem, 2.5vw, 1rem);
@@ -870,9 +870,9 @@
   }
   
   .guess-btn:hover {
-    background: #FF1744;
+    background: var(--accent2, #8B2FC9);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 16, 104, 0.4);
+    box-shadow: 0 6px 20px rgba(162, 57, 202, 0.5);
   }
   
   .guess-btn:active {
@@ -976,8 +976,8 @@
   }
   
   .progress-dot.active {
-    background: #FF1068;
-    box-shadow: 0 0 10px rgba(255, 16, 104, 0.5);
+    background: var(--accent, #A239CA);
+    box-shadow: 0 0 10px rgba(162, 57, 202, 0.5);
     transform: scale(1.3);
   }
   
