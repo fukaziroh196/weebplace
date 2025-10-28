@@ -42,12 +42,15 @@
     }
   }
 
-  onMount(() => {
-    loadOpenings();
+  onMount(async () => {
+    await loadOpenings();
     
     // Загрузка YouTube API
     if (window.YT && window.YT.Player) {
-      // API уже загружен
+      console.log('[YouTube] API already loaded');
+      if (currentOpening) {
+        setTimeout(() => initPlayer(), 500);
+      }
     } else {
       if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
         const tag = document.createElement('script');
@@ -57,9 +60,18 @@
       
       window.onYouTubeIframeAPIReady = () => {
         console.log('[YouTube] API Ready');
+        if (currentOpening) {
+          setTimeout(() => initPlayer(), 500);
+        }
       };
     }
   });
+  
+  // Реактивно инициализируем плеер когда появляется опенинг
+  $: if (currentOpening && window.YT && window.YT.Player && !playerReady) {
+    console.log('[YouTube] Auto-initializing player for:', currentOpening);
+    setTimeout(() => initPlayer(), 300);
+  }
 
   // === Извлечение YouTube Video ID из URL ===
   function extractVideoId(url) {
@@ -70,61 +82,103 @@
 
   // === Инициализация плеера ===
   function initPlayer() {
-    if (!currentOpening || !window.YT || !window.YT.Player) return;
+    console.log('[initPlayer] Starting initialization');
+    console.log('[initPlayer] currentOpening:', currentOpening);
+    console.log('[initPlayer] window.YT:', window.YT);
     
-    const videoId = extractVideoId(currentOpening.youtubeUrl);
+    if (!currentOpening || !window.YT || !window.YT.Player) {
+      console.error('[initPlayer] Missing requirements:', { currentOpening, YT: window.YT });
+      return;
+    }
+    
+    const videoId = extractVideoId(currentOpening.youtube_url || currentOpening.youtubeUrl);
+    console.log('[initPlayer] Extracted videoId:', videoId);
+    
     if (!videoId) {
-      console.error('Invalid YouTube URL');
+      console.error('[initPlayer] Invalid YouTube URL:', currentOpening.youtube_url || currentOpening.youtubeUrl);
       return;
     }
 
     // Удалить старый плеер
     if (player && player.destroy) {
-      player.destroy();
+      console.log('[initPlayer] Destroying old player');
+      try {
+        player.destroy();
+      } catch (e) {
+        console.error('[initPlayer] Error destroying old player:', e);
+      }
+      playerReady = false;
     }
 
-    player = new window.YT.Player('youtube-player', {
-      height: '315',
-      width: '560',
-      videoId: videoId,
-      playerVars: {
-        autoplay: 0,
-        start: currentOpening.startTime || 0,
-        end: currentOpening.endTime || 20,
-        enablejsapi: 1,
-        controls: 0,
-        modestbranding: 1,
-        rel: 0,
-        fs: 1,
-      },
-      events: {
-        onReady: (event) => {
-          playerReady = true;
-          console.log('[YouTube] Player ready');
+    console.log('[initPlayer] Creating new YouTube player');
+    try {
+      player = new window.YT.Player('youtube-player', {
+        height: '315',
+        width: '560',
+        videoId: videoId,
+        playerVars: {
+          autoplay: 0,
+          start: currentOpening.start_time || currentOpening.startTime || 0,
+          end: currentOpening.end_time || currentOpening.endTime || 20,
+          enablejsapi: 1,
+          controls: 0,
+          modestbranding: 1,
+          rel: 0,
+          fs: 1,
         },
-        onStateChange: (event) => {
-          if (event.data === window.YT.PlayerState.ENDED) {
-            console.log('[YouTube] Video ended');
+        events: {
+          onReady: (event) => {
+            playerReady = true;
+            console.log('[YouTube] Player ready!');
+          },
+          onStateChange: (event) => {
+            console.log('[YouTube] State changed:', event.data);
+            if (event.data === window.YT.PlayerState.ENDED) {
+              console.log('[YouTube] Video ended');
+            }
+          },
+          onError: (event) => {
+            console.error('[YouTube] Player error:', event.data);
           }
         },
-      },
-    });
+      });
+      console.log('[initPlayer] Player created successfully');
+    } catch (e) {
+      console.error('[initPlayer] Error creating player:', e);
+    }
   }
 
   // === Управление плеером ===
   function playVideo() {
-    if (!playerReady) {
+    console.log('[playVideo] Called. playerReady:', playerReady, 'player:', player);
+    
+    if (!player || !playerReady) {
+      console.log('[playVideo] Player not ready, initializing...');
       initPlayer();
-      setTimeout(() => {
-        if (player && player.playVideo) {
-          player.playVideo();
-          state = 'playing';
+      
+      // Ждём готовности и пытаемся снова
+      const checkAndPlay = setInterval(() => {
+        if (playerReady && player && player.playVideo) {
+          console.log('[playVideo] Player ready, starting playback');
+          clearInterval(checkAndPlay);
+          try {
+            player.playVideo();
+            state = 'playing';
+          } catch (e) {
+            console.error('[playVideo] Error:', e);
+          }
         }
-      }, 1000);
+      }, 200);
+      
+      // Таймаут на 5 секунд
+      setTimeout(() => clearInterval(checkAndPlay), 5000);
     } else {
-      if (player && player.playVideo) {
+      console.log('[playVideo] Player ready, playing immediately');
+      try {
         player.playVideo();
         state = 'playing';
+      } catch (e) {
+        console.error('[playVideo] Error:', e);
       }
     }
   }
