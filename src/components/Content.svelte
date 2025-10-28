@@ -361,7 +361,7 @@
     position: sticky;
     top: 2rem;
     box-shadow: 0 4px 12px rgba(91, 117, 83, 0.12);
-    margin-top: calc(clamp(2.5rem, 5vw, 4rem) + 1rem + 2rem);
+    margin-top: calc(clamp(2.5rem, 5vw, 4rem) + 3rem);
   }
   
   @media (max-width: 768px) {
