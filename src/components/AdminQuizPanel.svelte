@@ -65,70 +65,76 @@
     }
   }
 
-  // === Загрузка опенинга ===
-  let newOpening = {
-    title: '',
-    youtubeUrl: '',
-    startTime: 0,
-    endTime: 20
-  };
-  let openingUploading = false;
-  let openingUploadError = '';
+  // === Загрузка опенингов (3 шт) ===
+  let openingSlots = Array.from({ length: 3 }, () => ({ 
+    title: '', 
+    youtubeUrl: '', 
+    startTime: 0, 
+    endTime: 20 
+  }));
+  let openingPackUploading = false;
+  let openingPackError = '';
 
-  async function submitOpening() {
-    openingUploadError = '';
+  $: canSubmitOpeningPack = openingSlots.every((s) => s.title.trim() && s.youtubeUrl.trim());
+
+  async function submitOpeningPack() {
+    openingPackError = '';
     
     if (!adminUploadDate) {
-      openingUploadError = 'Выберите дату сета';
+      openingPackError = 'Выберите дату сета';
       return;
     }
     
-    if (!newOpening.title.trim()) {
-      openingUploadError = 'Введите название аниме';
-      return;
-    }
-    
-    if (!newOpening.youtubeUrl.trim()) {
-      openingUploadError = 'Введите ссылку на YouTube';
+    if (!canSubmitOpeningPack) {
+      openingPackError = 'Заполните все 3 опенинга (название и ссылку)';
       return;
     }
 
     try {
-      openingUploading = true;
-      console.log(`[submitOpening] Starting upload for ${adminUploadDate}`);
+      openingPackUploading = true;
+      console.log(`[submitOpeningPack] Starting upload for ${adminUploadDate}`);
       
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/openings`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('api_token')}`
-        },
-        body: JSON.stringify({
-          quizDate: adminUploadDate,
-          title: newOpening.title.trim(),
-          youtubeUrl: newOpening.youtubeUrl.trim(),
-          startTime: newOpening.startTime || 0,
-          endTime: newOpening.endTime || 20
-        })
-      });
+      // Загружаем 3 опенинга последовательно
+      for (let i = 0; i < openingSlots.length; i++) {
+        const opening = openingSlots[i];
+        
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/openings`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('api_token')}`
+          },
+          body: JSON.stringify({
+            quizDate: adminUploadDate,
+            title: opening.title.trim(),
+            youtubeUrl: opening.youtubeUrl.trim(),
+            startTime: opening.startTime || 0,
+            endTime: opening.endTime || 20
+          })
+        });
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status} на опенинге ${i + 1}`);
+        }
+        
+        console.log(`[submitOpeningPack] Opening ${i + 1} uploaded successfully`);
       }
-
-      const result = await response.json();
-      console.log('[submitOpening] Success:', result);
       
       // Очистить форму
-      newOpening = { title: '', youtubeUrl: '', startTime: 0, endTime: 20 };
+      openingSlots = Array.from({ length: 3 }, () => ({ 
+        title: '', 
+        youtubeUrl: '', 
+        startTime: 0, 
+        endTime: 20 
+      }));
       
-      alert(`✓ Опенинг успешно добавлен на дату ${adminUploadDate}!`);
+      alert(`✓ Пак опенингов (3 шт) успешно загружен на дату ${adminUploadDate}!`);
     } catch (e) {
-      console.error('[submitOpening] Error:', e);
-      openingUploadError = `Ошибка загрузки: ${e?.message || 'Network error'}`;
-      alert(openingUploadError);
+      console.error('[submitOpeningPack] Error:', e);
+      openingPackError = `Ошибка загрузки: ${e?.message || 'Network error'}`;
+      alert(openingPackError);
     } finally {
-      openingUploading = false;
+      openingPackUploading = false;
     }
   }
 
@@ -220,65 +226,71 @@
       </button>
     </div>
 
-    <!-- === ЗАГРУЗКА ОПЕНИНГА === -->
+    <!-- === ЗАГРУЗКА ОПЕНИНГОВ (3 шт) === -->
     <div class="upload-section">
-      <div class="section-title">🎵 Загрузка опенинга</div>
+      <div class="section-title">🎵 Загрузка опенингов (3 шт)</div>
       
-      <div class="opening-form">
-        <div class="form-group">
-          <label>Название аниме (правильный ответ):</label>
-          <input 
-            type="text" 
-            bind:value={newOpening.title}
-            placeholder="Например: Attack on Titan"
-            class="form-input"
-          />
-        </div>
-        
-        <div class="form-group">
-          <label>Ссылка на YouTube:</label>
-          <input 
-            type="text" 
-            bind:value={newOpening.youtubeUrl}
-            placeholder="https://www.youtube.com/watch?v=..."
-            class="form-input"
-          />
-        </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label>Начало (сек):</label>
-            <input 
-              type="number" 
-              bind:value={newOpening.startTime}
-              class="form-input"
-              min="0"
-            />
+      <div class="openings-grid">
+        {#each openingSlots as slot, idx}
+          <div class="opening-slot">
+            <div class="slot-header">Опенинг {idx + 1}</div>
+            
+            <div class="form-group">
+              <label>Название аниме:</label>
+              <input 
+                type="text" 
+                bind:value={slot.title}
+                placeholder="Attack on Titan"
+                class="form-input"
+              />
+            </div>
+            
+            <div class="form-group">
+              <label>Ссылка YouTube:</label>
+              <input 
+                type="text" 
+                bind:value={slot.youtubeUrl}
+                placeholder="https://www.youtube.com/watch?v=..."
+                class="form-input"
+              />
+            </div>
+            
+            <div class="form-row-compact">
+              <div class="form-group-compact">
+                <label>Старт (сек):</label>
+                <input 
+                  type="number" 
+                  bind:value={slot.startTime}
+                  class="form-input"
+                  min="0"
+                />
+              </div>
+              
+              <div class="form-group-compact">
+                <label>Конец (сек):</label>
+                <input 
+                  type="number" 
+                  bind:value={slot.endTime}
+                  class="form-input"
+                  min="1"
+                />
+              </div>
+            </div>
           </div>
-          
-          <div class="form-group">
-            <label>Конец (сек):</label>
-            <input 
-              type="number" 
-              bind:value={newOpening.endTime}
-              class="form-input"
-              min="1"
-            />
-          </div>
-        </div>
-        
-        {#if openingUploadError}
-          <div class="error-message">{openingUploadError}</div>
-        {/if}
-        
-        <button 
-          class="submit-btn"
-          on:click={submitOpening}
-          disabled={!newOpening.title.trim() || !newOpening.youtubeUrl.trim() || openingUploading}
-        >
-          {openingUploading ? '⏳ Загрузка...' : '✓ Загрузить опенинг'}
-        </button>
+        {/each}
       </div>
+      
+      {#if openingPackError}
+        <div class="error-message">{openingPackError}</div>
+      {/if}
+      
+      <button 
+        class="submit-btn"
+        on:click={submitOpeningPack}
+        disabled={!canSubmitOpeningPack || openingPackUploading}
+      >
+        {openingPackUploading ? '⏳ Загрузка...' : '✓ Загрузить пак опенингов'}
+      </button>
     </div>
   </div>
 {/if}
@@ -491,16 +503,48 @@
   }
 
   /* === ФОРМА ОПЕНИНГА === */
-  .opening-form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+  .openings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .opening-slot {
+    background: rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 16px;
+    transition: all 0.3s ease;
+  }
+
+  .opening-slot:hover {
+    border-color: var(--accent);
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .slot-header {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    text-align: center;
+    padding-bottom: 12px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
   }
 
   .form-group {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    margin-bottom: 12px;
+  }
+  
+  .form-group-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
 
   .form-row {
@@ -508,9 +552,16 @@
     grid-template-columns: 1fr 1fr;
     gap: 16px;
   }
+  
+  .form-row-compact {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
 
-  .form-group label {
-    color: rgba(255, 255, 255, 0.8);
+  .form-group label,
+  .form-group-compact label {
+    color: var(--text);
     font-weight: 600;
     font-size: 0.9rem;
   }
