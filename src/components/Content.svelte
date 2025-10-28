@@ -242,6 +242,16 @@
     }
   }
   
+  @media (max-width: 768px) {
+    .aniguessr-layout {
+      padding: 1rem 0.75rem;
+    }
+    
+    .main-container {
+      gap: 1.5rem;
+    }
+  }
+  
   /* Quiz cards section */
   .quiz-cards-section {
     display: flex;
@@ -262,6 +272,18 @@
     display: grid;
     gap: 1.5rem;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+  
+  @media (max-width: 768px) {
+    .main-title {
+      font-size: clamp(2rem, 8vw, 2.5rem);
+      margin-bottom: 0.75rem;
+    }
+    
+    .quiz-cards {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
   }
   
   .quiz-card {
@@ -286,6 +308,16 @@
     transform: translateY(-2px) scale(0.98);
   }
   
+  @media (max-width: 768px) {
+    .quiz-card {
+      padding: 2rem 1.5rem;
+    }
+    
+    .quiz-card:hover {
+      transform: translateY(-2px);
+    }
+  }
+  
   .card-content {
     position: relative;
     z-index: 1;
@@ -298,6 +330,12 @@
     color: var(--text);
     letter-spacing: 0.01em;
     line-height: 1.4;
+  }
+  
+  @media (max-width: 768px) {
+    .card-title {
+      font-size: clamp(1rem, 4vw, 1.2rem);
+    }
   }
   
   .replay-btn-new {
@@ -328,6 +366,15 @@
     transform: scale(0.96);
   }
   
+  @media (max-width: 768px) {
+    .replay-btn-new {
+      padding: 0.875rem 1.5rem;
+      font-size: 0.9rem;
+      width: 100%;
+      max-width: 350px;
+    }
+  }
+  
   .replay-icon {
     font-size: 1.5rem;
     animation: rotate 2s linear infinite;
@@ -346,6 +393,13 @@
     padding: 1.5rem;
     position: sticky;
     top: 2rem;
+  }
+  
+  @media (max-width: 768px) {
+    .leaderboard-sidebar {
+      padding: 1rem;
+      position: static;
+    }
   }
   
   .lb-header {
@@ -373,6 +427,17 @@
     border-radius: 12px;
     font-weight: 800;
     font-size: 0.9rem;
+  }
+  
+  @media (max-width: 768px) {
+    .lb-title {
+      font-size: 0.9rem;
+    }
+    
+    .streak-badge {
+      font-size: 0.8rem;
+      padding: 0.3rem 0.6rem;
+    }
   }
   
   .lb-tabs-new {
@@ -408,6 +473,13 @@
     background: rgba(162, 57, 202, 0.2);
     border-color: var(--accent);
     color: var(--accent);
+  }
+  
+  @media (max-width: 768px) {
+    .lb-tab-new {
+      font-size: 0.6rem;
+      padding: 0.4rem 0.5rem;
+    }
   }
   
   .lb-list {

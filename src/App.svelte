@@ -69,6 +69,16 @@
     justify-content: space-between;
   }
   
+  @media (max-width: 768px) {
+    .app-header {
+      height: 60px;
+    }
+    
+    .header-content {
+      padding: 0 16px;
+    }
+  }
+  
   .header-controls {
     display: flex;
     align-items: center;
@@ -109,6 +119,12 @@
     padding: 16px 12px;
   }
   
+  @media (max-width: 768px) {
+    .sidebar-container {
+      display: none;
+    }
+  }
+  
   .content-container {
     flex: 1;
     height: 100%;
@@ -121,6 +137,12 @@
     height: 100%;
     overflow-y: auto;
     padding: 20px;
+  }
+  
+  @media (max-width: 768px) {
+    .content-scroll {
+      padding: 12px;
+    }
   }
   
   .scroll-top-btn {
