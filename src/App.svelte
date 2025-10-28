@@ -1,7 +1,7 @@
 <script>
   import Sidebar from './components/Sidebar.svelte';
   import Content from './components/Content.svelte';
-  import UserMenu from './components/UserMenu.svelte';
+  import ProfileMenu from './components/ProfileMenu.svelte';
   import { currentUser } from './stores/authApi';
   
   let showTop = false;
@@ -15,7 +15,20 @@
   function closeProfileMenu() {
     showProfileMenu = false;
   }
+  
+  // Закрытие меню при клике вне его
+  function handleClickOutside(event) {
+    if (showProfileMenu) {
+      const dropdown = document.querySelector('.profile-dropdown');
+      const button = document.querySelector('.profile-btn');
+      if (dropdown && button && !dropdown.contains(event.target) && !button.contains(event.target)) {
+        closeProfileMenu();
+      }
+    }
+  }
 </script>
+
+<svelte:window on:click={handleClickOutside} />
 
 <div class="app-container">
   <!-- Шапка -->
@@ -34,8 +47,8 @@
         </button>
         
         {#if showProfileMenu}
-          <div class="profile-dropdown" on:click={closeProfileMenu}>
-            <UserMenu />
+          <div class="profile-dropdown">
+            <ProfileMenu />
           </div>
         {/if}
       </div>
