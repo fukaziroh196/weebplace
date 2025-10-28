@@ -17,7 +17,7 @@
   $: isAdmin = $currentUser?.role === 'admin' || $currentUser?.is_admin === 1 || $currentUser?.isAdmin === true;
 </script>
 
-<div class="sidebar flex flex-col h-full gap-3 pt-4 overflow-hidden">
+<div class="sidebar flex flex-col h-full gap-3 pt-8 overflow-hidden">
   <button class="nav-item {isActive('home') ? 'is-active' : ''}" on:click={goHome}>
     <div class="icon-wrapper">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
