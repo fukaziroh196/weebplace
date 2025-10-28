@@ -266,26 +266,30 @@
     }
     userSuggestTimer = setTimeout(async () => {
       try {
-        const ids = await Promise.resolve().then(() => {
-          let current;
-          const unsub = enabledSourceIds.subscribe((v) => (current = v));
-          unsub();
-          return current;
-        });
-        const results = await sourceRegistry.search(userAnswer.trim(), ids, { limit: 5 });
-        let custom; adminImages.subscribe((v) => (custom = v))();
-        userSuggestions = results.map((it) => (custom && custom[it.id] ? { ...it, image: custom[it.id] } : it));
-        showUserSuggestions = true;
+        const response = await fetch(`https://shikimori.one/api/animes?search=${encodeURIComponent(userAnswer.trim())}&limit=10&order=popularity`);
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+          userSuggestions = data.map(anime => ({
+            title: anime.russian || anime.name,
+            titleAlt: anime.name !== anime.russian ? anime.name : null
+          }));
+          showUserSuggestions = true;
+        } else {
+          userSuggestions = [];
+          showUserSuggestions = false;
+        }
       } catch (e) {
-        console.error('Suggest error', e);
+        console.error('[onUserAnswerInput] Error:', e);
         userSuggestions = [];
+        showUserSuggestions = false;
       }
     }, 300);
   }
   
-  function selectUserAnswer(anime) {
-    console.log('[selectUserAnswer] Selected anime:', anime);
-    userAnswer = String(anime.title || anime.russian || '').trim();
+  function selectUserAnswer(suggestion) {
+    console.log('[selectUserAnswer] Selected anime:', suggestion);
+    userAnswer = String(suggestion.title || '').trim();
     console.log('[selectUserAnswer] Set userAnswer to:', userAnswer);
     userSuggestions = [];
     showUserSuggestions = false;
@@ -577,18 +581,12 @@
             <div class="suggestions-dropdown">
               {#each userSuggestions as s}
                 <div class="suggestion-item" on:click={() => selectUserAnswer(s)}>
-                  {#if s.image}
-                    <img src={s.image} alt="" class="suggestion-image" />
-                  {/if}
                   <div class="suggestion-content">
                     <div class="suggestion-title">{s.title}</div>
-                    {#if s.russian && s.russian !== s.title}
-                      <div class="suggestion-subtitle">{s.russian}</div>
+                    {#if s.titleAlt}
+                      <div class="suggestion-subtitle">{s.titleAlt}</div>
                     {/if}
                   </div>
-                  {#if s.score}
-                    <span class="suggestion-score">★ {s.score}</span>
-                  {/if}
                 </div>
               {/each}
             </div>

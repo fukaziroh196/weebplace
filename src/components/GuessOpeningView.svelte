@@ -25,6 +25,11 @@
   let isChecking = false;
   let answerFeedback = ''; // 'correct' | 'incorrect' | ''
   
+  // === Автодополнение для ответов ===
+  let userSuggestions = [];
+  let showUserSuggestions = false;
+  let searchTimeout;
+  
   // === Система очков ===
   let totalScore = 0;
   let roundScores = []; // Массив очков для каждого раунда
@@ -199,9 +204,48 @@
     userAnswer = '';
     answerFeedback = '';
     hintUsed = false;
+    userSuggestions = [];
+    showUserSuggestions = false;
     if (player && playerReady) {
       player.stopVideo();
     }
+  }
+  
+  // === Автодополнение ===
+  async function onUserAnswerInput() {
+    clearTimeout(searchTimeout);
+    if (!userAnswer.trim() || userAnswer.trim().length < 2) {
+      userSuggestions = [];
+      showUserSuggestions = false;
+      return;
+    }
+    searchTimeout = setTimeout(async () => {
+      try {
+        const response = await fetch(`https://shikimori.one/api/animes?search=${encodeURIComponent(userAnswer.trim())}&limit=10&order=popularity`);
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+          userSuggestions = data.map(anime => ({
+            title: anime.russian || anime.name,
+            titleAlt: anime.name !== anime.russian ? anime.name : null
+          }));
+          showUserSuggestions = true;
+        } else {
+          userSuggestions = [];
+          showUserSuggestions = false;
+        }
+      } catch (e) {
+        console.error('[onUserAnswerInput] Error:', e);
+        userSuggestions = [];
+        showUserSuggestions = false;
+      }
+    }, 300);
+  }
+  
+  function selectUserAnswer(suggestion) {
+    userAnswer = String(suggestion.title || '').trim();
+    userSuggestions = [];
+    showUserSuggestions = false;
   }
 
   // === Проверка ответа ===
@@ -323,14 +367,38 @@
       <!-- Поле ввода ответа -->
       {#if state !== 'idle'}
         <div class="answer-section">
-          <input 
-            type="text" 
-            bind:value={userAnswer}
-            placeholder="Введите название аниме"
-            class="answer-input {answerFeedback === 'correct' ? 'answer-correct' : answerFeedback === 'incorrect' ? 'answer-incorrect' : ''}"
-            on:keydown={(e) => { if (e.key === 'Enter') checkAnswer(); }}
-            disabled={isChecking || state === 'revealed'}
-          />
+          <div class="answer-input-wrapper">
+            <input 
+              type="text" 
+              bind:value={userAnswer}
+              on:input={onUserAnswerInput}
+              on:focus={() => { if (userSuggestions.length > 0) showUserSuggestions = true; }}
+              on:blur={() => setTimeout(() => showUserSuggestions = false, 200)}
+              placeholder="Введите название аниме"
+              class="answer-input {answerFeedback === 'correct' ? 'answer-correct' : answerFeedback === 'incorrect' ? 'answer-incorrect' : ''}"
+              on:keydown={(e) => { 
+                if (e.key === 'Enter') checkAnswer(); 
+                if (e.key === 'Escape') showUserSuggestions = false;
+              }}
+              disabled={isChecking || state === 'revealed'}
+              autocomplete="off"
+            />
+            
+            {#if showUserSuggestions && userSuggestions.length > 0}
+              <div class="suggestions-dropdown">
+                {#each userSuggestions as s}
+                  <div class="suggestion-item" on:click={() => selectUserAnswer(s)}>
+                    <div class="suggestion-content">
+                      <div class="suggestion-title">{s.title}</div>
+                      {#if s.titleAlt}
+                        <div class="suggestion-subtitle">{s.titleAlt}</div>
+                      {/if}
+                    </div>
+                  </div>
+                {/each}
+              </div>
+            {/if}
+          </div>
           
           <button 
             class="answer-btn"
@@ -585,9 +653,14 @@
     margin-left: auto;
     margin-right: auto;
   }
+  
+  .answer-input-wrapper {
+    position: relative;
+    flex: 1;
+  }
 
   .answer-input {
-    flex: 1;
+    width: 100%;
     padding: 14px 16px;
     background: rgba(255, 255, 255, 0.05);
     border: 2px solid rgba(255, 255, 255, 0.2);
@@ -647,6 +720,55 @@
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
+  }
+  
+  /* === Автодополнение === */
+  .suggestions-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 8px;
+    background: var(--panelStrong);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    overflow: hidden;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 100;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+  
+  .suggestion-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  
+  .suggestion-item:last-child {
+    border-bottom: none;
+  }
+  
+  .suggestion-item:hover {
+    background: var(--extra);
+  }
+  
+  .suggestion-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .suggestion-title {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  
+  .suggestion-subtitle {
+    color: var(--muted);
+    font-size: 0.85rem;
   }
 
   /* === Кнопки управления === */
