@@ -34,8 +34,8 @@
   <!-- Верхняя бегущая строка -->
   <div class="marquee-top">
     <div class="marquee-content">
-      <span>WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • </span>
-      <span>WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • </span>
+      <span>work in progress / work in progress / work in progress / work in progress / work in progress / work in progress / work in progress / work in progress / </span>
+      <span>work in progress / work in progress / work in progress / work in progress / work in progress / work in progress / work in progress / work in progress / </span>
     </div>
   </div>
 
@@ -92,8 +92,8 @@
   <!-- Нижняя бегущая строка -->
   <div class="marquee-bottom">
     <div class="marquee-content">
-      <span>WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • </span>
-      <span>WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • WORK IN PROGRESS • </span>
+      <span>work in progress / work in progress / work in progress / work in progress / work in progress / work in progress / work in progress / work in progress / </span>
+      <span>work in progress / work in progress / work in progress / work in progress / work in progress / work in progress / work in progress / work in progress / </span>
     </div>
   </div>
 </div>
