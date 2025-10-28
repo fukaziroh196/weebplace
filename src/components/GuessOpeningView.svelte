@@ -25,21 +25,6 @@
   let isChecking = false;
   let answerFeedback = ''; // 'correct' | 'incorrect' | ''
 
-  // === Админ ===
-  let isAdmin = false;
-  let uploading = false;
-  let uploadError = '';
-  let newOpening = {
-    title: '',
-    youtubeUrl: '',
-    startTime: 0,
-    endTime: 20
-  };
-
-  $: {
-    isAdmin = $currentUser?.role === 'admin' || $currentUser?.is_admin === 1 || $currentUser?.isAdmin === true;
-    console.log('[GuessOpening] currentUser:', $currentUser, 'isAdmin:', isAdmin);
-  }
   $: currentOpening = openings[currentIndex] || null;
 
   // === Загрузка опенингов ===
@@ -196,48 +181,6 @@
   }
 
   // === Админ: загрузка опенинга ===
-  async function uploadOpening() {
-    uploadError = '';
-    
-    if (!newOpening.title.trim() || !newOpening.youtubeUrl.trim()) {
-      uploadError = 'Заполните название и ссылку на YouTube';
-      return;
-    }
-
-    try {
-      uploading = true;
-      
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/openings`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(newOpening)
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const result = await response.json();
-      console.log('[uploadOpening] Success:', result);
-      
-      // Очистить форму
-      newOpening = { title: '', youtubeUrl: '', startTime: 0, endTime: 20 };
-      
-      // Перезагрузить список
-      await loadOpenings();
-      
-      alert('✓ Опенинг успешно добавлен!');
-    } catch (e) {
-      console.error('[uploadOpening] Error:', e);
-      uploadError = `Ошибка загрузки: ${e?.message || 'Network error'}`;
-    } finally {
-      uploading = false;
-    }
-  }
-
   onDestroy(() => {
     if (player && player.destroy) {
       player.destroy();
@@ -246,84 +189,12 @@
 </script>
 
 <div class="guess-opening-container">
-  <!-- DEBUG INFO (удалить после проверки) -->
-  <div style="background: rgba(255,0,0,0.2); padding: 10px; margin-bottom: 10px; color: white; font-size: 12px;">
-    <strong>DEBUG:</strong> isAdmin = {isAdmin} | currentUser = {JSON.stringify($currentUser)} | openings.length = {openings.length}
-  </div>
-  
-  {#if isAdmin}
-    <!-- === АДМИН ПАНЕЛЬ === -->
-    <div class="admin-panel">
-      <h2 class="admin-title">Панель администратора</h2>
-      
-      <div class="admin-form">
-        <div class="form-group">
-          <label>Название аниме:</label>
-          <input 
-            type="text" 
-            bind:value={newOpening.title}
-            placeholder="Например: Attack on Titan"
-            class="admin-input"
-          />
-        </div>
-        
-        <div class="form-group">
-          <label>Ссылка на YouTube:</label>
-          <input 
-            type="text" 
-            bind:value={newOpening.youtubeUrl}
-            placeholder="https://www.youtube.com/watch?v=..."
-            class="admin-input"
-          />
-        </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label>Начало (сек):</label>
-            <input 
-              type="number" 
-              bind:value={newOpening.startTime}
-              class="admin-input"
-              min="0"
-            />
-          </div>
-          
-          <div class="form-group">
-            <label>Конец (сек):</label>
-            <input 
-              type="number" 
-              bind:value={newOpening.endTime}
-              class="admin-input"
-              min="1"
-            />
-          </div>
-        </div>
-        
-        {#if uploadError}
-          <div class="error-message">{uploadError}</div>
-        {/if}
-        
-        <button 
-          class="admin-upload-btn" 
-          on:click={uploadOpening}
-          disabled={uploading}
-        >
-          {uploading ? '⏳ Загрузка...' : '✓ Добавить опенинг'}
-        </button>
-      </div>
-      
-      <div class="divider"></div>
-    </div>
-  {/if}
-
   <!-- === ИГРОВОЙ ИНТЕРФЕЙС === -->
   {#if openings.length === 0}
     <div class="empty-state">
       <div class="empty-icon">🎵</div>
       <div class="empty-text">Пока нет опенингов для угадывания</div>
-      {#if !isAdmin}
-        <button class="back-btn" on:click={goHome}>← Назад</button>
-      {/if}
+      <button class="back-btn" on:click={goHome}>← Назад</button>
     </div>
   {:else}
     <div class="game-area">
@@ -412,102 +283,6 @@
     max-width: 900px;
     margin: 0 auto;
     padding: 20px;
-  }
-
-  /* === АДМИН ПАНЕЛЬ === */
-  .admin-panel {
-    background: rgba(162, 57, 202, 0.1);
-    border: 1px solid rgba(162, 57, 202, 0.3);
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 32px;
-  }
-
-  .admin-title {
-    color: var(--accent, #A239CA);
-    font-size: 1.5rem;
-    font-weight: 900;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-  }
-
-  .admin-form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-
-  .form-group label {
-    color: rgba(255, 255, 255, 0.8);
-    font-weight: 600;
-    font-size: 0.9rem;
-  }
-
-  .admin-input {
-    padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    color: white;
-    font-size: 1rem;
-    transition: all 0.3s;
-  }
-
-  .admin-input:focus {
-    outline: none;
-    border-color: var(--accent, #A239CA);
-    background: rgba(255, 255, 255, 0.08);
-  }
-
-  .admin-upload-btn {
-    padding: 14px 24px;
-    background: var(--accent, #A239CA);
-    color: white;
-    font-weight: 900;
-    font-size: 1rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s;
-    text-transform: uppercase;
-  }
-
-  .admin-upload-btn:hover:not(:disabled) {
-    background: var(--accent2, #8B2FC9);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(162, 57, 202, 0.5);
-  }
-
-  .admin-upload-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  .error-message {
-    color: #f44336;
-    font-weight: 600;
-    padding: 12px;
-    background: rgba(244, 67, 54, 0.1);
-    border: 1px solid rgba(244, 67, 54, 0.3);
-    border-radius: 8px;
-  }
-
-  .divider {
-    height: 1px;
-    background: rgba(255, 255, 255, 0.1);
-    margin: 24px 0 0 0;
   }
 
   /* === ИГРОВАЯ ОБЛАСТЬ === */
