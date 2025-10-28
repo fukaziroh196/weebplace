@@ -122,7 +122,6 @@
         </div>
       </aside>
     </div>
-  </div>
   {:else if $activeView === 'search'}
   <!-- Search View -->
   <div class="mt-2">
