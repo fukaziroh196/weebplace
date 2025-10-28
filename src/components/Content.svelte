@@ -85,7 +85,7 @@
       <!-- Right sidebar: Leaderboard -->
       <aside class="leaderboard-sidebar">
         <div class="lb-header">
-          <h2 class="lb-title">САМЫЕ АКТИВНЫЕ WEEB'Ы</h2>
+          <h2 class="lb-title">ЛИДЕРБОРД</h2>
           {#if $userStats?.data}
             <span class="streak-badge">🔥 {$userStats.data.currentStreak}</span>
           {/if}
@@ -416,6 +416,17 @@
     gap: 0.75rem;
     max-height: 600px;
     overflow-y: auto;
+    overflow-x: hidden;
+  }
+  
+  /* Hide scrollbar */
+  .lb-list::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .lb-list {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
   
   .lb-item {
