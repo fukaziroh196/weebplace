@@ -97,6 +97,10 @@
   let totalScore = 0;
   let roundScores = []; // очки за каждый раунд
   
+  // Визуальная обратная связь
+  let answerFeedback = ''; // 'correct' | 'incorrect' | ''
+  let isChecking = false;
+  
   // Загрузка данных из API
   async function fetchAllGuesses(dateOverride) {
     loading = true;
@@ -297,9 +301,27 @@
   
   async function checkAnswer() {
     const guessId = animeGuesses[currentImageIndex]?.id;
-    if (!guessId || !userAnswer.trim()) return;
+    const answer = userAnswer.trim();
+    
+    if (!guessId || !answer) {
+      console.log('[checkAnswer] No guess ID or empty answer');
+      return;
+    }
+    
+    if (isChecking) {
+      console.log('[checkAnswer] Already checking...');
+      return;
+    }
+    
+    isChecking = true;
+    answerFeedback = '';
+    
+    console.log('[checkAnswer] Checking:', { guessId, answer, title: animeGuesses[currentImageIndex]?.title });
+    
     try {
-      const res = await apiGuesses.checkAnswer(guessId, userAnswer.trim());
+      const res = await apiGuesses.checkAnswer(guessId, answer);
+      console.log('[checkAnswer] Response:', res);
+      
       if (res?.correct) {
         const userId = $currentUser?.id;
         const guess = animeGuesses.find(g => g.id === guessId);
@@ -313,9 +335,13 @@
         roundScores[currentImageIndex] = score;
         roundScores = [...roundScores]; // trigger reactivity
         
+        answerFeedback = 'correct';
+        
+        console.log('[checkAnswer] Correct! Score:', score, 'Total:', totalScore);
+        
         // Показываем уведомление с очками
         setTimeout(() => {
-          alert(`✅ Правильно! +${score} очков\n\nВсего очков: ${totalScore}`);
+          alert(`✅ Правильно! +${score.toLocaleString()} очков\n\nВсего очков: ${totalScore.toLocaleString()}`);
         }, 100);
         
         // Переход к следующей картинке
@@ -325,19 +351,33 @@
             userAnswer = '';
             unlockedClues = [];
             showTitle = false;
+            answerFeedback = '';
+            isChecking = false;
           }, 1200);
         } else {
           setTimeout(() => {
-            alert(`🎉 Поздравляем! Вы отгадали все картинки!\n\n🏆 Итоговый счёт: ${totalScore} очков`);
+            alert(`🎉 Поздравляем! Вы отгадали все картинки!\n\n🏆 Итоговый счёт: ${totalScore.toLocaleString()} очков`);
             userAnswer = '';
+            answerFeedback = '';
+            isChecking = false;
           }, 1200);
         }
       } else {
-        // Неправильный ответ - просто ничего не делаем, 0 очков
-        // Пользователь может попробовать ещё раз
+        // Неправильный ответ
+        answerFeedback = 'incorrect';
+        console.log('[checkAnswer] Incorrect answer');
+        
+        // Сбрасываем через 1 секунду
+        setTimeout(() => {
+          answerFeedback = '';
+          isChecking = false;
+        }, 1000);
       }
     } catch (e) {
-      alert('Ошибка проверки: ' + (e?.message || ''));
+      console.error('[checkAnswer] Error:', e);
+      alert('Ошибка проверки: ' + (e?.message || 'Неизвестная ошибка'));
+      answerFeedback = '';
+      isChecking = false;
     }
   }
   
@@ -606,7 +646,7 @@
             type="text" 
             bind:value={userAnswer}
             placeholder="Введите название аниме"
-            class="answer-input"
+            class="answer-input {answerFeedback === 'correct' ? 'answer-correct' : answerFeedback === 'incorrect' ? 'answer-incorrect' : ''}"
             on:input={onUserAnswerInput}
             on:keydown={(e) => { 
               if (e.key === 'Enter') {
@@ -616,13 +656,15 @@
               if (e.key === 'Escape') showUserSuggestions = false;
             }}
             autocomplete="off"
+            disabled={isChecking}
           />
           
           <button 
             on:click={checkAnswer}
             class="guess-btn"
+            disabled={isChecking || !userAnswer.trim()}
           >
-            ОТВЕТИТЬ
+            {isChecking ? '⏳' : 'ОТВЕТИТЬ'}
           </button>
           
           {#if showUserSuggestions && userSuggestions.length > 0}
@@ -853,6 +895,23 @@
     color: rgba(255, 255, 255, 0.4);
   }
   
+  .answer-input.answer-correct {
+    border-color: #4CAF50 !important;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+  }
+  
+  .answer-input.answer-incorrect {
+    border-color: #f44336 !important;
+    box-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
+    animation: shake 0.3s;
+  }
+  
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+  
   .guess-btn {
     padding: 14px 30px;
     background: var(--accent, #A239CA);
@@ -875,6 +934,12 @@
   
   .guess-btn:active {
     transform: translateY(0);
+  }
+  
+  .guess-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
   }
   
   @media (max-width: 768px) {
