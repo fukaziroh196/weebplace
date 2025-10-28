@@ -49,60 +49,78 @@
   // No-op mounts for quizzes home
 </script>
 
-  <div class="flex flex-col w-full px-6">
+  <div class="aniguessr-layout">
   {#if $activeView === 'home' || $activeView === 'aniquiz'}
-    <div class="mt-4">
-      <div class="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-8 items-start">
-        <!-- Left: quiz list -->
-        <div>
-          <div class="section-title">АРКАДА</div>
-          <div class="stack">
-            <button class="stack-item" on:click={() => { console.log('[Content] GoTo GuessAnime'); activeView.set('guessAnime'); }}>
-              <div class="stack-bullet">🎯</div>
-              <div>
-                <div class="stack-title">Угадай аниме по случайным кадрам</div>
-              </div>
-            </button>
-            <button class="stack-item" on:click={() => { console.log('[Content] GoTo GuessCharacter'); activeView.set('guessCharacter'); }}>
-              <div class="stack-bullet">👤</div>
-              <div>
-                <div class="stack-title">Угадывай персонажей по портретам</div>
-              </div>
-            </button>
-            <button class="stack-item" on:click={() => { console.log('[Content] GoTo GuessOpening'); activeView.set('guessOpening'); }}>
-              <div class="stack-bullet">🎵</div>
-              <div>
-                <div class="stack-title">Угадай аниме по опенингу</div>
-              </div>
-            </button>
-          </div>
-          <div class="mt-5">
-            <button class="replay-btn" on:click={openReplay}>↺  ПОВТОРИТЬ ПРЕДЫДУЩИЕ ДНИ</button>
-          </div>
+    <div class="main-container">
+      <!-- Center: Quiz cards -->
+      <div class="quiz-cards-section">
+        <h1 class="main-title">УГАДАЙ АНИМЕ</h1>
+        
+        <div class="quiz-cards">
+          <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessAnime'); activeView.set('guessAnime'); }}>
+            <div class="card-content">
+              <h3 class="card-title">... со скриншотом</h3>
+              <p class="card-subtitle">Угадай аниме по случайным кадрам</p>
+            </div>
+          </button>
+          
+          <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessCharacter'); activeView.set('guessCharacter'); }}>
+            <div class="card-content">
+              <h3 class="card-title">... персонажей</h3>
+              <p class="card-subtitle">Угадывай персонажей по портретам</p>
+            </div>
+          </button>
+          
+          <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessOpening'); activeView.set('guessOpening'); }}>
+            <div class="card-content">
+              <h3 class="card-title">... с опенингом</h3>
+              <p class="card-subtitle">Угадай аниме по опенингу</p>
+            </div>
+          </button>
         </div>
-        <!-- Right: leaderboard placeholder -->
-        <div>
-          <div class="section-title flex items-center justify-between">
-            <span>ЛИДЕРБОРД</span>
-            {#if $userStats?.data}
-              <span class="streak-pill" title="Серия дней">🔥 {$userStats.data.currentStreak}</span>
-            {/if}
-          </div>
-          <div class="lb-tabs">
-            <button class="lb-tab {$leaderboardPeriod==='day'?'active':''}" on:click={() => { leaderboardPeriod.set('day'); refreshLeaderboard('day'); }}>Сегодня</button>
-            <button class="lb-tab {$leaderboardPeriod==='week'?'active':''}" on:click={() => { leaderboardPeriod.set('week'); refreshLeaderboard('week'); }}>Неделя</button>
-            <button class="lb-tab {$leaderboardPeriod==='all'?'active':''}" on:click={() => { leaderboardPeriod.set('all'); refreshLeaderboard('all'); }}>Всё время</button>
-          </div>
-          <div class="lb">
-            {#each $leaderboard as r}
-              <div class="lb-row {r.highlight ? 'lb-row--hot' : ''}">
-                <div class="lb-rank">{r.rank}</div>
-                <div class="lb-name">{r.name}</div>
-                <div class="lb-days">{r.days?.toLocaleString() || 0} очков</div>
-              </div>
-            {/each}
-          </div>
+        
+        <button class="replay-btn-new" on:click={openReplay}>
+          <span class="replay-icon">↺</span>
+          ПОВТОРИТЬ ПРЕДЫДУЩИЕ ДНИ
+        </button>
+      </div>
+      
+      <!-- Right sidebar: Leaderboard -->
+      <aside class="leaderboard-sidebar">
+        <div class="lb-header">
+          <h2 class="lb-title">САМЫЕ АКТИВНЫЕ WEEB'Ы</h2>
+          {#if $userStats?.data}
+            <span class="streak-badge">🔥 {$userStats.data.currentStreak}</span>
+          {/if}
         </div>
+        
+        <div class="lb-tabs-new">
+          <button class="lb-tab-new {$leaderboardPeriod==='day'?'active':''}" on:click={() => { leaderboardPeriod.set('day'); refreshLeaderboard('day'); }}>
+            CURRENT STREAK
+          </button>
+          <button class="lb-tab-new {$leaderboardPeriod==='week'?'active':''}" on:click={() => { leaderboardPeriod.set('week'); refreshLeaderboard('week'); }}>
+            BEST STREAK
+          </button>
+          <button class="lb-tab-new {$leaderboardPeriod==='all'?'active':''}" on:click={() => { leaderboardPeriod.set('all'); refreshLeaderboard('all'); }}>
+            MOST ACTIVE
+          </button>
+        </div>
+        
+        <div class="lb-list">
+          {#each $leaderboard as r, idx}
+            <div class="lb-item {r.highlight ? 'top-three' : ''}">
+              <div class="lb-position">{idx + 1}</div>
+              <div class="lb-avatar">
+                <div class="avatar-placeholder"></div>
+              </div>
+              <div class="lb-info">
+                <div class="lb-username">{r.name}</div>
+                <div class="lb-score">{r.days?.toLocaleString() || 0} очков</div>
+              </div>
+            </div>
+          {/each}
+        </div>
+      </aside>
     </div>
   </div>
   {:else if $activeView === 'search'}
@@ -205,4 +223,293 @@
 
   /* Global background and text for pastel theme */
   :global(body) { background: var(--bg); color: var(--text); }
+  
+  /* AniGuessr-style layout */
+  .aniguessr-layout {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+  
+  .main-container {
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: 3rem;
+    align-items: start;
+  }
+  
+  @media (max-width: 1200px) {
+    .main-container {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+  
+  /* Quiz cards section */
+  .quiz-cards-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .main-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 900;
+    text-align: center;
+    color: var(--text);
+    letter-spacing: 0.02em;
+    margin-bottom: 1rem;
+  }
+  
+  .quiz-cards {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+  
+  .quiz-card {
+    position: relative;
+    background: var(--panel);
+    border: 2px solid rgba(162, 57, 202, 0.2);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+  }
+  
+  .quiz-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(162, 57, 202, 0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .quiz-card:hover::before {
+    opacity: 1;
+  }
+  
+  .quiz-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--accent);
+    box-shadow: 0 16px 40px rgba(162, 57, 202, 0.3);
+  }
+  
+  .quiz-card:active {
+    transform: translateY(-4px) scale(0.98);
+  }
+  
+  .card-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+  
+  .card-title {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.01em;
+  }
+  
+  .card-subtitle {
+    font-size: clamp(0.9rem, 1.5vw, 1rem);
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+  }
+  
+  .replay-btn-new {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 16px;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 24px rgba(162, 57, 202, 0.4);
+    margin: 0 auto;
+  }
+  
+  .replay-btn-new:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(162, 57, 202, 0.5);
+  }
+  
+  .replay-btn-new:active {
+    transform: scale(0.95);
+  }
+  
+  .replay-icon {
+    font-size: 1.5rem;
+    animation: rotate 2s linear infinite;
+  }
+  
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  
+  /* Leaderboard sidebar */
+  .leaderboard-sidebar {
+    background: var(--panel);
+    border: 2px solid rgba(162, 57, 202, 0.15);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    position: sticky;
+    top: 2rem;
+  }
+  
+  .lb-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .lb-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: 0.03em;
+  }
+  
+  .streak-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    background: rgba(162, 57, 202, 0.15);
+    border: 1px solid rgba(162, 57, 202, 0.4);
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.9rem;
+  }
+  
+  .lb-tabs-new {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .lb-tab-new {
+    flex: 1;
+    padding: 0.6rem 0.8rem;
+    background: transparent;
+    border: 1px solid rgba(162, 57, 202, 0.3);
+    border-radius: 12px;
+    color: var(--text);
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+  
+  .lb-tab-new:hover {
+    background: rgba(162, 57, 202, 0.1);
+    border-color: var(--accent);
+  }
+  
+  .lb-tab-new.active {
+    background: rgba(162, 57, 202, 0.2);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  
+  .lb-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 600px;
+    overflow-y: auto;
+  }
+  
+  .lb-item {
+    display: grid;
+    grid-template-columns: 40px 40px 1fr;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--panelStrong);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+  }
+  
+  .lb-item:hover {
+    background: rgba(162, 57, 202, 0.1);
+    transform: translateX(4px);
+  }
+  
+  .lb-item.top-three {
+    background: linear-gradient(90deg, rgba(162, 57, 202, 0.15), transparent);
+    border: 1px solid rgba(162, 57, 202, 0.3);
+  }
+  
+  .lb-position {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(162, 57, 202, 0.2);
+    border-radius: 8px;
+    font-weight: 800;
+    color: var(--accent);
+    font-size: 0.9rem;
+  }
+  
+  .lb-item.top-three .lb-position {
+    background: var(--accent);
+    color: #fff;
+  }
+  
+  .lb-avatar {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 50%;
+    border: 2px solid rgba(162, 57, 202, 0.4);
+  }
+  
+  .lb-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+  
+  .lb-username {
+    font-weight: 700;
+    color: var(--text);
+    font-size: 0.95rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .lb-score {
+    font-size: 0.8rem;
+    color: var(--accent);
+    font-weight: 600;
+  }
 </style>
