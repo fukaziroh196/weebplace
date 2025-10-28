@@ -333,7 +333,8 @@
           }, 1200);
         }
       } else {
-        alert('❌ Неправильно! Попробуйте еще раз.');
+        // Неправильный ответ - просто ничего не делаем, 0 очков
+        // Пользователь может попробовать ещё раз
       }
     } catch (e) {
       alert('Ошибка проверки: ' + (e?.message || ''));
@@ -748,18 +749,15 @@
   
   .quiz-image {
     width: 100%;
-    height: auto;
+    height: 45vh;
     display: block;
-    max-height: 45vh;
-    min-height: 250px;
-    object-fit: contain;
+    object-fit: cover;
     background: #000;
   }
   
   @media (max-width: 768px) {
     .quiz-image {
-      min-height: 180px;
-      max-height: 35vh;
+      height: 35vh;
     }
   }
   
