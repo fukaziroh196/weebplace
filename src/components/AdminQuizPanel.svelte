@@ -138,9 +138,98 @@
     }
   }
 
+  // === Просмотр загруженных данных ===
+  let uploadedImages = [];
+  let uploadedOpenings = [];
+  let loadingData = false;
+
+  async function loadUploadedData() {
+    if (!adminUploadDate) return;
+    
+    loadingData = true;
+    try {
+      // Загрузить картинки для выбранной даты
+      const imagesRes = await fetch(`${import.meta.env.VITE_API_URL}/anime-guesses?date=${adminUploadDate}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('api_token')}`
+        }
+      });
+      if (imagesRes.ok) {
+        uploadedImages = await imagesRes.json();
+      }
+      
+      // Загрузить опенинги для выбранной даты
+      const openingsRes = await fetch(`${import.meta.env.VITE_API_URL}/openings?date=${adminUploadDate}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('api_token')}`
+        }
+      });
+      if (openingsRes.ok) {
+        uploadedOpenings = await openingsRes.json();
+      }
+    } catch (e) {
+      console.error('[loadUploadedData] Error:', e);
+    } finally {
+      loadingData = false;
+    }
+  }
+
+  // === Удаление картинки ===
+  async function deleteImage(id) {
+    if (!confirm('Удалить эту картинку?')) return;
+    
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/anime-guesses/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('api_token')}`
+        }
+      });
+      
+      if (response.ok) {
+        alert('✓ Картинка удалена');
+        await loadUploadedData();
+      } else {
+        throw new Error('Ошибка удаления');
+      }
+    } catch (e) {
+      console.error('[deleteImage] Error:', e);
+      alert('Ошибка удаления: ' + e.message);
+    }
+  }
+
+  // === Удаление опенинга ===
+  async function deleteOpening(id) {
+    if (!confirm('Удалить этот опенинг?')) return;
+    
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/openings/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('api_token')}`
+        }
+      });
+      
+      if (response.ok) {
+        alert('✓ Опенинг удалён');
+        await loadUploadedData();
+      } else {
+        throw new Error('Ошибка удаления');
+      }
+    } catch (e) {
+      console.error('[deleteOpening] Error:', e);
+      alert('Ошибка удаления: ' + e.message);
+    }
+  }
+
   // === Вспомогательные функции ===
   function setDateToToday() {
     adminUploadDate = new Date().toISOString().split('T')[0];
+  }
+  
+  // Реактивная загрузка данных при смене даты
+  $: if (adminUploadDate) {
+    loadUploadedData();
   }
 
   onMount(() => {
@@ -291,6 +380,63 @@
       >
         {openingPackUploading ? '⏳ Загрузка...' : '✓ Загрузить пак опенингов'}
       </button>
+    </div>
+
+    <!-- === ПРОСМОТР ЗАГРУЖЕННЫХ КАРТИНОК === -->
+    <div class="view-section">
+      <div class="section-title">📋 Загруженные картинки на {adminUploadDate}</div>
+      
+      {#if loadingData}
+        <div class="loading-text">⏳ Загрузка...</div>
+      {:else if uploadedImages.length === 0}
+        <div class="empty-text">Нет загруженных картинок на эту дату</div>
+      {:else}
+        <div class="uploaded-list">
+          {#each uploadedImages as img}
+            <div class="uploaded-item">
+              <div class="item-preview">
+                <img src={`${import.meta.env.VITE_API_URL.replace('/api', '')}${img.image_url}`} alt={img.title} />
+              </div>
+              <div class="item-info">
+                <div class="item-title">{img.title}</div>
+                <div class="item-date">{img.quiz_date || 'Без даты'}</div>
+              </div>
+              <button class="delete-btn" on:click={() => deleteImage(img.id)}>
+                🗑️ Удалить
+              </button>
+            </div>
+          {/each}
+        </div>
+      {/if}
+    </div>
+
+    <!-- === ПРОСМОТР ЗАГРУЖЕННЫХ ОПЕНИНГОВ === -->
+    <div class="view-section">
+      <div class="section-title">📋 Загруженные опенинги на {adminUploadDate}</div>
+      
+      {#if loadingData}
+        <div class="loading-text">⏳ Загрузка...</div>
+      {:else if uploadedOpenings.length === 0}
+        <div class="empty-text">Нет загруженных опенингов на эту дату</div>
+      {:else}
+        <div class="uploaded-list">
+          {#each uploadedOpenings as opening}
+            <div class="uploaded-item">
+              <div class="item-icon">🎵</div>
+              <div class="item-info">
+                <div class="item-title">{opening.title}</div>
+                <div class="item-url">{opening.youtube_url}</div>
+                <div class="item-date">
+                  {opening.start_time}s - {opening.end_time}s | {opening.quiz_date || 'Без даты'}
+                </div>
+              </div>
+              <button class="delete-btn" on:click={() => deleteOpening(opening.id)}>
+                🗑️ Удалить
+              </button>
+            </div>
+          {/each}
+        </div>
+      {/if}
     </div>
   </div>
 {/if}
@@ -611,6 +757,128 @@
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
+  }
+
+  /* === ПРОСМОТР ЗАГРУЖЕННЫХ === */
+  .view-section {
+    background: rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: 32px;
+  }
+
+  .loading-text {
+    text-align: center;
+    color: var(--muted);
+    padding: 20px;
+    font-size: 1.1rem;
+  }
+
+  .empty-text {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.4);
+    padding: 20px;
+    font-size: 1rem;
+  }
+
+  .uploaded-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .uploaded-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+  }
+
+  .uploaded-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--accent);
+  }
+
+  .item-preview {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .item-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .item-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .item-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .item-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .item-url {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .item-date {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .delete-btn {
+    padding: 10px 20px;
+    background: rgba(244, 67, 54, 0.2);
+    border: 1px solid rgba(244, 67, 54, 0.4);
+    border-radius: 8px;
+    color: #f44336;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .delete-btn:hover {
+    background: rgba(244, 67, 54, 0.3);
+    border-color: #f44336;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
   }
 
   .error-message {
