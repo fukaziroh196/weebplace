@@ -113,10 +113,10 @@
   
   .sidebar-container {
     flex-shrink: 0;
-    width: 80px;
+    width: auto;
     height: 100%;
-    overflow: hidden;
-    padding: 8px;
+    overflow: visible;
+    padding: 16px 8px;
   }
   
   @media (max-width: 768px) {

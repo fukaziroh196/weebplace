@@ -17,112 +17,148 @@
   $: isAdmin = $currentUser?.role === 'admin' || $currentUser?.is_admin === 1 || $currentUser?.isAdmin === true;
 </script>
 
-<div class="sidebar flex flex-col h-full items-center gap-2 pt-4 overflow-hidden">
-  <button class="icon-btn {isActive('home') ? 'is-active' : ''}" on:click={goHome} title="Главная">
-    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-      <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-    </svg>
+<div class="sidebar flex flex-col h-full gap-3 pt-4 overflow-hidden">
+  <button class="nav-item {isActive('home') ? 'is-active' : ''}" on:click={goHome}>
+    <div class="icon-wrapper">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+      </svg>
+    </div>
+    <span class="nav-label">Главная</span>
   </button>
   
-  <button class="icon-btn {isActive('aniquiz') ? 'is-active' : ''}" on:click={goToAniQuiz} title="AniQuiz">
-    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-      <path d="M8 5v14l11-7z"/>
-    </svg>
+  <button class="nav-item {isActive('aniquiz') ? 'is-active' : ''}" on:click={goToAniQuiz}>
+    <div class="icon-wrapper">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+    </div>
+    <span class="nav-label">AniQuiz</span>
   </button>
   
-  <button class="icon-btn {isActive('events') ? 'is-active' : ''}" on:click={goToEvents} title="Ивенты">
-    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-      <path d="M4 5h2V3h12v2h2v2H4V5zm0 4h16v12H4V9zm2 2v8h12v-8H6z"/>
-      <rect x="7" y="12" width="2" height="2"/>
-      <rect x="11" y="12" width="2" height="2"/>
-      <rect x="15" y="12" width="2" height="2"/>
-    </svg>
+  <button class="nav-item {isActive('events') ? 'is-active' : ''}" on:click={goToEvents}>
+    <div class="icon-wrapper">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+        <path d="M4 5h2V3h12v2h2v2H4V5zm0 4h16v12H4V9zm2 2v8h12v-8H6z"/>
+        <rect x="7" y="12" width="2" height="2"/>
+        <rect x="11" y="12" width="2" height="2"/>
+        <rect x="15" y="12" width="2" height="2"/>
+      </svg>
+    </div>
+    <span class="nav-label">Ивенты</span>
   </button>
   
-  <button class="icon-btn {isActive('tournaments') ? 'is-active' : ''}" on:click={goToTournaments} title="Турниры">
-    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-      <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0 0 11 15.9V19H7v2h10v-2h-4v-3.1a5.01 5.01 0 0 0 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
-    </svg>
+  <button class="nav-item {isActive('tournaments') ? 'is-active' : ''}" on:click={goToTournaments}>
+    <div class="icon-wrapper">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+        <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0 0 11 15.9V19H7v2h10v-2h-4v-3.1a5.01 5.01 0 0 0 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
+      </svg>
+    </div>
+    <span class="nav-label">Турниры</span>
   </button>
   
-  <button class="icon-btn {isActive('tierlists') ? 'is-active' : ''}" on:click={goToTierLists} title="Тирлисты">
-    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-      <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
-    </svg>
+  <button class="nav-item {isActive('tierlists') ? 'is-active' : ''}" on:click={goToTierLists}>
+    <div class="icon-wrapper">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+        <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+      </svg>
+    </div>
+    <span class="nav-label">Тирлисты</span>
   </button>
   
-  <button class="icon-btn {isActive('calendar') ? 'is-active' : ''}" title="Календарь">
-    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-      <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V9h14v10zM5 7V5h14v2H5zm2 4h10v2H7v-2z"/>
-    </svg>
+  <button class="nav-item {isActive('calendar') ? 'is-active' : ''}">
+    <div class="icon-wrapper">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+        <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V9h14v10zM5 7V5h14v2H5zm2 4h10v2H7v-2z"/>
+      </svg>
+    </div>
+    <span class="nav-label">Календарь</span>
   </button>
   
-  <button class="icon-btn" title="Профиль">
-    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-    </svg>
+  <button class="nav-item">
+    <div class="icon-wrapper">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+      </svg>
+    </div>
+    <span class="nav-label">Профиль</span>
   </button>
 
   {#if isAdmin}
-    <div class="divider"></div>
-    <button class="icon-btn {isActive('adminQuiz') ? 'is-active' : ''}" on:click={goToAdminQuiz} title="Админ панель">
-      <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
-      </svg>
+    <button class="nav-item {isActive('adminQuiz') ? 'is-active' : ''}" on:click={goToAdminQuiz}>
+      <div class="icon-wrapper">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+        </svg>
+      </div>
+      <span class="nav-label">Админ</span>
     </button>
   {/if}
 </div>
 
 <style>
   .sidebar { 
-    background: rgba(255, 255, 255, 0.5);
-    padding: 12px 8px;
-    width: 64px;
+    background: transparent;
+    padding: 0;
   }
   
-  .icon-btn { 
+  .nav-item { 
     display: flex; 
     align-items: center; 
-    justify-content: center; 
-    width: 48px; 
-    height: 48px; 
-    border-radius: 12px; 
-    transition: all .2s cubic-bezier(0.4, 0, 0.2, 1); 
-    color: var(--muted); 
+    gap: 12px; 
+    padding: 0;
     border: none; 
     background: transparent;
     cursor: pointer;
-    position: relative;
+    transition: all .2s ease;
   }
   
-  .icon-btn:hover { 
-    background: rgba(91, 117, 83, 0.15); 
-    color: var(--accent);
+  .icon-wrapper {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--muted);
+    transition: all .2s ease;
+    flex-shrink: 0;
   }
   
-  .icon-btn.is-active { 
-    background: var(--extra); 
+  .nav-item:hover .icon-wrapper {
+    background: var(--extra);
     color: #FFFFFF;
-    box-shadow: 0 2px 8px rgba(139, 164, 127, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(139, 164, 127, 0.3);
   }
   
-  .icon-btn.is-active::after {
-    content: '';
-    position: absolute;
-    left: -8px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 4px;
-    height: 24px;
+  .nav-item.is-active .icon-wrapper {
     background: var(--accent);
-    border-radius: 0 4px 4px 0;
+    color: #FFFFFF;
+    box-shadow: 0 2px 8px rgba(91, 117, 83, 0.4);
   }
   
-  .divider {
-    width: 32px;
-    height: 2px;
-    background: rgba(91, 117, 83, 0.2);
-    margin: 8px 0;
+  .nav-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all .2s ease;
+    pointer-events: none;
+  }
+  
+  .nav-item:hover .nav-label {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  
+  .nav-item.is-active .nav-label {
+    opacity: 1;
+    transform: translateX(0);
+    color: var(--accent);
   }
   .theme-switch {
     appearance: none;
