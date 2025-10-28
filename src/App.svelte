@@ -11,27 +11,32 @@
 </script>
 
 <div class="app-container">
-  <!-- Кнопки в правом верхнем углу -->
-  <div class="top-controls">
-    <button class="control-btn theme-btn" title={$theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'} on:click={toggleTheme}>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        {#if $theme === 'dark'}
-          <path d="M12 3a9 9 0 0 0 9 9 9 9 0 1 1-9-9z"></path>
-        {:else}
-          <circle cx="12" cy="12" r="5"></circle>
-          <line x1="12" y1="1" x2="12" y2="3"></line>
-          <line x1="12" y1="21" x2="12" y2="23"></line>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-          <line x1="1" y1="12" x2="3" y2="12"></line>
-          <line x1="21" y1="12" x2="23" y2="12"></line>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-        {/if}
-      </svg>
-    </button>
-    <UserMenu />
-  </div>
+  <!-- Шапка с названием -->
+  <header class="app-header">
+    <div class="header-content">
+      <h1 class="site-title">AniQuiz</h1>
+      <div class="header-controls">
+        <button class="control-btn theme-btn" title={$theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'} on:click={toggleTheme}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            {#if $theme === 'dark'}
+              <path d="M12 3a9 9 0 0 0 9 9 9 9 0 1 1-9-9z"></path>
+            {:else}
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            {/if}
+          </svg>
+        </button>
+        <UserMenu />
+      </div>
+    </div>
+  </header>
 
   <!-- Основная область -->
   <div class="main-layout">
@@ -64,13 +69,40 @@
     height: 100vh;
     overflow: hidden;
     position: relative;
+    display: flex;
+    flex-direction: column;
   }
   
-  .top-controls {
-    position: fixed;
-    top: 16px;
-    right: 16px;
+  .app-header {
+    width: 100%;
+    height: 70px;
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     z-index: 100;
+  }
+  
+  .header-content {
+    height: 100%;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .site-title {
+    font-size: 28px;
+    font-weight: 900;
+    color: white;
+    margin: 0;
+    letter-spacing: 1px;
+    background: linear-gradient(135deg, #A239CA, #FF1068);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .header-controls {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -97,20 +129,21 @@
   .main-layout {
     display: flex;
     width: 100%;
-    height: 100vh;
+    flex: 1;
     gap: 0;
+    overflow: hidden;
   }
   
   .sidebar-container {
     flex-shrink: 0;
-    height: 100vh;
+    height: 100%;
     overflow: hidden;
     padding: 16px 12px;
   }
   
   .content-container {
     flex: 1;
-    height: 100vh;
+    height: 100%;
     position: relative;
     overflow: hidden;
   }
