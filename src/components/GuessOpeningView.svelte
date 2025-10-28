@@ -277,7 +277,6 @@
           {#if state === 'idle'}
             <button class="play-overlay-btn" on:click={playVideo}>
               <div class="play-icon">▶</div>
-              <div class="play-text">Нажми PLAY</div>
             </button>
           {:else if state === 'playing'}
             <div class="overlay-text">🎵 Слушай и угадывай!</div>
@@ -413,36 +412,39 @@
     margin: 0 auto 24px;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   }
 
   .youtube-iframe {
     width: 100%;
     aspect-ratio: 16 / 9;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
   }
 
   /* === Оверлей === */
   .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.6s ease-in-out;
-    pointer-events: none;
+    border-radius: 12px;
   }
 
   .overlay-idle {
-    background: rgba(0, 0, 0, 0.9);
+    background: var(--panelStrong);
     pointer-events: all;
+    box-shadow: 0 4px 12px rgba(91, 117, 83, 0.12);
   }
 
   .overlay-playing {
-    background: #000;
-    opacity: 1;
+    background: var(--panelStrong);
+    box-shadow: 0 4px 12px rgba(91, 117, 83, 0.12);
   }
 
   .overlay-blur {
@@ -450,43 +452,48 @@
     backdrop-filter: blur(20px);
     opacity: 1;
   }
+  
+  .overlay-blur .youtube-iframe {
+    opacity: 1;
+    position: relative;
+    pointer-events: all;
+  }
 
   .overlay-revealed {
     background: transparent;
-    opacity: 0;
+  }
+  
+  .overlay-revealed .youtube-iframe {
+    opacity: 1;
+    position: relative;
+    pointer-events: all;
   }
 
   .play-overlay-btn {
-    background: var(--accent, #A239CA);
+    background: var(--accent);
     border: none;
-    border-radius: 50%;
-    width: 120px;
-    height: 120px;
+    border-radius: 16px;
+    width: 140px;
+    height: 140px;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 8px 24px rgba(162, 57, 202, 0.5);
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 24px rgba(91, 117, 83, 0.4);
   }
 
   .play-overlay-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 12px 32px rgba(162, 57, 202, 0.7);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(91, 117, 83, 0.6);
+    background: var(--extra);
   }
 
   .play-icon {
     color: white;
-    font-size: 3rem;
+    font-size: 4rem;
     line-height: 1;
-  }
-
-  .play-text {
-    color: white;
-    font-size: 0.9rem;
-    font-weight: 700;
-    margin-top: 4px;
+    margin-left: 8px;
   }
 
   .overlay-text {
