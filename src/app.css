@@ -161,7 +161,7 @@ body.theme-light input[type="text"] { }
 
 /* Neon Tokyo (dark) */
 /* Light green minimalist theme */
-body.theme-dark { --bg:#D8E0C8; --panel:#E8EDD5; --panelStrong:#FFFFFF; --accent:#5B7553; --accent2:#6B8A62; --text:#3D4A37; --muted:#7A8A73; --extra:#8BA47F; }
+body.theme-dark { --bg:#B8C8A0; --panel:#D0DCBB; --panelStrong:#FFFFFF; --accent:#5B7553; --accent2:#6B8A62; --text:#2D3A27; --muted:#5A6A53; --extra:#8BA47F; }
 /* Light background with soft colors */
 body.theme-dark { background: var(--bg) !important; color: var(--text) !important; }
 body.theme-dark .glass { background: var(--bg) !important; border:1px solid rgba(91,117,83,.1) !important; box-shadow: none !important; }

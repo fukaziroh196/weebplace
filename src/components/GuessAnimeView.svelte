@@ -688,11 +688,11 @@
   .quiz-title {
     font-size: clamp(1.5rem, 5vw, 2.5rem);
     font-weight: 900;
-    color: white;
+    color: var(--accent);
     letter-spacing: 2px;
     margin: 0;
     text-align: center;
-    text-shadow: 0 0 20px rgba(162, 57, 202, 0.5);
+    text-shadow: none;
   }
   
   .round-badge {
@@ -730,14 +730,14 @@
   .score-value {
     font-size: clamp(1.8rem, 4vw, 2.8rem);
     font-weight: 900;
-    color: #FFD700;
+    color: var(--accent);
     line-height: 1;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    text-shadow: none;
   }
   
   .score-label {
     font-size: clamp(1rem, 2vw, 1.2rem);
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--text);
     text-transform: uppercase;
     letter-spacing: 0.1em;
   }
@@ -797,21 +797,22 @@
   }
   
   .clue-btn.locked {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.2);
-    color: rgba(255, 255, 255, 0.7);
+    background: var(--panelStrong);
+    border-color: var(--accent);
+    color: var(--text);
   }
   
   .clue-btn.locked:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(162, 57, 202, 0.5);
+    background: var(--extra);
+    border-color: var(--accent2);
+    color: #FFFFFF;
     transform: translateY(-2px);
   }
   
   .clue-btn.unlocked {
-    background: rgba(162, 57, 202, 0.2);
-    border-color: #A239CA;
-    color: white;
+    background: var(--extra);
+    border-color: var(--accent2);
+    color: #FFFFFF;
   }
   
   .clue-btn:disabled {
