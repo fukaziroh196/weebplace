@@ -6,8 +6,20 @@ echo "🔄 Перезапуск Weebplace..."
 # На VDS
 if [ -f "/var/www/kristal/weebplace/server/index.js" ]; then
   echo "📦 Обнаружен VDS - перезапускаем сервер..."
+  
+  # Сборка фронтенда
+  echo "🔨 Собираю фронтенд..."
+  cd /var/www/kristal/weebplace
+  npm install --silent
+  npm run build
+  
+  # Установка зависимостей бэкенда
+  echo "📦 Устанавливаю зависимости бэкенда..."
   cd /var/www/kristal/weebplace/server
   npm install --silent
+  
+  # Перезапуск сервиса
+  echo "♻️ Перезапускаю сервис..."
   sudo systemctl restart weebplace
   sudo systemctl status weebplace --no-pager -l | head -20
   echo ""

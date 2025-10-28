@@ -93,6 +93,10 @@
   let unlockedClues = []; // массив разблокированных подсказок для текущей картинки
   let showTitle = false;
   
+  // Система очков
+  let totalScore = 0;
+  let roundScores = []; // очки за каждый раунд
+  
   // Загрузка данных из API
   async function fetchAllGuesses(dateOverride) {
     loading = true;
@@ -279,6 +283,18 @@
     showUserSuggestions = false;
   }
   
+  function calculateScore() {
+    // Без подсказок: 10000
+    // 1 подсказка: 8000
+    // 2 подсказки: 5000
+    // 3 подсказки: 2500
+    const cluesUsed = unlockedClues.length + (showTitle ? 1 : 0);
+    if (cluesUsed === 0) return 10000;
+    if (cluesUsed === 1) return 8000;
+    if (cluesUsed === 2) return 5000;
+    return 2500;
+  }
+  
   async function checkAnswer() {
     const guessId = animeGuesses[currentImageIndex]?.id;
     if (!guessId || !userAnswer.trim()) return;
@@ -291,6 +307,17 @@
           guess.guessedBy.push(userId);
         }
         
+        // Начисляем очки
+        const score = calculateScore();
+        totalScore += score;
+        roundScores[currentImageIndex] = score;
+        roundScores = [...roundScores]; // trigger reactivity
+        
+        // Показываем уведомление с очками
+        setTimeout(() => {
+          alert(`✅ Правильно! +${score} очков\n\nВсего очков: ${totalScore}`);
+        }, 100);
+        
         // Переход к следующей картинке
         if (currentImageIndex < animeGuesses.length - 1) {
           setTimeout(() => {
@@ -298,10 +325,12 @@
             userAnswer = '';
             unlockedClues = [];
             showTitle = false;
-          }, 800);
+          }, 1200);
         } else {
-          alert('🎉 Поздравляем! Вы отгадали все картинки сегодняшнего сета!');
-          userAnswer = '';
+          setTimeout(() => {
+            alert(`🎉 Поздравляем! Вы отгадали все картинки!\n\n🏆 Итоговый счёт: ${totalScore} очков`);
+            userAnswer = '';
+          }, 1200);
         }
       } else {
         alert('❌ Неправильно! Попробуйте еще раз.');
@@ -361,9 +390,8 @@
 </script>
 
 <div class="flex flex-col w-full">
-  <h1 class="text-3xl font-bold text-white mb-6">🎌 Угадай аниме</h1>
-  
   {#if isAdmin}
+    <h1 class="text-3xl font-bold text-white mb-6">🎌 Угадай аниме</h1>
     <!-- Пак 4 картинки: отдельные поля и ответы -->
     <div class="bg-purple-900/70 backdrop-blur-md rounded-xl p-6 mb-6 glass-frame">
       <h2 class="text-2xl font-bold text-white mb-4">📤 Загрузка сета (4 картинки)</h2>
@@ -502,18 +530,23 @@
       <div class="quiz-container">
         <!-- Заголовок с раундом -->
         <div class="quiz-header">
-          <h1 class="quiz-title">GUESS THE ANIME</h1>
+          <h1 class="quiz-title">УГАДАЙ АНИМЕ</h1>
           <div class="round-badge">
-            <span class="round-text">Round {currentImageIndex + 1}</span>
-            <span class="difficulty-badge">Easy</span>
+            <span class="round-text">Раунд {currentImageIndex + 1}</span>
+            <span class="difficulty-badge">Легко</span>
           </div>
+          {#if totalScore > 0}
+            <div class="score-display">
+              🏆 Очки: <span class="score-value">{totalScore.toLocaleString()}</span>
+            </div>
+          {/if}
         </div>
         
         <!-- Большая картинка по центру -->
         <div class="image-container">
           <img 
             src={animeGuesses[currentImageIndex].image} 
-            alt="Guess the anime"
+            alt="Угадай аниме"
             class="quiz-image"
           />
         </div>
@@ -530,7 +563,7 @@
               {#if unlockedClues.includes(0)}
                 {getFirstClue(animeGuesses[currentImageIndex].title)}
               {:else}
-                UNLOCK FIRST CLUE
+                ПЕРВАЯ ПОДСКАЗКА
               {/if}
             </span>
           </button>
@@ -545,7 +578,7 @@
               {#if unlockedClues.includes(1)}
                 {getSecondClue(animeGuesses[currentImageIndex].title)}
               {:else}
-                UNLOCK SECOND CLUE
+                ВТОРАЯ ПОДСКАЗКА
               {/if}
             </span>
           </button>
@@ -560,7 +593,7 @@
               {#if showTitle}
                 {getTitleClue(animeGuesses[currentImageIndex].title)}
               {:else}
-                UNLOCK TITLE CLUE
+                ПОДСКАЗКА НАЗВАНИЕ
               {/if}
             </span>
           </button>
@@ -571,7 +604,7 @@
           <input 
             type="text" 
             bind:value={userAnswer}
-            placeholder="Type your answer here"
+            placeholder="Введите название аниме"
             class="answer-input"
             on:input={onUserAnswerInput}
             on:keydown={(e) => { 
@@ -588,7 +621,7 @@
             on:click={checkAnswer}
             class="guess-btn"
           >
-            GUESS
+            ОТВЕТИТЬ
           </button>
           
           {#if showUserSuggestions && userSuggestions.length > 0}
@@ -648,22 +681,23 @@
   
   /* Quiz Interface Styles (aniguessr-like) */
   .quiz-container {
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 10px;
+    width: 100%;
   }
   
   .quiz-header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
   }
   
   .quiz-title {
-    font-size: 2.5rem;
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
     font-weight: 900;
     color: white;
     letter-spacing: 2px;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     text-shadow: 0 0 20px rgba(162, 57, 202, 0.5);
   }
   
@@ -671,10 +705,12 @@
     display: inline-flex;
     align-items: center;
     gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
   }
   
   .round-text {
-    font-size: 1.5rem;
+    font-size: clamp(1rem, 3vw, 1.5rem);
     font-weight: 700;
     color: white;
   }
@@ -684,15 +720,27 @@
     color: white;
     padding: 4px 12px;
     border-radius: 20px;
-    font-size: 0.875rem;
+    font-size: clamp(0.75rem, 2vw, 0.875rem);
     font-weight: 700;
+  }
+  
+  .score-display {
+    margin-top: 10px;
+    font-size: clamp(1rem, 3vw, 1.25rem);
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .score-value {
+    color: #FFD700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
   }
   
   .image-container {
     position: relative;
     width: 100%;
     max-width: 900px;
-    margin: 0 auto 30px;
+    margin: 0 auto 20px;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
@@ -702,29 +750,47 @@
     width: 100%;
     height: auto;
     display: block;
-    min-height: 400px;
-    object-fit: cover;
+    max-height: 60vh;
+    min-height: 300px;
+    object-fit: contain;
+    background: #000;
+  }
+  
+  @media (max-width: 768px) {
+    .quiz-image {
+      min-height: 200px;
+      max-height: 50vh;
+    }
   }
   
   .clues-container {
     display: flex;
-    gap: 15px;
+    gap: 10px;
     justify-content: center;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     flex-wrap: wrap;
+    padding: 0 10px;
   }
   
   .clue-btn {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
+    gap: 6px;
+    padding: 10px 16px;
     border-radius: 8px;
     font-weight: 700;
-    font-size: 0.875rem;
+    font-size: clamp(0.7rem, 2vw, 0.875rem);
     transition: all 0.3s;
     cursor: pointer;
     border: 2px solid;
+    white-space: nowrap;
+  }
+  
+  @media (max-width: 768px) {
+    .clue-btn {
+      padding: 8px 12px;
+      gap: 4px;
+    }
   }
   
   .clue-btn.locked {
@@ -761,20 +827,22 @@
   .answer-container {
     position: relative;
     max-width: 720px;
-    margin: 0 auto 30px;
+    margin: 0 auto 20px;
     display: flex;
-    gap: 10px;
+    gap: 8px;
+    padding: 0 10px;
   }
   
   .answer-input {
     flex: 1;
-    padding: 16px 20px;
+    padding: 14px 16px;
     background: rgba(255, 255, 255, 0.05);
     border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px;
     color: white;
-    font-size: 1rem;
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
     transition: all 0.3s;
+    min-width: 0;
   }
   
   .answer-input:focus {
@@ -788,16 +856,17 @@
   }
   
   .guess-btn {
-    padding: 16px 40px;
+    padding: 14px 30px;
     background: #FF1068;
     color: white;
     font-weight: 900;
-    font-size: 1rem;
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
     border-radius: 8px;
     border: none;
     cursor: pointer;
     transition: all 0.3s;
     letter-spacing: 1px;
+    white-space: nowrap;
   }
   
   .guess-btn:hover {
@@ -808,6 +877,16 @@
   
   .guess-btn:active {
     transform: translateY(0);
+  }
+  
+  @media (max-width: 768px) {
+    .answer-input {
+      padding: 12px 14px;
+    }
+    
+    .guess-btn {
+      padding: 12px 20px;
+    }
   }
   
   .suggestions-dropdown {
