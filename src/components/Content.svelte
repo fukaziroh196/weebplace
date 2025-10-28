@@ -288,20 +288,19 @@
   
   .quiz-card {
     position: relative;
-    background: rgba(22, 22, 22, 0.8);
-    border: 2px solid rgba(162, 57, 202, 0.35);
-    border-radius: 16px;
+    background: var(--panelStrong);
+    border: none;
+    border-radius: 20px;
     padding: 2.5rem 2rem;
     cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
+    box-shadow: 0 4px 12px rgba(91, 117, 83, 0.12);
   }
   
   .quiz-card:hover {
     transform: translateY(-4px);
-    border-color: rgba(162, 57, 202, 0.7);
-    background: rgba(162, 57, 202, 0.15);
-    box-shadow: 0 8px 24px rgba(162, 57, 202, 0.4);
+    box-shadow: 0 8px 20px rgba(91, 117, 83, 0.18);
   }
   
   .quiz-card:active {
@@ -344,22 +343,23 @@
     justify-content: center;
     gap: 0.75rem;
     padding: 1rem 2rem;
-    background: transparent;
-    border: 2px solid var(--accent);
-    border-radius: 12px;
-    color: var(--accent);
+    background: var(--extra);
+    border: none;
+    border-radius: 16px;
+    color: #FFFFFF;
     font-size: 1rem;
-    font-weight: 800;
-    letter-spacing: 0.05em;
+    font-weight: 700;
+    letter-spacing: 0.02em;
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     margin: 0 auto;
+    box-shadow: 0 4px 12px rgba(139, 164, 127, 0.25);
   }
   
   .replay-btn-new:hover {
-    background: rgba(162, 57, 202, 0.15);
-    border-color: rgba(162, 57, 202, 0.8);
+    background: var(--accent2);
     transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(107, 138, 98, 0.3);
   }
   
   .replay-btn-new:active {
@@ -387,12 +387,13 @@
   
   /* Leaderboard sidebar */
   .leaderboard-sidebar {
-    background: rgba(22, 22, 22, 0.6);
-    border: 2px solid rgba(162, 57, 202, 0.3);
-    border-radius: 16px;
+    background: var(--panelStrong);
+    border: none;
+    border-radius: 20px;
     padding: 1.5rem;
     position: sticky;
     top: 2rem;
+    box-shadow: 0 4px 12px rgba(91, 117, 83, 0.12);
   }
   
   @media (max-width: 768px) {
@@ -450,13 +451,13 @@
   .lb-tab-new {
     flex: 1;
     padding: 0.5rem 0.6rem;
-    background: transparent;
-    border: 2px solid rgba(162, 57, 202, 0.3);
-    border-radius: 10px;
-    color: rgba(231, 223, 221, 0.7);
-    font-weight: 700;
+    background: var(--panel);
+    border: none;
+    border-radius: 12px;
+    color: var(--muted);
+    font-weight: 600;
     font-size: 0.65rem;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.02em;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
@@ -464,15 +465,13 @@
   }
   
   .lb-tab-new:hover {
-    background: rgba(162, 57, 202, 0.12);
-    border-color: rgba(162, 57, 202, 0.5);
-    color: rgba(231, 223, 221, 0.9);
+    background: var(--extra);
+    color: #FFFFFF;
   }
   
   .lb-tab-new.active {
-    background: rgba(162, 57, 202, 0.2);
-    border-color: var(--accent);
-    color: var(--accent);
+    background: var(--accent);
+    color: #FFFFFF;
   }
   
   @media (max-width: 768px) {
@@ -507,21 +506,19 @@
     align-items: center;
     gap: 0.6rem;
     padding: 0.6rem;
-    background: rgba(22, 22, 22, 0.4);
-    border: 1px solid rgba(162, 57, 202, 0.2);
-    border-radius: 10px;
+    background: var(--panel);
+    border: none;
+    border-radius: 12px;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .lb-item:hover {
-    background: rgba(162, 57, 202, 0.12);
-    border-color: rgba(162, 57, 202, 0.4);
+    background: rgba(139, 164, 127, 0.15);
     transform: translateX(2px);
   }
   
   .lb-item.top-three {
-    background: rgba(162, 57, 202, 0.15);
-    border: 2px solid rgba(162, 57, 202, 0.5);
+    background: rgba(139, 164, 127, 0.2);
   }
   
   .lb-position {
@@ -530,7 +527,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(162, 57, 202, 0.2);
+    background: var(--panel);
     border-radius: 8px;
     font-weight: 800;
     color: var(--accent);
@@ -539,7 +536,7 @@
   
   .lb-item.top-three .lb-position {
     background: var(--accent);
-    color: #fff;
+    color: #FFFFFF;
   }
   
   .lb-avatar {
@@ -552,7 +549,7 @@
     height: 100%;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
     border-radius: 50%;
-    border: 2px solid rgba(162, 57, 202, 0.4);
+    border: 2px solid rgba(91, 117, 83, 0.3);
   }
   
   .lb-info {

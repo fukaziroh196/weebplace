@@ -160,17 +160,17 @@ body.theme-light .workspace-frame, body.theme-light .panel-frame, body.theme-lig
 body.theme-light input[type="text"] { }
 
 /* Neon Tokyo (dark) */
-/* Mystic Anime palette for dark theme (keep background as now) */
-body.theme-dark { --bg:#161616; --panel:#161616; --panelStrong:#161616; --accent:#A239CA; --accent2:#A239CA; --text:#E7DFDD; --muted:#A0A0A0; --extra:#F4E04D; }
-/* сплошной фон без градиентов */
+/* Light green minimalist theme */
+body.theme-dark { --bg:#E8EDD5; --panel:#F5F8EC; --panelStrong:#FFFFFF; --accent:#5B7553; --accent2:#6B8A62; --text:#3D4A37; --muted:#7A8A73; --extra:#8BA47F; }
+/* Light background with soft colors */
 body.theme-dark { background: var(--bg) !important; color: var(--text) !important; }
-body.theme-dark .glass { background: var(--bg) !important; border:1px solid rgba(255,255,255,.06) !important; box-shadow: none !important; }
-body.theme-dark .workspace-frame { background: var(--bg) !important; border:1px solid rgba(255,255,255,.06) !important; box-shadow: none !important; }
-body.theme-dark .panel-frame { background: var(--bg) !important; border:1px solid rgba(255,255,255,.06) !important; box-shadow: none !important; }
-body.theme-dark .glass-frame { background: var(--bg) !important; border:1px solid rgba(255,255,255,.06) !important; box-shadow: none !important; }
-body.theme-dark .menu-surface { background: var(--bg) !important; color: var(--text) !important; border:1px solid rgba(255,255,255,.06) !important; box-shadow: none !important; }
-body.theme-dark input[type="text"] { background-color: var(--bg); color: var(--text); border:1px solid rgba(255,255,255,.12); box-shadow: none; }
-body.theme-dark input[type="text"]::placeholder { color: rgba(245,245,245,.45); }
+body.theme-dark .glass { background: var(--bg) !important; border:1px solid rgba(91,117,83,.1) !important; box-shadow: none !important; }
+body.theme-dark .workspace-frame { background: var(--panel) !important; border:1px solid rgba(91,117,83,.1) !important; box-shadow: 0 2px 8px rgba(91,117,83,.08) !important; }
+body.theme-dark .panel-frame { background: var(--panel) !important; border:1px solid rgba(91,117,83,.1) !important; box-shadow: 0 2px 8px rgba(91,117,83,.08) !important; }
+body.theme-dark .glass-frame { background: var(--panel) !important; border:1px solid rgba(91,117,83,.1) !important; box-shadow: 0 2px 8px rgba(91,117,83,.08) !important; }
+body.theme-dark .menu-surface { background: var(--panelStrong) !important; color: var(--text) !important; border:1px solid rgba(91,117,83,.15) !important; box-shadow: 0 4px 12px rgba(91,117,83,.12) !important; }
+body.theme-dark input[type="text"] { background-color: var(--panelStrong); color: var(--text); border:1px solid rgba(91,117,83,.2); box-shadow: none; }
+body.theme-dark input[type="text"]::placeholder { color: rgba(91,117,83,.5); }
 
 /* Utility remap remains palette-aware via variables */
 
