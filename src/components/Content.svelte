@@ -384,13 +384,14 @@
   .streak-badge {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.4rem 0.8rem;
-    background: rgba(162, 57, 202, 0.15);
-    border: 1px solid rgba(162, 57, 202, 0.4);
-    border-radius: 12px;
-    font-weight: 800;
-    font-size: 0.9rem;
+    gap: 0.3rem;
+    padding: 0.3rem 0.6rem;
+    background: var(--extra);
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: white;
   }
   
   @media (max-width: 768px) {
