@@ -36,7 +36,10 @@
     endTime: 20
   };
 
-  $: isAdmin = $currentUser?.role === 'admin';
+  $: {
+    isAdmin = $currentUser?.role === 'admin' || $currentUser?.is_admin === 1 || $currentUser?.isAdmin === true;
+    console.log('[GuessOpening] currentUser:', $currentUser, 'isAdmin:', isAdmin);
+  }
   $: currentOpening = openings[currentIndex] || null;
 
   // === Загрузка опенингов ===
@@ -243,6 +246,11 @@
 </script>
 
 <div class="guess-opening-container">
+  <!-- DEBUG INFO (удалить после проверки) -->
+  <div style="background: rgba(255,0,0,0.2); padding: 10px; margin-bottom: 10px; color: white; font-size: 12px;">
+    <strong>DEBUG:</strong> isAdmin = {isAdmin} | currentUser = {JSON.stringify($currentUser)} | openings.length = {openings.length}
+  </div>
+  
   {#if isAdmin}
     <!-- === АДМИН ПАНЕЛЬ === -->
     <div class="admin-panel">
