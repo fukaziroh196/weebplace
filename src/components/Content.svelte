@@ -114,7 +114,7 @@
               <div class="lb-row {r.highlight ? 'lb-row--hot' : ''}">
                 <div class="lb-rank">{r.rank}</div>
                 <div class="lb-name">{r.name}</div>
-                <div class="lb-days">{r.days} {lbPeriod==='day' ? 'угад.' : 'дней'}</div>
+                <div class="lb-days">{r.days?.toLocaleString() || 0} очков</div>
               </div>
             {/each}
           </div>
