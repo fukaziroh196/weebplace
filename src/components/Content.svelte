@@ -365,6 +365,9 @@
     top: 2rem;
     box-shadow: 0 4px 12px rgba(91, 117, 83, 0.12);
     margin-top: calc((clamp(2.5rem, 5vw, 4rem) + 3rem) * 1.3 - 2px);
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
   }
   
   @media (max-width: 768px) {
@@ -458,9 +461,6 @@
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    max-height: 350px; /* Примерно 5-6 записей */
-    overflow-y: auto;
-    overflow-x: hidden;
     padding-right: 8px;
     padding-bottom: 8px; /* Отступ снизу для последнего элемента */
   }
