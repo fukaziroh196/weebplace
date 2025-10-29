@@ -488,16 +488,16 @@
         
         <!-- Большая картинка по центру -->
         <div class="image-container">
-          {#if unlockedClues.includes(0) && currentGuess?.hint1_image}
-            <img 
-              src="{import.meta.env.VITE_API_URL.replace('/api', '')}{currentGuess.hint1_image}" 
-              alt="Подсказка 1"
-              class="quiz-image"
-            />
-          {:else if unlockedClues.includes(1) && currentGuess?.hint2_image}
+          {#if unlockedClues.includes(1) && currentGuess?.hint2_image}
             <img 
               src="{import.meta.env.VITE_API_URL.replace('/api', '')}{currentGuess.hint2_image}" 
               alt="Подсказка 2"
+              class="quiz-image"
+            />
+          {:else if unlockedClues.includes(0) && currentGuess?.hint1_image}
+            <img 
+              src="{import.meta.env.VITE_API_URL.replace('/api', '')}{currentGuess.hint1_image}" 
+              alt="Подсказка 1"
               class="quiz-image"
             />
           {:else}
