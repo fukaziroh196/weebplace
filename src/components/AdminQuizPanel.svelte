@@ -14,7 +14,7 @@
   let adminUploadDate = selectedDate;
 
   // === Загрузка картинок (4 шт) ===
-  let packSlots = Array.from({ length: 4 }, () => ({ file: null, title: '', hint: '', uploading: false }));
+  let packSlots = Array.from({ length: 4 }, () => ({ file: null, title: '', hint1File: null, hint2File: null, uploading: false }));
   let packUploading = false;
   let packUploadError = '';
   
@@ -48,13 +48,45 @@
       packUploading = true;
       console.log(`[submitPack] Starting upload for ${adminUploadDate}`);
       
-      const slots = packSlots.map((s) => ({ file: s.file, title: s.title.trim(), hint: s.hint.trim() }));
+      const slots = packSlots.map((s) => ({ file: s.file, title: s.title.trim() }));
       const result = await apiGuesses.uploadPack(slots, adminUploadDate);
       
       console.log('[submitPack] Upload success:', result);
       
+      // Загрузить подсказки для каждой картинки
+      if (result.items && Array.isArray(result.items)) {
+        for (let i = 0; i < result.items.length; i++) {
+          const slot = packSlots[i];
+          const item = result.items[i];
+          
+          if ((slot.hint1File || slot.hint2File) && item.id) {
+            try {
+              const formData = new FormData();
+              if (slot.hint1File) formData.append('hint1', slot.hint1File);
+              if (slot.hint2File) formData.append('hint2', slot.hint2File);
+              
+              const hintRes = await fetch(`${import.meta.env.VITE_API_URL}/anime-guesses/${item.id}/hints`, {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${localStorage.getItem('api_token')}`
+                },
+                body: formData
+              });
+              
+              if (!hintRes.ok) {
+                console.error(`[submitPack] Failed to upload hints for slot ${i + 1}`);
+              } else {
+                console.log(`[submitPack] Hints uploaded for slot ${i + 1}`);
+              }
+            } catch (e) {
+              console.error(`[submitPack] Error uploading hints for slot ${i + 1}:`, e);
+            }
+          }
+        }
+      }
+      
       // Очистить форму
-      packSlots = Array.from({ length: 4 }, () => ({ file: null, title: '', hint: '', uploading: false }));
+      packSlots = Array.from({ length: 4 }, () => ({ file: null, title: '', hint1File: null, hint2File: null, uploading: false }));
       
       // Обновить список дат
       await refreshQuizDates();
@@ -390,12 +422,62 @@
               {/if}
             </div>
             
-            <input 
-              type="text" 
-              bind:value={slot.hint}
-              placeholder="Подсказка (необязательно)"
-              class="hint-input"
-            />
+            <div class="hint-section">
+              <div class="hint-label">Подсказки (необязательно):</div>
+              <div class="hint-uploads">
+                <label class="hint-file-label">
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    on:change={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        packSlots[idx].hint1File = file;
+                        packSlots = [...packSlots];
+                      }
+                    }}
+                    class="file-input"
+                  />
+                  <div class="hint-placeholder">
+                    {#if slot.hint1File}
+                      <div class="hint-preview">
+                        <img src={URL.createObjectURL(slot.hint1File)} alt="Hint 1" />
+                        <span class="hint-number">1</span>
+                      </div>
+                    {:else}
+                      <div class="hint-icon">🖼️</div>
+                      <div class="hint-text">Подсказка 1</div>
+                    {/if}
+                  </div>
+                </label>
+                
+                <label class="hint-file-label">
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    on:change={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        packSlots[idx].hint2File = file;
+                        packSlots = [...packSlots];
+                      }
+                    }}
+                    class="file-input"
+                  />
+                  <div class="hint-placeholder">
+                    {#if slot.hint2File}
+                      <div class="hint-preview">
+                        <img src={URL.createObjectURL(slot.hint2File)} alt="Hint 2" />
+                        <span class="hint-number">2</span>
+                      </div>
+                    {:else}
+                      <div class="hint-icon">🖼️</div>
+                      <div class="hint-text">Подсказка 2</div>
+                    {/if}
+                  </div>
+                </label>
+              </div>
+            </div>
           </div>
         {/each}
       </div>
@@ -519,8 +601,15 @@
               </div>
               <div class="item-info">
                 <div class="item-title">{img.title}</div>
-                {#if img.hint}
-                  <div class="item-hint">💡 {img.hint}</div>
+                {#if img.hint1_image || img.hint2_image}
+                  <div class="item-hints">
+                    {#if img.hint1_image}
+                      <span class="hint-badge">🖼️ Подсказка 1</span>
+                    {/if}
+                    {#if img.hint2_image}
+                      <span class="hint-badge">🖼️ Подсказка 2</span>
+                    {/if}
+                  </div>
                 {/if}
                 <div class="item-date">{img.quiz_date || 'Без даты'}</div>
               </div>
@@ -771,25 +860,87 @@
     color: rgba(255, 255, 255, 0.4);
   }
 
-  .hint-input {
-    padding: 10px 12px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
-    color: white;
+  /* === ПОДСКАЗКИ === */
+  .hint-section {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .hint-label {
     font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .hint-uploads {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .hint-file-label {
+    cursor: pointer;
+    display: block;
+  }
+
+  .hint-placeholder {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
   }
 
-  .hint-input:focus {
-    outline: none;
-    border-color: var(--accent, #A239CA);
-    background: rgba(255, 255, 255, 0.08);
+  .hint-placeholder:hover {
+    border-color: var(--accent);
+    background: rgba(91, 117, 83, 0.1);
   }
 
-  .hint-input::placeholder {
-    color: rgba(255, 255, 255, 0.3);
-    font-style: italic;
+  .hint-preview {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  .hint-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hint-number {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: var(--accent);
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .hint-icon {
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+  }
+
+  .hint-text {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.75rem;
+    font-weight: 600;
   }
 
   /* === ФОРМА ОПЕНИНГА === */
@@ -999,15 +1150,21 @@
     white-space: nowrap;
   }
 
-  .item-hint {
-    font-size: 0.9rem;
-    color: var(--accent);
+  .item-hints {
+    display: flex;
+    gap: 6px;
     margin-bottom: 4px;
-    padding: 4px 8px;
+    flex-wrap: wrap;
+  }
+
+  .hint-badge {
+    font-size: 0.75rem;
+    color: var(--accent);
+    padding: 3px 8px;
     background: rgba(91, 117, 83, 0.15);
-    border-radius: 6px;
+    border-radius: 4px;
     display: inline-block;
-    font-style: italic;
+    font-weight: 600;
   }
 
   .item-date {

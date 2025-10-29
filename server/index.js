@@ -75,7 +75,8 @@ db.serialize(() => {
     anime_id TEXT NOT NULL,
     source_id TEXT,
     quiz_date TEXT,
-    hint TEXT,
+    hint1_image TEXT,
+    hint2_image TEXT,
     created_at INTEGER NOT NULL,
     guessed_by TEXT,
     FOREIGN KEY (user_id) REFERENCES users(id)
@@ -87,8 +88,9 @@ db.serialize(() => {
     db.run(`ALTER TABLE anime_guesses ADD COLUMN quiz_date TEXT`, (e) => { /* ignore */ });
   });
   
-  // Migration: ensure hint column exists
-  db.run(`ALTER TABLE anime_guesses ADD COLUMN hint TEXT`, (e) => { /* ignore duplicate column */ });
+  // Migration: ensure hint columns exist
+  db.run(`ALTER TABLE anime_guesses ADD COLUMN hint1_image TEXT`, (e) => { /* ignore duplicate column */ });
+  db.run(`ALTER TABLE anime_guesses ADD COLUMN hint2_image TEXT`, (e) => { /* ignore duplicate column */ });
 
   // Таблица для библиотек пользователей
   db.run(`CREATE TABLE IF NOT EXISTS user_libraries (
@@ -592,13 +594,12 @@ app.post('/api/packs', authenticateToken, requireAdmin, upload.fields([
           const imageUrl = `/uploads/${img.filename}`;
           const guessId = Date.now().toString() + Math.random().toString(36).substring(7) + '-' + idx;
           const title = titles[idx];
-          const hint = String(req.body[`hint${idx + 1}`] || '').trim();
           const animeId = String(req.body[`animeId${idx + 1}`] || `manual-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Date.now()}`);
           const sourceId = req.body[`sourceId${idx + 1}`] || 'manual';
 
           db.run(
-            'INSERT INTO anime_guesses (id, user_id, image_url, title, anime_id, source_id, quiz_date, hint, created_at, guessed_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [guessId, req.user.id, imageUrl, title, animeId, sourceId, quizDate, hint || null, Date.now(), '[]'],
+            'INSERT INTO anime_guesses (id, user_id, image_url, title, anime_id, source_id, quiz_date, created_at, guessed_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [guessId, req.user.id, imageUrl, title, animeId, sourceId, quizDate, Date.now(), '[]'],
             function (insertErr) {
               if (insertErr && !errorOccurred) {
                 console.error(`[/api/packs] INSERT error for ${title}:`, insertErr);
@@ -747,6 +748,54 @@ app.delete('/api/anime-guesses/:id', authenticateToken, requireAdmin, (req, res)
       }
 
       res.json({ success: true });
+    });
+  });
+});
+
+// Загрузить картинки-подсказки для существующего anime_guess
+app.post('/api/anime-guesses/:id/hints', authenticateToken, requireAdmin, upload.fields([
+  { name: 'hint1', maxCount: 1 },
+  { name: 'hint2', maxCount: 1 }
+]), (req, res) => {
+  const { id } = req.params;
+  
+  const hint1File = req.files?.hint1?.[0];
+  const hint2File = req.files?.hint2?.[0];
+  
+  if (!hint1File && !hint2File) {
+    return res.status(400).json({ error: 'At least one hint image is required' });
+  }
+  
+  const hint1Url = hint1File ? `/uploads/${hint1File.filename}` : null;
+  const hint2Url = hint2File ? `/uploads/${hint2File.filename}` : null;
+  
+  // Собираем UPDATE query динамически
+  const updates = [];
+  const values = [];
+  
+  if (hint1Url) {
+    updates.push('hint1_image = ?');
+    values.push(hint1Url);
+  }
+  if (hint2Url) {
+    updates.push('hint2_image = ?');
+    values.push(hint2Url);
+  }
+  
+  values.push(id);
+  
+  const query = `UPDATE anime_guesses SET ${updates.join(', ')} WHERE id = ?`;
+  
+  db.run(query, values, function(err) {
+    if (err) {
+      console.error('[POST /api/anime-guesses/:id/hints] Error:', err);
+      return res.status(500).json({ error: err.message });
+    }
+    
+    res.json({ 
+      success: true,
+      hint1_image: hint1Url,
+      hint2_image: hint2Url
     });
   });
 });

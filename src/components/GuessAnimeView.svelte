@@ -99,6 +99,9 @@
   let roundScores = []; // очки за каждый раунд
   let showFinalResults = false;
   
+  // Текущая картинка для отображения
+  $: currentGuess = animeGuesses[currentImageIndex] || null;
+  
   // Визуальная обратная связь
   let answerFeedback = ''; // 'correct' | 'incorrect' | ''
   let isChecking = false;
@@ -431,23 +434,13 @@
     showTitle = true;
   }
   
-  // Генерация подсказок на основе названия аниме
-  function getFirstClue(title) {
+  // Подсказки:
+  // 1. Первая подсказка - картинка (hint1_image)
+  // 2. Вторая подсказка - картинка (hint2_image)
+  // 3. Третья подсказка - первая буква названия
+  function getFirstLetterHint(title) {
     if (!title) return '';
-    const words = title.split(/\s+/);
-    return words[0] || '';
-  }
-  
-  function getSecondClue(title) {
-    if (!title) return '';
-    const len = title.length;
-    return title.substring(0, Math.ceil(len / 2));
-  }
-  
-  function getTitleClue(title) {
-    if (!title) return '';
-    // Маскируем каждую вторую букву
-    return title.split('').map((c, i) => i % 2 === 1 ? '_' : c).join('');
+    return title.charAt(0).toUpperCase();
   }
   
   function showHint(guess) {
@@ -504,47 +497,50 @@
         
         <!-- Кнопки разблокировки подсказок -->
         <div class="clues-container">
-          <button 
-            class="clue-btn {unlockedClues.includes(0) ? 'unlocked' : 'locked'}"
-            on:click={() => unlockClue(0)}
-            disabled={unlockedClues.includes(0)}
-          >
-            <span class="clue-icon">🔒</span>
-            <span class="clue-text">
+          <!-- Подсказка 1: Картинка -->
+          {#if currentGuess?.hint1_image}
+            <button 
+              class="clue-btn {unlockedClues.includes(0) ? 'unlocked' : 'locked'}"
+              on:click={() => unlockClue(0)}
+              disabled={unlockedClues.includes(0)}
+            >
               {#if unlockedClues.includes(0)}
-                {getFirstClue(animeGuesses[currentImageIndex].title)}
+                <img src="{import.meta.env.VITE_API_URL.replace('/api', '')}{currentGuess.hint1_image}" alt="Подсказка 1" class="hint-image" />
               {:else}
-                ПЕРВАЯ ПОДСКАЗКА
+                <span class="clue-icon">🔒</span>
+                <span class="clue-text">ПОДСКАЗКА 1</span>
               {/if}
-            </span>
-          </button>
+            </button>
+          {/if}
           
-          <button 
-            class="clue-btn {unlockedClues.includes(1) ? 'unlocked' : 'locked'}"
-            on:click={() => unlockClue(1)}
-            disabled={unlockedClues.includes(1)}
-          >
-            <span class="clue-icon">🔒</span>
-            <span class="clue-text">
+          <!-- Подсказка 2: Картинка -->
+          {#if currentGuess?.hint2_image}
+            <button 
+              class="clue-btn {unlockedClues.includes(1) ? 'unlocked' : 'locked'}"
+              on:click={() => unlockClue(1)}
+              disabled={unlockedClues.includes(1)}
+            >
               {#if unlockedClues.includes(1)}
-                {getSecondClue(animeGuesses[currentImageIndex].title)}
+                <img src="{import.meta.env.VITE_API_URL.replace('/api', '')}{currentGuess.hint2_image}" alt="Подсказка 2" class="hint-image" />
               {:else}
-                ВТОРАЯ ПОДСКАЗКА
+                <span class="clue-icon">🔒</span>
+                <span class="clue-text">ПОДСКАЗКА 2</span>
               {/if}
-            </span>
-          </button>
+            </button>
+          {/if}
           
+          <!-- Подсказка 3: Первая буква -->
           <button 
             class="clue-btn {showTitle ? 'unlocked' : 'locked'}"
             on:click={unlockTitleClue}
             disabled={showTitle}
           >
-            <span class="clue-icon">🔒</span>
+            <span class="clue-icon">{showTitle ? '🔓' : '🔒'}</span>
             <span class="clue-text">
               {#if showTitle}
-                {getTitleClue(animeGuesses[currentImageIndex].title)}
+                {getFirstLetterHint(animeGuesses[currentImageIndex].title)}
               {:else}
-                ПОДСКАЗКА НАЗВАНИЕ
+                ПЕРВАЯ БУКВА
               {/if}
             </span>
           </button>
@@ -824,6 +820,18 @@
   .clue-text {
     text-transform: uppercase;
     letter-spacing: 1px;
+  }
+  
+  .hint-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  .clue-btn.unlocked {
+    padding: 0;
+    overflow: hidden;
   }
   
   .answer-container {
