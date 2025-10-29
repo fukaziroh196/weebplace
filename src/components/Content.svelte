@@ -462,6 +462,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 8px;
+    padding-bottom: 8px; /* Отступ снизу для последнего элемента */
   }
   
   /* Hide scrollbar */
