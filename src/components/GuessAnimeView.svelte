@@ -498,36 +498,32 @@
         <!-- Кнопки разблокировки подсказок -->
         <div class="clues-container">
           <!-- Подсказка 1: Картинка -->
-          {#if currentGuess?.hint1_image}
-            <button 
-              class="clue-btn {unlockedClues.includes(0) ? 'unlocked' : 'locked'}"
-              on:click={() => unlockClue(0)}
-              disabled={unlockedClues.includes(0)}
-            >
-              {#if unlockedClues.includes(0)}
-                <img src="{import.meta.env.VITE_API_URL.replace('/api', '')}{currentGuess.hint1_image}" alt="Подсказка 1" class="hint-image" />
-              {:else}
-                <span class="clue-icon">🔒</span>
-                <span class="clue-text">ПОДСКАЗКА 1</span>
-              {/if}
-            </button>
-          {/if}
+          <button 
+            class="clue-btn {unlockedClues.includes(0) ? 'unlocked' : 'locked'}"
+            on:click={() => unlockClue(0)}
+            disabled={unlockedClues.includes(0)}
+          >
+            {#if unlockedClues.includes(0) && currentGuess?.hint1_image}
+              <img src="{import.meta.env.VITE_API_URL.replace('/api', '')}{currentGuess.hint1_image}" alt="Подсказка 1" class="hint-image" />
+            {:else}
+              <span class="clue-icon">🔒</span>
+              <span class="clue-text">ПОДСКАЗКА 1</span>
+            {/if}
+          </button>
           
           <!-- Подсказка 2: Картинка -->
-          {#if currentGuess?.hint2_image}
-            <button 
-              class="clue-btn {unlockedClues.includes(1) ? 'unlocked' : 'locked'}"
-              on:click={() => unlockClue(1)}
-              disabled={unlockedClues.includes(1)}
-            >
-              {#if unlockedClues.includes(1)}
-                <img src="{import.meta.env.VITE_API_URL.replace('/api', '')}{currentGuess.hint2_image}" alt="Подсказка 2" class="hint-image" />
-              {:else}
-                <span class="clue-icon">🔒</span>
-                <span class="clue-text">ПОДСКАЗКА 2</span>
-              {/if}
-            </button>
-          {/if}
+          <button 
+            class="clue-btn {unlockedClues.includes(1) ? 'unlocked' : 'locked'}"
+            on:click={() => unlockClue(1)}
+            disabled={unlockedClues.includes(1)}
+          >
+            {#if unlockedClues.includes(1) && currentGuess?.hint2_image}
+              <img src="{import.meta.env.VITE_API_URL.replace('/api', '')}{currentGuess.hint2_image}" alt="Подсказка 2" class="hint-image" />
+            {:else}
+              <span class="clue-icon">🔒</span>
+              <span class="clue-text">ПОДСКАЗКА 2</span>
+            {/if}
+          </button>
           
           <!-- Подсказка 3: Первая буква -->
           <button 
