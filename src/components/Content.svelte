@@ -365,7 +365,7 @@
     top: 2rem;
     box-shadow: 0 4px 12px rgba(91, 117, 83, 0.12);
     margin-top: calc((clamp(2.5rem, 5vw, 4rem) + 3rem) * 1.3 - 2px);
-    max-height: 430px; /* Увеличена максимальная высота на 20% */
+    max-height: 516px; /* Увеличена максимальная высота ещё на 20% */
     display: flex;
     flex-direction: column;
     overflow-y: auto;
