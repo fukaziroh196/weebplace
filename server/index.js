@@ -103,6 +103,32 @@ db.serialize(() => {
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`);
 
+  // Таблица для баттлов аниме
+  db.run(`CREATE TABLE IF NOT EXISTS anime_battles (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    title TEXT NOT NULL,
+    image_url TEXT NOT NULL,
+    anime_id TEXT NOT NULL,
+    source_id TEXT,
+    quiz_date TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )`);
+
+  // Таблица для результатов баттлов
+  db.run(`CREATE TABLE IF NOT EXISTS battle_results (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    anime_id TEXT NOT NULL,
+    wins INTEGER DEFAULT 0,
+    losses INTEGER DEFAULT 0,
+    points INTEGER DEFAULT 0,
+    quiz_date TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )`);
+
   // Таблица для библиотек пользователей
   db.run(`CREATE TABLE IF NOT EXISTS user_libraries (
     user_id TEXT,
@@ -986,6 +1012,144 @@ app.post('/api/scores', authenticateToken, (req, res) => {
       res.json({ success: true, scoreId });
     }
   );
+});
+
+// ==================== BATTLE ENDPOINTS ====================
+
+// GET /api/battles - Получить аниме для баттла (по дате)
+app.get('/api/battles', (req, res) => {
+  const { date } = req.query;
+  
+  let query = 'SELECT id, title, image_url as image, anime_id, source_id, quiz_date, created_at FROM anime_battles';
+  let params = [];
+  
+  if (date) {
+    query += ' WHERE quiz_date = ?';
+    params.push(date);
+  }
+  
+  query += ' ORDER BY created_at';
+  
+  db.all(query, params, (err, rows) => {
+    if (err) {
+      console.error('[GET /api/battles] Error:', err);
+      return res.status(500).json({ error: err.message });
+    }
+    res.json({ anime: rows || [] });
+  });
+});
+
+// POST /api/battles - Добавить аниме для баттла (только для админа)
+app.post('/api/battles', authenticateToken, requireAdmin, upload.single('image'), (req, res) => {
+  const { title, animeId, sourceId, quizDate } = req.body;
+  
+  if (!title || !animeId || !quizDate || !req.file) {
+    return res.status(400).json({ error: 'title, animeId, quizDate, and image file are required' });
+  }
+  
+  const imageUrl = `/uploads/${req.file.filename}`;
+  const battleId = `battle_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+  
+  db.run(
+    'INSERT INTO anime_battles (id, user_id, title, image_url, anime_id, source_id, quiz_date, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+    [battleId, req.user.id, title, imageUrl, animeId, sourceId || 'manual', quizDate, Date.now()],
+    function(err) {
+      if (err) {
+        console.error('[POST /api/battles] Error:', err);
+        return res.status(500).json({ error: err.message });
+      }
+      
+      console.log(`[POST /api/battles] Battle anime added: ${title} by ${req.user.username}`);
+      res.json({ success: true, id: battleId, imageUrl });
+    }
+  );
+});
+
+// POST /api/battle-results - Сохранить результаты баттла
+app.post('/api/battle-results', authenticateToken, (req, res) => {
+  const { date, results } = req.body;
+  
+  if (!date || !Array.isArray(results)) {
+    return res.status(400).json({ error: 'date and results array are required' });
+  }
+  
+  // Удаляем старые результаты для этой даты
+  db.run('DELETE FROM battle_results WHERE user_id = ? AND quiz_date = ?', [req.user.id, date], (err) => {
+    if (err) {
+      console.error('[POST /api/battle-results] DELETE error:', err);
+      return res.status(500).json({ error: err.message });
+    }
+    
+    // Добавляем новые результаты
+    let completed = 0;
+    let errorOccurred = null;
+    
+    if (results.length === 0) {
+      return res.json({ success: true });
+    }
+    
+    results.forEach((result, index) => {
+      const resultId = `result_${Date.now()}_${index}_${Math.random().toString(36).substring(7)}`;
+      
+      db.run(
+        'INSERT INTO battle_results (id, user_id, anime_id, wins, losses, points, quiz_date, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [resultId, req.user.id, result.animeId, result.wins, result.losses, result.points, date, Date.now()],
+        function(err) {
+          if (err && !errorOccurred) {
+            console.error('[POST /api/battle-results] INSERT error:', err);
+            errorOccurred = err;
+          }
+          
+          completed++;
+          if (completed === results.length) {
+            if (errorOccurred) {
+              return res.status(500).json({ error: errorOccurred.message });
+            }
+            
+            console.log(`[POST /api/battle-results] Results saved for ${req.user.username} on ${date}`);
+            res.json({ success: true });
+          }
+        }
+      );
+    });
+  });
+});
+
+// GET /api/battle-results - Получить результаты баттлов
+app.get('/api/battle-results', (req, res) => {
+  const { date, userId } = req.query;
+  
+  let query = `
+    SELECT br.*, ab.title, ab.image_url as image 
+    FROM battle_results br 
+    LEFT JOIN anime_battles ab ON br.anime_id = ab.anime_id AND br.quiz_date = ab.quiz_date
+  `;
+  let params = [];
+  let conditions = [];
+  
+  if (date) {
+    conditions.push('br.quiz_date = ?');
+    params.push(date);
+  }
+  
+  if (userId) {
+    conditions.push('br.user_id = ?');
+    params.push(userId);
+  }
+  
+  if (conditions.length > 0) {
+    query += ' WHERE ' + conditions.join(' AND ');
+  }
+  
+  query += ' ORDER BY br.points DESC, br.wins DESC';
+  
+  db.all(query, params, (err, rows) => {
+    if (err) {
+      console.error('[GET /api/battle-results] Error:', err);
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(rows || []);
+  });
 });
 
 app.listen(PORT, () => {

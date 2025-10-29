@@ -10,6 +10,7 @@
   import GuessAnimeView from './GuessAnimeView.svelte';
   import GuessCharacterView from './GuessCharacterView.svelte';
   import GuessOpeningView from './GuessOpeningView.svelte';
+  import GuessBattleView from './GuessBattleView.svelte';
   import AdminQuizPanel from './AdminQuizPanel.svelte';
   import { availableQuizDates, refreshQuizDates } from '../stores/quizzes';
   import { userStats, loadUserStats } from '../stores/stats';
@@ -66,6 +67,12 @@
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessOpening'); activeView.set('guessOpening'); }}>
             <div class="card-content">
               <h3 class="card-title">Угадай аниме по опенингу</h3>
+            </div>
+          </button>
+          
+          <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessBattle'); activeView.set('guessBattle'); }}>
+            <div class="card-content">
+              <h3 class="card-title">Аниме Баттл</h3>
             </div>
           </button>
           
@@ -171,6 +178,8 @@
   <GuessCharacterView />
   {:else if $activeView === 'guessOpening'}
   <GuessOpeningView />
+  {:else if $activeView === 'guessBattle'}
+  <GuessBattleView />
   {:else if $activeView === 'adminQuiz'}
   <AdminQuizPanel />
   {/if}

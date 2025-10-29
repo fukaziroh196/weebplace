@@ -90,6 +90,90 @@
 
   $: canSubmitOpeningPack = openingSlots.every((s) => s.title.trim() && s.youtubeUrl.trim());
 
+  // === Загрузка баттл пака (8-16 аниме) ===
+  let battleSlots = Array.from({ length: 12 }, () => ({ 
+    file: null, 
+    title: '', 
+    uploading: false 
+  }));
+  let battlePackUploading = false;
+  let battlePackError = '';
+  
+  // Автодополнение для баттла
+  let battleSuggestions = Array(12).fill([]);
+  let battleShowSuggestions = Array(12).fill(false);
+
+  $: canSubmitBattlePack = battleSlots.filter(s => s.file && s.title.trim()).length >= 8;
+
+  function handleBattleFileSelect(index, event) {
+    const file = event.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      battleSlots[index].file = file;
+      battleSlots = [...battleSlots];
+    }
+  }
+
+  function handleBattleTitleInput(index, event) {
+    battleSlots[index].title = event.target.value;
+    battleSlots = [...battleSlots];
+  }
+
+  async function submitBattlePack() {
+    battlePackError = '';
+    
+    if (!adminUploadDate) {
+      battlePackError = 'Выберите дату сета';
+      return;
+    }
+    
+    const validSlots = battleSlots.filter(s => s.file && s.title.trim());
+    if (validSlots.length < 8) {
+      battlePackError = 'Минимум 8 аниме для баттла';
+      return;
+    }
+    
+    try {
+      battlePackUploading = true;
+      console.log(`[submitBattlePack] Starting upload for ${adminUploadDate}`);
+      
+      // Загружаем каждое аниме
+      for (let i = 0; i < validSlots.length; i++) {
+        const slot = validSlots[i];
+        const formData = new FormData();
+        formData.append('image', slot.file);
+        formData.append('title', slot.title.trim());
+        formData.append('animeId', `battle-${Date.now()}-${i}`);
+        formData.append('sourceId', 'manual');
+        formData.append('quizDate', adminUploadDate);
+        
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/battles`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('api_token')}`
+          },
+          body: formData
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status} на аниме ${i + 1}`);
+        }
+        
+        console.log(`[submitBattlePack] Battle anime ${i + 1} uploaded successfully`);
+      }
+      
+      // Очистить форму
+      battleSlots = Array.from({ length: 12 }, () => ({ file: null, title: '', uploading: false }));
+      
+      alert(`✓ Баттл пак успешно загружен на дату ${adminUploadDate}!\n${validSlots.length} аниме добавлено.`);
+    } catch (e) {
+      console.error('[submitBattlePack] Error:', e);
+      battlePackError = `Ошибка загрузки: ${e?.message || 'Network error'}`;
+      alert(battlePackError);
+    } finally {
+      battlePackUploading = false;
+    }
+  }
+
   async function submitOpeningPack() {
     openingPackError = '';
     
@@ -243,9 +327,12 @@
       if (type === 'image') {
         imageSuggestions[index] = [];
         imageShowSuggestions[index] = false;
-      } else {
+      } else if (type === 'opening') {
         openingSuggestions[index] = [];
         openingShowSuggestions[index] = false;
+      } else if (type === 'battle') {
+        battleSuggestions[index] = [];
+        battleShowSuggestions[index] = false;
       }
       return;
     }
@@ -269,11 +356,16 @@
             imageShowSuggestions[index] = true;
             imageSuggestions = [...imageSuggestions];
             imageShowSuggestions = [...imageShowSuggestions];
-          } else {
+          } else if (type === 'opening') {
             openingSuggestions[index] = suggestions;
             openingShowSuggestions[index] = true;
             openingSuggestions = [...openingSuggestions];
             openingShowSuggestions = [...openingShowSuggestions];
+          } else if (type === 'battle') {
+            battleSuggestions[index] = suggestions;
+            battleShowSuggestions[index] = true;
+            battleSuggestions = [...battleSuggestions];
+            battleShowSuggestions = [...battleShowSuggestions];
           }
         }
       } catch (e) {
@@ -294,6 +386,13 @@
     openingSlots = [...openingSlots];
     openingShowSuggestions[index] = false;
     openingShowSuggestions = [...openingShowSuggestions];
+  }
+
+  function selectBattleAnime(title, index) {
+    battleSlots[index].title = title;
+    battleSlots = [...battleSlots];
+    battleShowSuggestions[index] = false;
+    battleShowSuggestions = [...battleShowSuggestions];
   }
 
   // === Вспомогательные функции ===
@@ -554,6 +653,78 @@
         disabled={!canSubmitOpeningPack || openingPackUploading}
       >
         {openingPackUploading ? '⏳ Загрузка...' : '✓ Загрузить пак опенингов'}
+      </button>
+    </div>
+
+    <!-- === ЗАГРУЗКА БАТТЛ ПАКА === -->
+    <div class="upload-section">
+      <div class="section-title">⚔️ Загрузка баттл пака (8-16 аниме)</div>
+      
+      <div class="battle-grid">
+        {#each battleSlots as slot, idx}
+          <div class="battle-slot">
+            <div class="slot-header">Аниме {idx + 1}</div>
+            
+            <div class="form-group">
+              <label>Изображение:</label>
+              <input 
+                type="file" 
+                accept="image/*"
+                on:change={(e) => handleBattleFileSelect(idx, e)}
+                class="form-input"
+              />
+              {#if slot.file}
+                <div class="file-preview">
+                  <img src={URL.createObjectURL(slot.file)} alt="Preview" />
+                </div>
+              {/if}
+            </div>
+            
+            <div class="form-group">
+              <label>Название аниме:</label>
+              <div class="autocomplete-wrapper">
+                <input 
+                  type="text" 
+                  bind:value={slot.title}
+                  on:input={() => searchAnime(slot.title, idx, 'battle')}
+                  on:focus={() => { if (battleSuggestions[idx]?.length > 0) battleShowSuggestions[idx] = true; battleShowSuggestions = [...battleShowSuggestions]; }}
+                  on:blur={() => setTimeout(() => { battleShowSuggestions[idx] = false; battleShowSuggestions = [...battleShowSuggestions]; }, 200)}
+                  placeholder="Attack on Titan"
+                  class="form-input"
+                  autocomplete="off"
+                />
+                {#if battleShowSuggestions[idx] && battleSuggestions[idx]?.length > 0}
+                  <div class="suggestions-dropdown">
+                    {#each battleSuggestions[idx] as suggestion}
+                      <button 
+                        type="button"
+                        class="suggestion-item"
+                        on:click={() => selectBattleAnime(suggestion.title, idx)}
+                      >
+                        <div class="suggestion-title">{suggestion.title}</div>
+                        {#if suggestion.titleAlt}
+                          <div class="suggestion-subtitle">{suggestion.titleAlt}</div>
+                        {/if}
+                      </button>
+                    {/each}
+                  </div>
+                {/if}
+              </div>
+            </div>
+          </div>
+        {/each}
+      </div>
+      
+      {#if battlePackError}
+        <div class="error-message">{battlePackError}</div>
+      {/if}
+      
+      <button 
+        class="submit-btn"
+        on:click={submitBattlePack}
+        disabled={!canSubmitBattlePack || battlePackUploading}
+      >
+        {battlePackUploading ? '⏳ Загрузка...' : '✓ Загрузить баттл пак'}
       </button>
     </div>
 
@@ -922,6 +1093,40 @@
     flex-direction: column;
     gap: 20px;
     margin-bottom: 20px;
+  }
+
+  /* === ФОРМА БАТТЛА === */
+  .battle-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .battle-slot {
+    background: rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s ease;
+  }
+
+  .battle-slot:hover {
+    border-color: var(--accent);
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .file-preview {
+    margin-top: 10px;
+  }
+
+  .file-preview img {
+    width: 100%;
+    max-width: 200px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   .opening-slot {
