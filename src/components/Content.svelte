@@ -365,9 +365,10 @@
     top: 2rem;
     box-shadow: 0 4px 12px rgba(91, 117, 83, 0.12);
     margin-top: calc((clamp(2.5rem, 5vw, 4rem) + 3rem) * 1.3 - 2px);
-    min-height: 600px; /* Увеличена минимальная высота */
+    max-height: 360px; /* Ограничена максимальная высота на 40% ниже */
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
   }
   
   @media (max-width: 768px) {
