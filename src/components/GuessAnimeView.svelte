@@ -3,7 +3,7 @@
   import { currentUser } from '../stores/authApi';
   import { fetchSuggestions, suggestions, enabledSourceIds, adminImages } from '../stores/sources';
   import { clickOutside } from '../lib/clickOutside';
-  import { animeGuesses as apiGuesses, getBatchSampleZipUrl } from '../lib/api';
+  import { animeGuesses as apiGuesses, getBatchSampleZipUrl, scores } from '../lib/api';
   import { quizDate, availableQuizDates, refreshQuizDates, setQuizDate } from '../stores/quizzes';
   import { refreshLeaderboard, leaderboardPeriod } from '../stores/leaderboard';
   
@@ -378,6 +378,9 @@
             isChecking = false;
             showFinalResults = true;
             
+            // Отправить очки на сервер
+            await submitScore();
+            
             // Обновить лидерборд после завершения квиза
             let period;
             leaderboardPeriod.subscribe(v => period = v)();
@@ -412,6 +415,9 @@
             answerFeedback = '';
             isChecking = false;
             showFinalResults = true;
+            
+            // Отправить очки на сервер
+            await submitScore();
             
             // Обновить лидерборд после завершения квиза
             let period;
@@ -458,6 +464,19 @@
         return word.charAt(0).toUpperCase() + '_'.repeat(word.length - 1);
       })
       .join(' ');
+  }
+
+  // === Отправка очков на сервер ===
+  async function submitScore() {
+    if (!$currentUser || totalScore <= 0) return;
+    
+    try {
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+      await scores.submit('anime', totalScore, today);
+      console.log(`[submitScore] Score submitted: ${totalScore} points for anime quiz`);
+    } catch (error) {
+      console.error('[submitScore] Error submitting score:', error);
+    }
   }
   
   function showHint(guess) {

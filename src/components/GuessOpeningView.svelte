@@ -2,7 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { goHome } from '../stores/ui';
   import { currentUser } from '../stores/authApi';
-  import { animeGuesses as apiGuesses } from '../lib/api';
+  import { animeGuesses as apiGuesses, scores } from '../lib/api';
 
   // === Состояние визуализации ===
   // 'idle' — не начато (показываем кнопку PLAY)
@@ -282,6 +282,7 @@
           } else {
             // Все опенинги отгаданы - показать финальные результаты
             console.log('[checkAnswer] All openings completed!');
+            await submitScore();
             showFinalResults = true;
           }
         }, 1500);
@@ -303,6 +304,7 @@
           } else {
             // Все опенинги пройдены - показать финальные результаты
             console.log('[checkAnswer] All openings completed!');
+            await submitScore();
             showFinalResults = true;
           }
         }, 1500);
@@ -311,6 +313,19 @@
       console.error('[checkAnswer] Error:', e);
     } finally {
       isChecking = false;
+    }
+  }
+
+  // === Отправка очков на сервер ===
+  async function submitScore() {
+    if (!$currentUser || totalScore <= 0) return;
+    
+    try {
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+      await scores.submit('opening', totalScore, today);
+      console.log(`[submitScore] Score submitted: ${totalScore} points for opening quiz`);
+    } catch (error) {
+      console.error('[submitScore] Error submitting score:', error);
     }
   }
 

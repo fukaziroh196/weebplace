@@ -263,6 +263,16 @@ export const leaderboard = {
   }
 };
 
+// Scores API
+export const scores = {
+  async submit(quizType, score, date) {
+    return await apiRequest('/scores', {
+      method: 'POST',
+      body: JSON.stringify({ quizType, score, date }),
+    });
+  }
+};
+
 export function getBatchSampleZipUrl(date) {
   const q = date ? `?date=${encodeURIComponent(date)}` : '';
   return `${API_URL}/anime-guesses/batch/sample${q}`;

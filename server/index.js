@@ -92,6 +92,17 @@ db.serialize(() => {
   db.run(`ALTER TABLE anime_guesses ADD COLUMN hint1_image TEXT`, (e) => { /* ignore duplicate column */ });
   db.run(`ALTER TABLE anime_guesses ADD COLUMN hint2_image TEXT`, (e) => { /* ignore duplicate column */ });
 
+  // Таблица для очков пользователей
+  db.run(`CREATE TABLE IF NOT EXISTS user_scores (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    quiz_type TEXT NOT NULL,
+    score INTEGER NOT NULL,
+    quiz_date TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )`);
+
   // Таблица для библиотек пользователей
   db.run(`CREATE TABLE IF NOT EXISTS user_libraries (
     user_id TEXT,
@@ -950,6 +961,31 @@ app.delete('/api/openings/:id', authenticateToken, requireAdmin, (req, res) => {
 
     res.json({ success: true, deleted: this.changes });
   });
+});
+
+// Submit quiz score
+app.post('/api/scores', authenticateToken, (req, res) => {
+  const { quizType, score, date } = req.body;
+  
+  if (!quizType || typeof score !== 'number' || !date) {
+    return res.status(400).json({ error: 'quizType, score, and date are required' });
+  }
+  
+  const scoreId = `score_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+  
+  db.run(
+    'INSERT INTO user_scores (id, user_id, quiz_type, score, quiz_date, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+    [scoreId, req.user.id, quizType, score, date, Date.now()],
+    function(err) {
+      if (err) {
+        console.error('[POST /api/scores] Error:', err);
+        return res.status(500).json({ error: err.message });
+      }
+      
+      console.log(`[POST /api/scores] Score submitted: ${score} points for ${quizType} by ${req.user.username}`);
+      res.json({ success: true, scoreId });
+    }
+  );
 });
 
 app.listen(PORT, () => {
