@@ -721,7 +721,7 @@
   }
   
   .difficulty-badge {
-    background: var(--accent, #A239CA);
+    background: var(--accent);
     color: white;
     padding: 4px 12px;
     border-radius: 20px;
@@ -933,7 +933,7 @@
   
   .guess-btn {
     padding: 14px 30px;
-    background: var(--accent, #A239CA);
+    background: var(--accent);
     color: white;
     font-weight: 900;
     font-size: clamp(0.875rem, 2.5vw, 1rem);
@@ -948,7 +948,7 @@
   .guess-btn:hover {
     background: var(--accent2);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(162, 57, 202, 0.3);
+    box-shadow: none;
   }
   
   .guess-btn:active {
@@ -1054,12 +1054,12 @@
   
   .progress-dot.completed {
     background: var(--accent);
-    box-shadow: 0 0 10px rgba(162, 57, 202, 0.3);
+    box-shadow: none;
   }
   
   .progress-dot.active {
     background: var(--accent);
-    box-shadow: 0 0 10px rgba(162, 57, 202, 0.3);
+    box-shadow: none;
     transform: scale(1.3);
   }
   
@@ -1124,7 +1124,7 @@
   }
   
   .final-score-box {
-    background: linear-gradient(135deg, var(--accent, #A239CA) 0%, var(--accent2, #8B2FC9) 100%);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
     border-radius: 12px;
     padding: 20px;
     text-align: center;
@@ -1165,7 +1165,7 @@
   }
   
   .round-label {
-    color: var(--accent, #A239CA);
+    color: var(--accent);
     font-weight: 700;
     font-size: clamp(0.85rem, 1.8vw, 0.95rem);
   }
@@ -1210,7 +1210,7 @@
   .close-results-btn {
     width: 100%;
     padding: 14px;
-    background: var(--accent, #A239CA);
+    background: var(--accent);
     color: white;
     font-weight: 900;
     font-size: 1rem;
@@ -1223,9 +1223,9 @@
   }
   
   .close-results-btn:hover {
-    background: var(--accent2, #8B2FC9);
+    background: var(--accent2);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(162, 57, 202, 0.4);
+    box-shadow: none;
   }
   
   .close-results-btn:active {
