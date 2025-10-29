@@ -360,7 +360,7 @@
     background: var(--panelStrong);
     border: none;
     border-radius: 20px;
-    padding: 1.5rem 1.5rem 1.8rem 1.5rem; /* Увеличен padding-bottom */
+    padding: 1.5rem;
     position: sticky;
     top: 2rem;
     box-shadow: 0 4px 12px rgba(91, 117, 83, 0.12);
@@ -368,7 +368,6 @@
     max-height: 516px; /* Увеличена максимальная высота ещё на 20% */
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
   }
   
   @media (max-width: 768px) {
@@ -462,8 +461,12 @@
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    padding-right: 8px;
+    padding-right: 12px; /* Увеличен отступ справа для прокрутки */
     padding-bottom: 8px; /* Отступ снизу для последнего элемента */
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 440px; /* Ограничена максимальная высота списка */
   }
   
   /* Hide scrollbar */
