@@ -4,6 +4,8 @@
   import { goHome } from '../stores/ui';
   import { quizDate } from '../stores/quizzes';
 
+  export let packId = null;
+
   // === Состояние игры ===
   let battleData = [];
   let currentRound = 0;
@@ -25,8 +27,12 @@
     error = '';
     
     try {
-      // Баттлы не привязаны к конкретным дням, загружаем все
-      const url = `${import.meta.env.VITE_API_URL}/battles`;
+      if (!packId) {
+        error = 'Не выбран баттл пак';
+        return;
+      }
+      
+      const url = `${import.meta.env.VITE_API_URL}/battles/${packId}`;
       console.log('[loadBattleData] Fetching from:', url);
       const response = await fetch(url);
       

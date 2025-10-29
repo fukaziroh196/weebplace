@@ -10,7 +10,7 @@
   import GuessAnimeView from './GuessAnimeView.svelte';
   import GuessCharacterView from './GuessCharacterView.svelte';
   import GuessOpeningView from './GuessOpeningView.svelte';
-  import GuessBattleView from './GuessBattleView.svelte';
+  import BattlePackSelector from './BattlePackSelector.svelte';
   import AdminQuizPanel from './AdminQuizPanel.svelte';
   import { availableQuizDates, refreshQuizDates } from '../stores/quizzes';
   import { userStats, loadUserStats } from '../stores/stats';
@@ -178,8 +178,8 @@
   <GuessCharacterView />
   {:else if $activeView === 'guessOpening'}
   <GuessOpeningView />
-  {:else if $activeView === 'guessBattle'}
-  <GuessBattleView />
+            {:else if $activeView === 'guessBattle'}
+            <BattlePackSelector />
   {:else if $activeView === 'adminQuiz'}
   <AdminQuizPanel />
   {/if}

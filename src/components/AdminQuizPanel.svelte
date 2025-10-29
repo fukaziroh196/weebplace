@@ -90,7 +90,15 @@
 
   $: canSubmitOpeningPack = openingSlots.every((s) => s.title.trim() && s.youtubeUrl.trim());
 
-  // === Загрузка баттл пака (8-16 аниме) ===
+  // === Управление баттл паками ===
+  let battlePacks = [];
+  let selectedBattlePack = null;
+  let newPackName = '';
+  let newPackDescription = '';
+  let creatingPack = false;
+  let packError = '';
+
+  // === Загрузка аниме в баттл пак ===
   let battleSlots = Array.from({ length: 12 }, () => ({ 
     file: null, 
     title: '', 
@@ -103,7 +111,7 @@
   let battleSuggestions = Array(12).fill([]);
   let battleShowSuggestions = Array(12).fill(false);
 
-  $: canSubmitBattlePack = battleSlots.filter(s => s.file && s.title.trim()).length >= 8;
+  $: canSubmitBattlePack = selectedBattlePack && battleSlots.filter(s => s.file && s.title.trim()).length >= 8;
 
   function handleBattleFileSelect(index, event) {
     const file = event.target.files?.[0];
@@ -139,7 +147,7 @@
         formData.append('title', slot.title.trim());
         formData.append('animeId', `battle-${Date.now()}-${i}`);
         formData.append('sourceId', 'manual');
-        formData.append('quizDate', 'battle'); // Баттлы не привязаны к датам
+        formData.append('packId', selectedBattlePack);
         
         console.log(`[submitBattlePack] Uploading anime ${i + 1}:`, {
           title: slot.title.trim(),
@@ -398,6 +406,67 @@
     battleShowSuggestions = [...battleShowSuggestions];
   }
 
+  // === Загрузка баттл паков ===
+  async function loadBattlePacks() {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/battle-packs`);
+      if (response.ok) {
+        const data = await response.json();
+        battlePacks = data.packs || [];
+        console.log('[loadBattlePacks] Loaded packs:', battlePacks);
+      }
+    } catch (e) {
+      console.error('[loadBattlePacks] Error:', e);
+    }
+  }
+
+  // === Создание нового баттл пака ===
+  async function createBattlePack() {
+    if (!newPackName.trim()) {
+      packError = 'Введите название пака';
+      return;
+    }
+
+    try {
+      creatingPack = true;
+      packError = '';
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/battle-packs`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('api_token')}`
+        },
+        body: JSON.stringify({
+          name: newPackName.trim(),
+          description: newPackDescription.trim()
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('[createBattlePack] Pack created:', result);
+        
+        // Очистить форму
+        newPackName = '';
+        newPackDescription = '';
+        
+        // Перезагрузить список паков
+        await loadBattlePacks();
+        
+        alert('✓ Баттл пак успешно создан!');
+      } else {
+        const errorText = await response.text();
+        packError = `Ошибка создания пака: ${errorText}`;
+      }
+    } catch (e) {
+      console.error('[createBattlePack] Error:', e);
+      packError = `Ошибка сети: ${e.message}`;
+    } finally {
+      creatingPack = false;
+    }
+  }
+
   // === Вспомогательные функции ===
   function setDateToToday() {
     adminUploadDate = new Date().toISOString().split('T')[0];
@@ -408,9 +477,11 @@
     loadUploadedData();
   }
 
-  onMount(() => {
+  onMount(async () => {
     if (!isAdmin) {
       goHome();
+    } else {
+      await loadBattlePacks();
     }
   });
 </script>
@@ -659,9 +730,72 @@
       </button>
     </div>
 
-    <!-- === ЗАГРУЗКА БАТТЛ ПАКА === -->
+    <!-- === УПРАВЛЕНИЕ БАТТЛ ПАКАМИ === -->
     <div class="upload-section">
-      <div class="section-title">⚔️ Загрузка баттл пака (8-16 аниме) - постоянные пакеты без даты</div>
+      <div class="section-title">⚔️ Управление баттл паками</div>
+      
+      <!-- Создание нового пака -->
+      <div class="pack-creation">
+        <h3>Создать новый баттл пак</h3>
+        <div class="form-group">
+          <label>Название пака:</label>
+          <input 
+            type="text" 
+            bind:value={newPackName}
+            placeholder="Например: Лучшие аниме 2024"
+            class="form-input"
+          />
+        </div>
+        <div class="form-group">
+          <label>Описание (необязательно):</label>
+          <textarea 
+            bind:value={newPackDescription}
+            placeholder="Краткое описание пака..."
+            class="form-input"
+            rows="2"
+          ></textarea>
+        </div>
+        {#if packError}
+          <div class="error-message">{packError}</div>
+        {/if}
+        <button 
+          class="submit-btn"
+          on:click={createBattlePack}
+          disabled={!newPackName.trim() || creatingPack}
+        >
+          {creatingPack ? '⏳ Создание...' : '✓ Создать пак'}
+        </button>
+      </div>
+
+      <!-- Выбор пака для загрузки аниме -->
+      {#if battlePacks.length > 0}
+        <div class="pack-selection">
+          <h3>Выберите пак для загрузки аниме</h3>
+          <div class="packs-list">
+            {#each battlePacks as pack}
+              <div 
+                class="pack-item" 
+                class:selected={selectedBattlePack === pack.id}
+                on:click={() => selectedBattlePack = pack.id}
+              >
+                <div class="pack-info">
+                  <div class="pack-name">{pack.name}</div>
+                  {#if pack.description}
+                    <div class="pack-description">{pack.description}</div>
+                  {/if}
+                </div>
+                <div class="pack-arrow">{selectedBattlePack === pack.id ? '✓' : '→'}</div>
+              </div>
+            {/each}
+          </div>
+        </div>
+      {/if}
+    </div>
+
+    <!-- === ЗАГРУЗКА АНИМЕ В БАТТЛ ПАК === -->
+    {#if selectedBattlePack}
+      <div class="upload-section">
+        <div class="section-title">📦 Загрузка аниме в выбранный пак (8-16 аниме)</div>
       
       <div class="battle-grid">
         {#each battleSlots as slot, idx}
@@ -729,7 +863,8 @@
       >
         {battlePackUploading ? '⏳ Загрузка...' : '✓ Загрузить баттл пак'}
       </button>
-    </div>
+      </div>
+    {/if}
 
     <!-- === ПРОСМОТР ЗАГРУЖЕННЫХ КАРТИНОК === -->
     <div class="view-section">
@@ -1130,6 +1265,86 @@
     object-fit: cover;
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  /* === СТИЛИ ДЛЯ БАТТЛ ПАКОВ === */
+  .pack-creation {
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .pack-creation h3 {
+    color: var(--text);
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 0 15px 0;
+  }
+
+  .pack-selection {
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .pack-selection h3 {
+    color: var(--text);
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 0 15px 0;
+  }
+
+  .packs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .pack-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .pack-item:hover {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: var(--accent);
+  }
+
+  .pack-item.selected {
+    background: rgba(0, 0, 0, 0.4);
+    border-color: var(--accent);
+  }
+
+  .pack-info {
+    flex: 1;
+  }
+
+  .pack-name {
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .pack-description {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .pack-arrow {
+    color: var(--accent);
+    font-size: 1.2rem;
+    font-weight: bold;
   }
 
   .opening-slot {

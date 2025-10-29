@@ -103,18 +103,29 @@ db.serialize(() => {
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`);
 
-  // Таблица для баттлов аниме
-  db.run(`CREATE TABLE IF NOT EXISTS anime_battles (
-    id TEXT PRIMARY KEY,
-    user_id TEXT NOT NULL,
-    title TEXT NOT NULL,
-    image_url TEXT NOT NULL,
-    anime_id TEXT NOT NULL,
-    source_id TEXT,
-    quiz_date TEXT NOT NULL,
-    created_at INTEGER NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-  )`);
+// Таблица для баттл паков
+db.run(`CREATE TABLE IF NOT EXISTS battle_packs (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT,
+  user_id TEXT NOT NULL,
+  created_at INTEGER NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+)`);
+
+// Таблица для аниме в баттл паках
+db.run(`CREATE TABLE IF NOT EXISTS anime_battles (
+  id TEXT PRIMARY KEY,
+  pack_id TEXT NOT NULL,
+  user_id TEXT NOT NULL,
+  title TEXT NOT NULL,
+  image_url TEXT NOT NULL,
+  anime_id TEXT NOT NULL,
+  source_id TEXT,
+  created_at INTEGER NOT NULL,
+  FOREIGN KEY (pack_id) REFERENCES battle_packs(id),
+  FOREIGN KEY (user_id) REFERENCES users(id)
+)`);
 
   // Таблица для результатов баттлов
   db.run(`CREATE TABLE IF NOT EXISTS battle_results (
@@ -1016,41 +1027,76 @@ app.post('/api/scores', authenticateToken, (req, res) => {
 
 // ==================== BATTLE ENDPOINTS ====================
 
-// GET /api/battles - Получить аниме для баттла (все пакеты)
-app.get('/api/battles', (req, res) => {
-  // Баттлы не привязаны к датам, всегда показываем все
-  db.all('SELECT id, title, image_url as image, anime_id, source_id, quiz_date, created_at FROM anime_battles ORDER BY created_at', [], (err, rows) => {
+// GET /api/battle-packs - Получить список баттл паков
+app.get('/api/battle-packs', (req, res) => {
+  db.all('SELECT id, name, description, created_at FROM battle_packs ORDER BY created_at DESC', [], (err, rows) => {
     if (err) {
-      console.error('[GET /api/battles] Error:', err);
+      console.error('[GET /api/battle-packs] Error:', err);
+      return res.status(500).json({ error: err.message });
+    }
+    res.json({ packs: rows || [] });
+  });
+});
+
+// GET /api/battles/:packId - Получить аниме для конкретного баттл пака
+app.get('/api/battles/:packId', (req, res) => {
+  const { packId } = req.params;
+  
+  db.all('SELECT id, title, image_url as image, anime_id, source_id, created_at FROM anime_battles WHERE pack_id = ? ORDER BY created_at', [packId], (err, rows) => {
+    if (err) {
+      console.error('[GET /api/battles/:packId] Error:', err);
       return res.status(500).json({ error: err.message });
     }
     res.json({ anime: rows || [] });
   });
 });
 
-// POST /api/battles - Добавить аниме для баттла (только для админа)
-app.post('/api/battles', authenticateToken, requireAdmin, upload.single('image'), (req, res) => {
-  const { title, animeId, sourceId, quizDate } = req.body;
+// POST /api/battle-packs - Создать новый баттл пак (только для админа)
+app.post('/api/battle-packs', authenticateToken, requireAdmin, (req, res) => {
+  const { name, description } = req.body;
   
-  if (!title || !animeId || !req.file) {
-    return res.status(400).json({ error: 'title, animeId, and image file are required' });
+  if (!name) {
+    return res.status(400).json({ error: 'Pack name is required' });
+  }
+  
+  const packId = `pack_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+  
+  db.run(
+    'INSERT INTO battle_packs (id, name, description, user_id, created_at) VALUES (?, ?, ?, ?, ?)',
+    [packId, name, description || '', req.user.id, Date.now()],
+    function(err) {
+      if (err) {
+        console.error('[POST /api/battle-packs] Error:', err);
+        return res.status(500).json({ error: err.message });
+      }
+      
+      console.log(`[POST /api/battle-packs] Battle pack created: ${name} by ${req.user.username}`);
+      res.json({ success: true, id: packId });
+    }
+  );
+});
+
+// POST /api/battles - Добавить аниме в баттл пак (только для админа)
+app.post('/api/battles', authenticateToken, requireAdmin, upload.single('image'), (req, res) => {
+  const { title, animeId, sourceId, packId } = req.body;
+  
+  if (!title || !animeId || !packId || !req.file) {
+    return res.status(400).json({ error: 'title, animeId, packId, and image file are required' });
   }
   
   const imageUrl = `/uploads/${req.file.filename}`;
   const battleId = `battle_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-  // Используем переданную дату или дефолтную для баттлов
-  const battleDate = quizDate || 'battle';
   
   db.run(
-    'INSERT INTO anime_battles (id, user_id, title, image_url, anime_id, source_id, quiz_date, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-    [battleId, req.user.id, title, imageUrl, animeId, sourceId || 'manual', battleDate, Date.now()],
+    'INSERT INTO anime_battles (id, pack_id, user_id, title, image_url, anime_id, source_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+    [battleId, packId, req.user.id, title, imageUrl, animeId, sourceId || 'manual', Date.now()],
     function(err) {
       if (err) {
         console.error('[POST /api/battles] Error:', err);
         return res.status(500).json({ error: err.message });
       }
       
-      console.log(`[POST /api/battles] Battle anime added: ${title} by ${req.user.username}`);
+      console.log(`[POST /api/battles] Battle anime added: ${title} to pack ${packId} by ${req.user.username}`);
       res.json({ success: true, id: battleId, imageUrl });
     }
   );
