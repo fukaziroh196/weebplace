@@ -159,7 +159,7 @@ export const animeGuesses = {
   },
 
   async uploadPack(slots, quizDate) {
-    // slots: [{ file, title } x4]
+    // slots: [{ file, title, hint } x4]
     if (!Array.isArray(slots) || slots.length !== 4) {
       throw new Error('Exactly 4 slots required');
     }
@@ -180,6 +180,9 @@ export const animeGuesses = {
       }
       formData.append(`image${i + 1}`, slot.file);
       formData.append(`title${i + 1}`, slot.title.trim());
+      if (slot.hint && slot.hint.trim()) {
+        formData.append(`hint${i + 1}`, slot.hint.trim());
+      }
     }
 
     console.log(`[uploadPack] Uploading pack for ${quizDate}...`);

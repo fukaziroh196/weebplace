@@ -75,6 +75,7 @@ db.serialize(() => {
     anime_id TEXT NOT NULL,
     source_id TEXT,
     quiz_date TEXT,
+    hint TEXT,
     created_at INTEGER NOT NULL,
     guessed_by TEXT,
     FOREIGN KEY (user_id) REFERENCES users(id)
@@ -85,6 +86,9 @@ db.serialize(() => {
     // no-op; we'll try to add column blindly, ignore error if exists
     db.run(`ALTER TABLE anime_guesses ADD COLUMN quiz_date TEXT`, (e) => { /* ignore */ });
   });
+  
+  // Migration: ensure hint column exists
+  db.run(`ALTER TABLE anime_guesses ADD COLUMN hint TEXT`, (e) => { /* ignore duplicate column */ });
 
   // Таблица для библиотек пользователей
   db.run(`CREATE TABLE IF NOT EXISTS user_libraries (
@@ -588,12 +592,13 @@ app.post('/api/packs', authenticateToken, requireAdmin, upload.fields([
           const imageUrl = `/uploads/${img.filename}`;
           const guessId = Date.now().toString() + Math.random().toString(36).substring(7) + '-' + idx;
           const title = titles[idx];
+          const hint = String(req.body[`hint${idx + 1}`] || '').trim();
           const animeId = String(req.body[`animeId${idx + 1}`] || `manual-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Date.now()}`);
           const sourceId = req.body[`sourceId${idx + 1}`] || 'manual';
 
           db.run(
-            'INSERT INTO anime_guesses (id, user_id, image_url, title, anime_id, source_id, quiz_date, created_at, guessed_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [guessId, req.user.id, imageUrl, title, animeId, sourceId, quizDate, Date.now(), '[]'],
+            'INSERT INTO anime_guesses (id, user_id, image_url, title, anime_id, source_id, quiz_date, hint, created_at, guessed_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [guessId, req.user.id, imageUrl, title, animeId, sourceId, quizDate, hint || null, Date.now(), '[]'],
             function (insertErr) {
               if (insertErr && !errorOccurred) {
                 console.error(`[/api/packs] INSERT error for ${title}:`, insertErr);

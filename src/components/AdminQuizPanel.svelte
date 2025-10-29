@@ -14,7 +14,7 @@
   let adminUploadDate = selectedDate;
 
   // === Загрузка картинок (4 шт) ===
-  let packSlots = Array.from({ length: 4 }, () => ({ file: null, title: '', uploading: false }));
+  let packSlots = Array.from({ length: 4 }, () => ({ file: null, title: '', hint: '', uploading: false }));
   let packUploading = false;
   let packUploadError = '';
   
@@ -48,13 +48,13 @@
       packUploading = true;
       console.log(`[submitPack] Starting upload for ${adminUploadDate}`);
       
-      const slots = packSlots.map((s) => ({ file: s.file, title: s.title.trim() }));
+      const slots = packSlots.map((s) => ({ file: s.file, title: s.title.trim(), hint: s.hint.trim() }));
       const result = await apiGuesses.uploadPack(slots, adminUploadDate);
       
       console.log('[submitPack] Upload success:', result);
       
       // Очистить форму
-      packSlots = Array.from({ length: 4 }, () => ({ file: null, title: '', uploading: false }));
+      packSlots = Array.from({ length: 4 }, () => ({ file: null, title: '', hint: '', uploading: false }));
       
       // Обновить список дат
       await refreshQuizDates();
@@ -389,6 +389,13 @@
                 </div>
               {/if}
             </div>
+            
+            <input 
+              type="text" 
+              bind:value={slot.hint}
+              placeholder="Подсказка (необязательно)"
+              class="hint-input"
+            />
           </div>
         {/each}
       </div>
@@ -512,6 +519,9 @@
               </div>
               <div class="item-info">
                 <div class="item-title">{img.title}</div>
+                {#if img.hint}
+                  <div class="item-hint">💡 {img.hint}</div>
+                {/if}
                 <div class="item-date">{img.quiz_date || 'Без даты'}</div>
               </div>
               <button class="delete-btn" on:click={() => deleteImage(img.id)}>
@@ -761,6 +771,27 @@
     color: rgba(255, 255, 255, 0.4);
   }
 
+  .hint-input {
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    color: white;
+    font-size: 0.85rem;
+    transition: all 0.3s;
+  }
+
+  .hint-input:focus {
+    outline: none;
+    border-color: var(--accent, #A239CA);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .hint-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+    font-style: italic;
+  }
+
   /* === ФОРМА ОПЕНИНГА === */
   .openings-grid {
     display: flex;
@@ -966,6 +997,17 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .item-hint {
+    font-size: 0.9rem;
+    color: var(--accent);
+    margin-bottom: 4px;
+    padding: 4px 8px;
+    background: rgba(91, 117, 83, 0.15);
+    border-radius: 6px;
+    display: inline-block;
+    font-style: italic;
   }
 
   .item-date {
