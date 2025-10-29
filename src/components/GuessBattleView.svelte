@@ -26,13 +26,18 @@
     
     try {
       const currentDate = $quizDate || new Date().toISOString().split('T')[0];
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/battles?date=${currentDate}`);
+      const url = `${import.meta.env.VITE_API_URL}/battles?date=${currentDate}`;
+      console.log('[loadBattleData] Fetching from:', url);
+      const response = await fetch(url);
       
       if (response.ok) {
         const data = await response.json();
+        console.log('[loadBattleData] Received data:', data);
         battleData = data.anime || [];
+        console.log('[loadBattleData] Battle data:', battleData, 'length:', battleData.length);
         
         if (battleData.length < 2) {
+          console.log('[loadBattleData] Not enough anime:', battleData.length);
           error = 'Недостаточно аниме для баттла (минимум 2)';
           return;
         }

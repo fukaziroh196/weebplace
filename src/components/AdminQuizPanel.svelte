@@ -146,6 +146,12 @@
         formData.append('sourceId', 'manual');
         formData.append('quizDate', adminUploadDate);
         
+        console.log(`[submitBattlePack] Uploading anime ${i + 1}:`, {
+          title: slot.title.trim(),
+          file: slot.file.name,
+          date: adminUploadDate
+        });
+        
         const response = await fetch(`${import.meta.env.VITE_API_URL}/battles`, {
           method: 'POST',
           headers: {
@@ -155,10 +161,13 @@
         });
         
         if (!response.ok) {
-          throw new Error(`HTTP ${response.status} на аниме ${i + 1}`);
+          const errorText = await response.text();
+          console.error(`[submitBattlePack] Error ${response.status}:`, errorText);
+          throw new Error(`HTTP ${response.status} на аниме ${i + 1}: ${errorText}`);
         }
         
-        console.log(`[submitBattlePack] Battle anime ${i + 1} uploaded successfully`);
+        const result = await response.json();
+        console.log(`[submitBattlePack] Battle anime ${i + 1} uploaded successfully:`, result);
       }
       
       // Очистить форму
