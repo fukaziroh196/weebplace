@@ -494,7 +494,11 @@
         
         <!-- Большая картинка по центру -->
         <div class="image-container">
-          {#if displayedImageMode === 'hint2' && unlockedClues.includes(1) && currentGuess?.hint2_image}
+          {#if displayedImageMode === 'firstLetter' && showTitle}
+            <div class="first-letter-display">
+              <div class="first-letter-text">{getFirstLetterHint(animeGuesses[currentImageIndex].title)}</div>
+            </div>
+          {:else if displayedImageMode === 'hint2' && unlockedClues.includes(1) && currentGuess?.hint2_image}
             <img 
               src="{import.meta.env.VITE_API_URL.replace('/api', '')}{currentGuess.hint2_image}" 
               alt="Подсказка 2"
@@ -537,25 +541,13 @@
             }}
             disabled={!currentGuess?.hint2_image}
           >Подсказка 2</button>
-        </div>
-        
-        <!-- Кнопка разблокировки первой буквы -->
-        <div class="clues-container">
-          <!-- Подсказка 3: Первая буква -->
           <button 
-            class="clue-btn {showTitle ? 'unlocked' : 'locked'}"
-            on:click={unlockTitleClue}
-            disabled={showTitle}
-          >
-            <span class="clue-icon">{showTitle ? '🔓' : '🔒'}</span>
-            <span class="clue-text">
-              {#if showTitle}
-                {getFirstLetterHint(animeGuesses[currentImageIndex].title)}
-              {:else}
-                ПЕРВАЯ БУКВА
-              {/if}
-            </span>
-          </button>
+            class="view-btn {displayedImageMode === 'firstLetter' ? 'active' : ''}"
+            on:click={() => { 
+              if (!showTitle) unlockTitleClue();
+              displayedImageMode = 'firstLetter';
+            }}
+          >Первая буква</button>
         </div>
         
         <!-- Поле ввода ответа -->
@@ -802,6 +794,30 @@
   .view-btn:hover:not(:disabled) { background: rgba(255,255,255,0.12); }
   .view-btn:disabled { opacity: 0.5; cursor: not-allowed; }
   .view-btn.active { background: var(--accent); border-color: var(--accent2); }
+  
+  .first-letter-display {
+    width: 100%;
+    height: 45vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    border-radius: 12px;
+  }
+  
+  .first-letter-text {
+    font-size: clamp(8rem, 15vw, 12rem);
+    font-weight: 900;
+    color: white;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    letter-spacing: 0.1em;
+  }
+  
+  @media (max-width: 768px) {
+    .first-letter-display {
+      height: 35vh;
+    }
+  }
   
   .clue-btn {
     display: flex;
