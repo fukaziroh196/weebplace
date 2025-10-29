@@ -360,7 +360,7 @@
     background: var(--panelStrong);
     border: none;
     border-radius: 20px;
-    padding: 1.5rem;
+    padding: 1.5rem 1.5rem 1.8rem 1.5rem; /* Увеличен padding-bottom */
     position: sticky;
     top: 2rem;
     box-shadow: 0 4px 12px rgba(91, 117, 83, 0.12);
