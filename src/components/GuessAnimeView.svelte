@@ -811,20 +811,18 @@
   
   .first-letter-display {
     width: 100%;
-    max-width: 600px;
-    margin: 0 auto 20px;
-    padding: 15px 20px;
+    margin: 0 auto 15px;
+    padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     background: transparent;
-    border: 2px solid var(--accent);
-    border-radius: 8px;
+    border: none;
   }
   
   .first-letter-text {
-    font-size: clamp(1.5rem, 4vw, 2.5rem);
-    font-weight: 700;
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    font-weight: 600;
     color: var(--accent);
     letter-spacing: 0.05em;
     font-family: monospace;
