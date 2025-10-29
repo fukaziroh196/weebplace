@@ -25,8 +25,8 @@
     error = '';
     
     try {
-      const currentDate = $quizDate || new Date().toISOString().split('T')[0];
-      const url = `${import.meta.env.VITE_API_URL}/battles?date=${currentDate}`;
+      // Баттлы не привязаны к конкретным дням, загружаем все
+      const url = `${import.meta.env.VITE_API_URL}/battles`;
       console.log('[loadBattleData] Fetching from:', url);
       const response = await fetch(url);
       
@@ -194,20 +194,7 @@
     generateMatches();
   }
 
-  // === Перезагрузка при смене даты ===
-  let lastLoadedDate = '';
-  $: (async () => {
-    try {
-      const currentDate = $quizDate || new Date().toISOString().split('T')[0];
-      if (currentDate && currentDate !== lastLoadedDate) {
-        lastLoadedDate = currentDate;
-        await loadBattleData();
-        restartTournament();
-      }
-    } catch (e) {
-      console.error('[Date change] Error:', e);
-    }
-  })();
+  // Баттлы не зависят от даты, загружаем только при монтировании
 
   onMount(() => {
     loadBattleData();

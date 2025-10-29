@@ -1016,21 +1016,10 @@ app.post('/api/scores', authenticateToken, (req, res) => {
 
 // ==================== BATTLE ENDPOINTS ====================
 
-// GET /api/battles - Получить аниме для баттла (по дате)
+// GET /api/battles - Получить аниме для баттла (все пакеты)
 app.get('/api/battles', (req, res) => {
-  const { date } = req.query;
-  
-  let query = 'SELECT id, title, image_url as image, anime_id, source_id, quiz_date, created_at FROM anime_battles';
-  let params = [];
-  
-  if (date) {
-    query += ' WHERE quiz_date = ?';
-    params.push(date);
-  }
-  
-  query += ' ORDER BY created_at';
-  
-  db.all(query, params, (err, rows) => {
+  // Баттлы не привязаны к датам, всегда показываем все
+  db.all('SELECT id, title, image_url as image, anime_id, source_id, quiz_date, created_at FROM anime_battles ORDER BY created_at', [], (err, rows) => {
     if (err) {
       console.error('[GET /api/battles] Error:', err);
       return res.status(500).json({ error: err.message });
@@ -1043,16 +1032,18 @@ app.get('/api/battles', (req, res) => {
 app.post('/api/battles', authenticateToken, requireAdmin, upload.single('image'), (req, res) => {
   const { title, animeId, sourceId, quizDate } = req.body;
   
-  if (!title || !animeId || !quizDate || !req.file) {
-    return res.status(400).json({ error: 'title, animeId, quizDate, and image file are required' });
+  if (!title || !animeId || !req.file) {
+    return res.status(400).json({ error: 'title, animeId, and image file are required' });
   }
   
   const imageUrl = `/uploads/${req.file.filename}`;
   const battleId = `battle_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+  // Используем переданную дату или дефолтную для баттлов
+  const battleDate = quizDate || 'battle';
   
   db.run(
     'INSERT INTO anime_battles (id, user_id, title, image_url, anime_id, source_id, quiz_date, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-    [battleId, req.user.id, title, imageUrl, animeId, sourceId || 'manual', quizDate, Date.now()],
+    [battleId, req.user.id, title, imageUrl, animeId, sourceId || 'manual', battleDate, Date.now()],
     function(err) {
       if (err) {
         console.error('[POST /api/battles] Error:', err);

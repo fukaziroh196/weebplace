@@ -121,11 +121,6 @@
   async function submitBattlePack() {
     battlePackError = '';
     
-    if (!adminUploadDate) {
-      battlePackError = 'Выберите дату сета';
-      return;
-    }
-    
     const validSlots = battleSlots.filter(s => s.file && s.title.trim());
     if (validSlots.length < 8) {
       battlePackError = 'Минимум 8 аниме для баттла';
@@ -134,7 +129,7 @@
     
     try {
       battlePackUploading = true;
-      console.log(`[submitBattlePack] Starting upload for ${adminUploadDate}`);
+      console.log(`[submitBattlePack] Starting upload (no date required for battles)`);
       
       // Загружаем каждое аниме
       for (let i = 0; i < validSlots.length; i++) {
@@ -144,12 +139,11 @@
         formData.append('title', slot.title.trim());
         formData.append('animeId', `battle-${Date.now()}-${i}`);
         formData.append('sourceId', 'manual');
-        formData.append('quizDate', adminUploadDate);
+        formData.append('quizDate', 'battle'); // Баттлы не привязаны к датам
         
         console.log(`[submitBattlePack] Uploading anime ${i + 1}:`, {
           title: slot.title.trim(),
-          file: slot.file.name,
-          date: adminUploadDate
+          file: slot.file.name
         });
         
         const response = await fetch(`${import.meta.env.VITE_API_URL}/battles`, {
@@ -173,7 +167,7 @@
       // Очистить форму
       battleSlots = Array.from({ length: 12 }, () => ({ file: null, title: '', uploading: false }));
       
-      alert(`✓ Баттл пак успешно загружен на дату ${adminUploadDate}!\n${validSlots.length} аниме добавлено.`);
+      alert(`✓ Баттл пак успешно загружен!\n${validSlots.length} аниме добавлено.`);
     } catch (e) {
       console.error('[submitBattlePack] Error:', e);
       battlePackError = `Ошибка загрузки: ${e?.message || 'Network error'}`;
@@ -667,7 +661,7 @@
 
     <!-- === ЗАГРУЗКА БАТТЛ ПАКА === -->
     <div class="upload-section">
-      <div class="section-title">⚔️ Загрузка баттл пака (8-16 аниме)</div>
+      <div class="section-title">⚔️ Загрузка баттл пака (8-16 аниме) - постоянные пакеты без даты</div>
       
       <div class="battle-grid">
         {#each battleSlots as slot, idx}
