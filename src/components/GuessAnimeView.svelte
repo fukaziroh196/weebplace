@@ -93,6 +93,8 @@
   // Система подсказок (как на aniguessr)
   let unlockedClues = []; // массив разблокированных подсказок для текущей картинки
   let showTitle = false;
+  // Режим отображения изображения: original | hint1 | hint2
+  let displayedImageMode = 'original';
   
   // Система очков
   let totalScore = 0;
@@ -364,6 +366,7 @@
             userAnswer = '';
             unlockedClues = [];
             showTitle = false;
+            displayedImageMode = 'original';
             answerFeedback = '';
             isChecking = false;
           }, 800);
@@ -398,6 +401,7 @@
             userAnswer = '';
             unlockedClues = [];
             showTitle = false;
+            displayedImageMode = 'original';
             answerFeedback = '';
             isChecking = false;
           }, 800);
@@ -428,6 +432,8 @@
     if (!unlockedClues.includes(clueIndex)) {
       unlockedClues = [...unlockedClues, clueIndex];
     }
+    // Переключаемся на выбранную подсказку
+    displayedImageMode = clueIndex === 0 ? 'hint1' : 'hint2';
   }
   
   function unlockTitleClue() {
@@ -488,13 +494,13 @@
         
         <!-- Большая картинка по центру -->
         <div class="image-container">
-          {#if unlockedClues.includes(1) && currentGuess?.hint2_image}
+          {#if displayedImageMode === 'hint2' && unlockedClues.includes(1) && currentGuess?.hint2_image}
             <img 
               src="{import.meta.env.VITE_API_URL.replace('/api', '')}{currentGuess.hint2_image}" 
               alt="Подсказка 2"
               class="quiz-image"
             />
-          {:else if unlockedClues.includes(0) && currentGuess?.hint1_image}
+          {:else if displayedImageMode === 'hint1' && unlockedClues.includes(0) && currentGuess?.hint1_image}
             <img 
               src="{import.meta.env.VITE_API_URL.replace('/api', '')}{currentGuess.hint1_image}" 
               alt="Подсказка 1"
@@ -507,6 +513,24 @@
               class="quiz-image"
             />
           {/if}
+        </div>
+
+        <!-- Переключатель вида изображения -->
+        <div class="view-toggle">
+          <button 
+            class="view-btn {displayedImageMode === 'original' ? 'active' : ''}"
+            on:click={() => displayedImageMode = 'original'}
+          >Оригинал</button>
+          <button 
+            class="view-btn {displayedImageMode === 'hint1' ? 'active' : ''}"
+            on:click={() => { if (unlockedClues.includes(0) && currentGuess?.hint1_image) displayedImageMode = 'hint1'; }}
+            disabled={!unlockedClues.includes(0) || !currentGuess?.hint1_image}
+          >Подсказка 1</button>
+          <button 
+            class="view-btn {displayedImageMode === 'hint2' ? 'active' : ''}"
+            on:click={() => { if (unlockedClues.includes(1) && currentGuess?.hint2_image) displayedImageMode = 'hint2'; }}
+            disabled={!unlockedClues.includes(1) || !currentGuess?.hint2_image}
+          >Подсказка 2</button>
         </div>
         
         <!-- Кнопки разблокировки подсказок -->
@@ -770,6 +794,28 @@
     flex-wrap: wrap;
     padding: 0 10px;
   }
+
+  .view-toggle {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin: 8px auto 12px;
+    padding: 0 10px;
+  }
+  .view-btn {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.06);
+    color: white;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .view-btn:hover:not(:disabled) { background: rgba(255,255,255,0.12); }
+  .view-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .view-btn.active { background: var(--accent); border-color: var(--accent2); }
   
   .clue-btn {
     display: flex;
