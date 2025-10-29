@@ -488,11 +488,25 @@
         
         <!-- Большая картинка по центру -->
         <div class="image-container">
-          <img 
-            src={animeGuesses[currentImageIndex].image} 
-            alt="Угадай аниме"
-            class="quiz-image"
-          />
+          {#if unlockedClues.includes(0) && currentGuess?.hint1_image}
+            <img 
+              src="{import.meta.env.VITE_API_URL.replace('/api', '')}{currentGuess.hint1_image}" 
+              alt="Подсказка 1"
+              class="quiz-image"
+            />
+          {:else if unlockedClues.includes(1) && currentGuess?.hint2_image}
+            <img 
+              src="{import.meta.env.VITE_API_URL.replace('/api', '')}{currentGuess.hint2_image}" 
+              alt="Подсказка 2"
+              class="quiz-image"
+            />
+          {:else}
+            <img 
+              src={animeGuesses[currentImageIndex].image} 
+              alt="Угадай аниме"
+              class="quiz-image"
+            />
+          {/if}
         </div>
         
         <!-- Кнопки разблокировки подсказок -->
@@ -503,12 +517,8 @@
             on:click={() => unlockClue(0)}
             disabled={unlockedClues.includes(0)}
           >
-            {#if unlockedClues.includes(0) && currentGuess?.hint1_image}
-              <img src="{import.meta.env.VITE_API_URL.replace('/api', '')}{currentGuess.hint1_image}" alt="Подсказка 1" class="hint-image" />
-            {:else}
-              <span class="clue-icon">🔒</span>
-              <span class="clue-text">ПОДСКАЗКА 1</span>
-            {/if}
+            <span class="clue-icon">{unlockedClues.includes(0) ? '🔓' : '🔒'}</span>
+            <span class="clue-text">ПОДСКАЗКА 1</span>
           </button>
           
           <!-- Подсказка 2: Картинка -->
@@ -517,12 +527,8 @@
             on:click={() => unlockClue(1)}
             disabled={unlockedClues.includes(1)}
           >
-            {#if unlockedClues.includes(1) && currentGuess?.hint2_image}
-              <img src="{import.meta.env.VITE_API_URL.replace('/api', '')}{currentGuess.hint2_image}" alt="Подсказка 2" class="hint-image" />
-            {:else}
-              <span class="clue-icon">🔒</span>
-              <span class="clue-text">ПОДСКАЗКА 2</span>
-            {/if}
+            <span class="clue-icon">{unlockedClues.includes(1) ? '🔓' : '🔒'}</span>
+            <span class="clue-text">ПОДСКАЗКА 2</span>
           </button>
           
           <!-- Подсказка 3: Первая буква -->
@@ -818,17 +824,7 @@
     letter-spacing: 1px;
   }
   
-  .hint-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 8px;
-  }
   
-  .clue-btn.unlocked {
-    padding: 0;
-    overflow: hidden;
-  }
   
   .answer-container {
     position: relative;
