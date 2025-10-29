@@ -523,38 +523,24 @@
           >Оригинал</button>
           <button 
             class="view-btn {displayedImageMode === 'hint1' ? 'active' : ''}"
-            on:click={() => { if (unlockedClues.includes(0) && currentGuess?.hint1_image) displayedImageMode = 'hint1'; }}
-            disabled={!unlockedClues.includes(0) || !currentGuess?.hint1_image}
+            on:click={() => { 
+              if (!unlockedClues.includes(0)) unlockClue(0);
+              if (currentGuess?.hint1_image) displayedImageMode = 'hint1';
+            }}
+            disabled={!currentGuess?.hint1_image}
           >Подсказка 1</button>
           <button 
             class="view-btn {displayedImageMode === 'hint2' ? 'active' : ''}"
-            on:click={() => { if (unlockedClues.includes(1) && currentGuess?.hint2_image) displayedImageMode = 'hint2'; }}
-            disabled={!unlockedClues.includes(1) || !currentGuess?.hint2_image}
+            on:click={() => { 
+              if (!unlockedClues.includes(1)) unlockClue(1);
+              if (currentGuess?.hint2_image) displayedImageMode = 'hint2';
+            }}
+            disabled={!currentGuess?.hint2_image}
           >Подсказка 2</button>
         </div>
         
-        <!-- Кнопки разблокировки подсказок -->
+        <!-- Кнопка разблокировки первой буквы -->
         <div class="clues-container">
-          <!-- Подсказка 1: Картинка -->
-          <button 
-            class="clue-btn {unlockedClues.includes(0) ? 'unlocked' : 'locked'}"
-            on:click={() => unlockClue(0)}
-            disabled={unlockedClues.includes(0)}
-          >
-            <span class="clue-icon">{unlockedClues.includes(0) ? '🔓' : '🔒'}</span>
-            <span class="clue-text">ПОДСКАЗКА 1</span>
-          </button>
-          
-          <!-- Подсказка 2: Картинка -->
-          <button 
-            class="clue-btn {unlockedClues.includes(1) ? 'unlocked' : 'locked'}"
-            on:click={() => unlockClue(1)}
-            disabled={unlockedClues.includes(1)}
-          >
-            <span class="clue-icon">{unlockedClues.includes(1) ? '🔓' : '🔒'}</span>
-            <span class="clue-text">ПОДСКАЗКА 2</span>
-          </button>
-          
           <!-- Подсказка 3: Первая буква -->
           <button 
             class="clue-btn {showTitle ? 'unlocked' : 'locked'}"
