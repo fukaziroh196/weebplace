@@ -906,7 +906,7 @@
   
   .answer-input:focus {
     outline: none;
-    border-color: #A239CA;
+    border-color: var(--accent);
     background: rgba(255, 255, 255, 0.08);
   }
   
@@ -946,9 +946,9 @@
   }
   
   .guess-btn:hover {
-    background: var(--accent2, #8B2FC9);
+    background: var(--accent2);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(162, 57, 202, 0.5);
+    box-shadow: 0 6px 20px rgba(162, 57, 202, 0.3);
   }
   
   .guess-btn:active {
@@ -977,7 +977,7 @@
     left: 0;
     right: 120px;
     margin-top: 8px;
-    background: rgba(30, 30, 40, 0.98);
+    background: var(--panel);
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
@@ -1013,7 +1013,7 @@
   }
   
   .suggestion-title {
-    color: white;
+    color: var(--text);
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -1021,7 +1021,7 @@
   }
   
   .suggestion-subtitle {
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--muted);
     font-size: 0.875rem;
     white-space: nowrap;
     overflow: hidden;
@@ -1053,13 +1053,13 @@
   }
   
   .progress-dot.completed {
-    background: #A239CA;
-    box-shadow: 0 0 10px rgba(162, 57, 202, 0.5);
+    background: var(--accent);
+    box-shadow: 0 0 10px rgba(162, 57, 202, 0.3);
   }
   
   .progress-dot.active {
-    background: var(--accent, #A239CA);
-    box-shadow: 0 0 10px rgba(162, 57, 202, 0.5);
+    background: var(--accent);
+    box-shadow: 0 0 10px rgba(162, 57, 202, 0.3);
     transform: scale(1.3);
   }
   
