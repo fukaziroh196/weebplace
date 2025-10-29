@@ -499,6 +499,8 @@ app.get('/api/anime-guesses', (req, res) => {
       animeId: guess.anime_id,
       sourceId: guess.source_id,
       quizDate: guess.quiz_date,
+      hint1_image: guess.hint1_image,
+      hint2_image: guess.hint2_image,
       createdAt: guess.created_at,
       guessedBy: JSON.parse(guess.guessed_by || '[]')
     }));
