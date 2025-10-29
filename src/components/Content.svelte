@@ -458,9 +458,10 @@
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    max-height: 600px;
+    max-height: 350px; /* Примерно 5-6 записей */
     overflow-y: auto;
     overflow-x: hidden;
+    padding-right: 8px;
   }
   
   /* Hide scrollbar */
