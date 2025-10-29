@@ -3,6 +3,7 @@
   import { goHome } from '../stores/ui';
   import { currentUser } from '../stores/authApi';
   import { animeGuesses as apiGuesses, scores } from '../lib/api';
+  import { quizDate } from '../stores/quizzes';
 
   // === Состояние визуализации ===
   // 'idle' — не начато (показываем кнопку PLAY)
@@ -37,11 +38,35 @@
   let showFinalResults = false;
 
   $: currentOpening = openings[currentIndex] || null;
+  
+  // Перезагружаем опенинги при изменении даты
+  let lastLoadedDate = '';
+  $: (async () => {
+    try {
+      const currentDate = $quizDate || new Date().toISOString().split('T')[0];
+      if (currentDate && currentDate !== lastLoadedDate) {
+        lastLoadedDate = currentDate;
+        await loadOpenings();
+        // Сбрасываем состояние игры при смене даты
+        currentIndex = 0;
+        totalScore = 0;
+        roundScores = [];
+        hintUsed = false;
+        showFinalResults = false;
+        userAnswer = '';
+        answerFeedback = '';
+        state = 'idle';
+      }
+    } catch (e) {
+      console.error('[Date change] Error:', e);
+    }
+  })();
 
   // === Загрузка опенингов ===
   async function loadOpenings() {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/openings`);
+      const currentDate = $quizDate || new Date().toISOString().split('T')[0];
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/openings?date=${currentDate}`);
       if (response.ok) {
         openings = await response.json();
         if (openings.length > 0) {
@@ -273,7 +298,7 @@
         
         console.log(`[checkAnswer] Correct! Score: ${roundScore}, Total: ${totalScore}`);
         
-        setTimeout(() => {
+        setTimeout(async () => {
           // Переход к следующему опенингу
           if (currentIndex < openings.length - 1) {
             currentIndex++;
@@ -293,7 +318,7 @@
         
         console.log(`[checkAnswer] Incorrect! Score: 0`);
         
-        setTimeout(() => {
+        setTimeout(async () => {
           answerFeedback = '';
           
           // Переход к следующему опенингу даже при неправильном ответе
