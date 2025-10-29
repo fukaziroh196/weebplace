@@ -449,6 +449,17 @@
     return title.charAt(0).toUpperCase();
   }
   
+  function getTitleWithUnderscores(title) {
+    if (!title) return '';
+    return title
+      .split(' ')
+      .map(word => {
+        if (word.length === 0) return '';
+        return word.charAt(0).toUpperCase() + '_'.repeat(word.length - 1);
+      })
+      .join(' ');
+  }
+  
   function showHint(guess) {
     showAnswer = guess.id;
     setTimeout(() => {
@@ -549,7 +560,7 @@
         <!-- Первая буква (показывается между подсказками и полем ввода) -->
         {#if displayedImageMode === 'firstLetter' && showTitle}
           <div class="first-letter-display">
-            <div class="first-letter-text">{getFirstLetterHint(animeGuesses[currentImageIndex].title)}</div>
+            <div class="first-letter-text">{getTitleWithUnderscores(animeGuesses[currentImageIndex].title)}</div>
           </div>
         {/if}
         
@@ -800,23 +811,23 @@
   
   .first-letter-display {
     width: 100%;
-    max-width: 400px;
+    max-width: 600px;
     margin: 0 auto 20px;
-    padding: 20px;
+    padding: 15px 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(162, 57, 202, 0.3);
+    background: transparent;
+    border: 2px solid var(--accent);
+    border-radius: 8px;
   }
   
   .first-letter-text {
-    font-size: clamp(4rem, 8vw, 6rem);
-    font-weight: 900;
-    color: white;
-    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    letter-spacing: 0.1em;
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    font-family: monospace;
   }
   
   .clue-btn {
