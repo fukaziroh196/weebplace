@@ -159,17 +159,17 @@ export const animeGuesses = {
   },
 
   async uploadPack(slots, quizDate) {
-    // slots: [{ file, title } x4]
+    // slots: [{ file, title, hint1File?, hint2File? } x4]
     if (!Array.isArray(slots) || slots.length !== 4) {
       throw new Error('Exactly 4 slots required');
     }
     if (!quizDate || !/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(quizDate)) {
       throw new Error('Valid quizDate (YYYY-MM-DD) required');
     }
-    
+
     const formData = new FormData();
     formData.append('quizDate', quizDate);
-    
+
     for (let i = 0; i < 4; i++) {
       const slot = slots[i];
       if (!slot.file) {
@@ -180,6 +180,14 @@ export const animeGuesses = {
       }
       formData.append(`image${i + 1}`, slot.file);
       formData.append(`title${i + 1}`, slot.title.trim());
+
+      // Отправляем подсказки если они есть
+      if (slot.hint1File) {
+        formData.append(`hint1_${i + 1}`, slot.hint1File);
+      }
+      if (slot.hint2File) {
+        formData.append(`hint2_${i + 1}`, slot.hint2File);
+      }
     }
 
     console.log(`[uploadPack] Uploading pack for ${quizDate}...`);

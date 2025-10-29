@@ -47,44 +47,17 @@
     try {
       packUploading = true;
       console.log(`[submitPack] Starting upload for ${adminUploadDate}`);
-      
-      const slots = packSlots.map((s) => ({ file: s.file, title: s.title.trim() }));
+
+      const slots = packSlots.map((s) => ({
+        file: s.file,
+        title: s.title.trim(),
+        hint1File: s.hint1File,
+        hint2File: s.hint2File
+      }));
       const result = await apiGuesses.uploadPack(slots, adminUploadDate);
-      
+
       console.log('[submitPack] Upload success:', result);
-      
-      // Загрузить подсказки для каждой картинки
-      if (result.items && Array.isArray(result.items)) {
-        for (let i = 0; i < result.items.length; i++) {
-          const slot = packSlots[i];
-          const item = result.items[i];
-          
-          if ((slot.hint1File || slot.hint2File) && item.id) {
-            try {
-              const formData = new FormData();
-              if (slot.hint1File) formData.append('hint1', slot.hint1File);
-              if (slot.hint2File) formData.append('hint2', slot.hint2File);
-              
-              const hintRes = await fetch(`${import.meta.env.VITE_API_URL}/anime-guesses/${item.id}/hints`, {
-                method: 'POST',
-                headers: {
-                  'Authorization': `Bearer ${localStorage.getItem('api_token')}`
-                },
-                body: formData
-              });
-              
-              if (!hintRes.ok) {
-                console.error(`[submitPack] Failed to upload hints for slot ${i + 1}`);
-              } else {
-                console.log(`[submitPack] Hints uploaded for slot ${i + 1}`);
-              }
-            } catch (e) {
-              console.error(`[submitPack] Error uploading hints for slot ${i + 1}:`, e);
-            }
-          }
-        }
-      }
-      
+
       // Очистить форму
       packSlots = Array.from({ length: 4 }, () => ({ file: null, title: '', hint1File: null, hint2File: null, uploading: false }));
       

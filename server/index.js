@@ -539,6 +539,14 @@ app.post('/api/packs', authenticateToken, requireAdmin, upload.fields([
   { name: 'image2', maxCount: 1 },
   { name: 'image3', maxCount: 1 },
   { name: 'image4', maxCount: 1 },
+  { name: 'hint1_1', maxCount: 1 },
+  { name: 'hint1_2', maxCount: 1 },
+  { name: 'hint1_3', maxCount: 1 },
+  { name: 'hint1_4', maxCount: 1 },
+  { name: 'hint2_1', maxCount: 1 },
+  { name: 'hint2_2', maxCount: 1 },
+  { name: 'hint2_3', maxCount: 1 },
+  { name: 'hint2_4', maxCount: 1 },
 ]), (req, res) => {
   console.log('[/api/packs] New pack upload request');
   
@@ -552,7 +560,11 @@ app.post('/api/packs', authenticateToken, requireAdmin, upload.fields([
   // Validate images and titles
   const images = [req.files?.image1?.[0], req.files?.image2?.[0], req.files?.image3?.[0], req.files?.image4?.[0]];
   const titles = [req.body.title1, req.body.title2, req.body.title3, req.body.title4].map((t) => String(t || '').trim());
-  
+
+  // Validate hint images (optional)
+  const hint1Images = [req.files?.[`hint1_1`]?.[0], req.files?.[`hint1_2`]?.[0], req.files?.[`hint1_3`]?.[0], req.files?.[`hint1_4`]?.[0]];
+  const hint2Images = [req.files?.[`hint2_1`]?.[0], req.files?.[`hint2_2`]?.[0], req.files?.[`hint2_3`]?.[0], req.files?.[`hint2_4`]?.[0]];
+
   for (let i = 0; i < 4; i++) {
     if (!images[i]) {
       console.error(`[/api/packs] Missing image${i+1}`);
@@ -597,9 +609,13 @@ app.post('/api/packs', authenticateToken, requireAdmin, upload.fields([
           const animeId = String(req.body[`animeId${idx + 1}`] || `manual-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Date.now()}`);
           const sourceId = req.body[`sourceId${idx + 1}`] || 'manual';
 
+          // Handle hint images
+          const hint1Url = hint1Images[idx] ? `/uploads/${hint1Images[idx].filename}` : null;
+          const hint2Url = hint2Images[idx] ? `/uploads/${hint2Images[idx].filename}` : null;
+
           db.run(
-            'INSERT INTO anime_guesses (id, user_id, image_url, title, anime_id, source_id, quiz_date, created_at, guessed_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [guessId, req.user.id, imageUrl, title, animeId, sourceId, quizDate, Date.now(), '[]'],
+            'INSERT INTO anime_guesses (id, user_id, image_url, title, anime_id, source_id, quiz_date, hint1_image, hint2_image, created_at, guessed_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [guessId, req.user.id, imageUrl, title, animeId, sourceId, quizDate, hint1Url, hint2Url, Date.now(), '[]'],
             function (insertErr) {
               if (insertErr && !errorOccurred) {
                 console.error(`[/api/packs] INSERT error for ${title}:`, insertErr);
@@ -752,53 +768,7 @@ app.delete('/api/anime-guesses/:id', authenticateToken, requireAdmin, (req, res)
   });
 });
 
-// Загрузить картинки-подсказки для существующего anime_guess
-app.post('/api/anime-guesses/:id/hints', authenticateToken, requireAdmin, upload.fields([
-  { name: 'hint1', maxCount: 1 },
-  { name: 'hint2', maxCount: 1 }
-]), (req, res) => {
-  const { id } = req.params;
-  
-  const hint1File = req.files?.hint1?.[0];
-  const hint2File = req.files?.hint2?.[0];
-  
-  if (!hint1File && !hint2File) {
-    return res.status(400).json({ error: 'At least one hint image is required' });
-  }
-  
-  const hint1Url = hint1File ? `/uploads/${hint1File.filename}` : null;
-  const hint2Url = hint2File ? `/uploads/${hint2File.filename}` : null;
-  
-  // Собираем UPDATE query динамически
-  const updates = [];
-  const values = [];
-  
-  if (hint1Url) {
-    updates.push('hint1_image = ?');
-    values.push(hint1Url);
-  }
-  if (hint2Url) {
-    updates.push('hint2_image = ?');
-    values.push(hint2Url);
-  }
-  
-  values.push(id);
-  
-  const query = `UPDATE anime_guesses SET ${updates.join(', ')} WHERE id = ?`;
-  
-  db.run(query, values, function(err) {
-    if (err) {
-      console.error('[POST /api/anime-guesses/:id/hints] Error:', err);
-      return res.status(500).json({ error: err.message });
-    }
-    
-    res.json({ 
-      success: true,
-      hint1_image: hint1Url,
-      hint2_image: hint2Url
-    });
-  });
-});
+// Отдельный endpoint для подсказок больше не нужен - они загружаются с паком
 
 // Проверить ответ в игре
 app.post('/api/anime-guesses/:id/check', authenticateToken, (req, res) => {
