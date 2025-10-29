@@ -111,7 +111,7 @@
   let battleSuggestions = Array(12).fill([]);
   let battleShowSuggestions = Array(12).fill(false);
 
-  $: canSubmitBattlePack = selectedBattlePack && battleSlots.filter(s => s.file && s.title.trim()).length >= 8;
+  $: canSubmitBattlePack = (newPackName.trim() || selectedBattlePack) && battleSlots.filter(s => s.file && s.title.trim()).length >= 8;
 
   function handleBattleFileSelect(index, event) {
     const file = event.target.files?.[0];
@@ -129,6 +129,52 @@
   async function submitBattlePack() {
     battlePackError = '';
     
+    // Проверяем, что выбран или создан пак
+    if (!selectedBattlePack) {
+      // Если пак не выбран, создаем новый
+      if (!newPackName.trim()) {
+        battlePackError = 'Введите название пака или выберите существующий';
+        return;
+      }
+      
+      // Создаем новый пак
+      try {
+        creatingPack = true;
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/battle-packs`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('api_token')}`
+          },
+          body: JSON.stringify({
+            name: newPackName.trim(),
+            description: newPackDescription.trim()
+          })
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(errorText);
+        }
+        
+        const result = await response.json();
+        selectedBattlePack = result.id;
+        
+        // Перезагружаем список паков
+        await loadBattlePacks();
+        
+        // Очистить форму создания пака
+        newPackName = '';
+        newPackDescription = '';
+        creatingPack = false;
+      } catch (e) {
+        creatingPack = false;
+        battlePackError = `Ошибка создания пака: ${e.message}`;
+        alert(battlePackError);
+        return;
+      }
+    }
+    
     const validSlots = battleSlots.filter(s => s.file && s.title.trim());
     if (validSlots.length < 8) {
       battlePackError = 'Минимум 8 аниме для баттла';
@@ -137,7 +183,7 @@
     
     try {
       battlePackUploading = true;
-      console.log(`[submitBattlePack] Starting upload (no date required for battles)`);
+      console.log(`[submitBattlePack] Starting upload to pack ${selectedBattlePack}`);
       
       // Загружаем каждое аниме
       for (let i = 0; i < validSlots.length; i++) {
@@ -420,52 +466,6 @@
     }
   }
 
-  // === Создание нового баттл пака ===
-  async function createBattlePack() {
-    if (!newPackName.trim()) {
-      packError = 'Введите название пака';
-      return;
-    }
-
-    try {
-      creatingPack = true;
-      packError = '';
-
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/battle-packs`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('api_token')}`
-        },
-        body: JSON.stringify({
-          name: newPackName.trim(),
-          description: newPackDescription.trim()
-        })
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log('[createBattlePack] Pack created:', result);
-        
-        // Очистить форму
-        newPackName = '';
-        newPackDescription = '';
-        
-        // Перезагрузить список паков
-        await loadBattlePacks();
-        
-        alert('✓ Баттл пак успешно создан!');
-      } else {
-        const errorText = await response.text();
-        packError = `Ошибка создания пака: ${errorText}`;
-      }
-    } catch (e) {
-      console.error('[createBattlePack] Error:', e);
-      packError = `Ошибка сети: ${e.message}`;
-    } finally {
-      creatingPack = false;
-    }
-  }
 
   // === Вспомогательные функции ===
   function setDateToToday() {
@@ -734,11 +734,12 @@
     <div class="upload-section">
       <div class="section-title">⚔️ Управление баттл паками</div>
       
-      <!-- Создание нового пака -->
+      <!-- Создание нового пака или выбор существующего -->
       <div class="pack-creation">
-        <h3>Создать новый баттл пак</h3>
+        <h3>Создать новый пак или добавить в существующий</h3>
+        
         <div class="form-group">
-          <label>Название пака:</label>
+          <label>Название пака (для нового пака):</label>
           <input 
             type="text" 
             bind:value={newPackName}
@@ -746,6 +747,7 @@
             class="form-input"
           />
         </div>
+        
         <div class="form-group">
           <label>Описание (необязательно):</label>
           <textarea 
@@ -755,47 +757,38 @@
             rows="2"
           ></textarea>
         </div>
-        {#if packError}
-          <div class="error-message">{packError}</div>
+        
+        <!-- Выбор существующего пака -->
+        {#if battlePacks.length > 0}
+          <div class="pack-selection">
+            <h4>Или выберите существующий пак:</h4>
+            <div class="packs-list">
+              {#each battlePacks as pack}
+                <div 
+                  class="pack-item" 
+                  class:selected={selectedBattlePack === pack.id}
+                  on:click={() => {
+                    selectedBattlePack = pack.id;
+                    newPackName = ''; // Очищаем название для нового пака
+                    newPackDescription = '';
+                  }}
+                >
+                  <div class="pack-info">
+                    <div class="pack-name">{pack.name}</div>
+                    {#if pack.description}
+                      <div class="pack-description">{pack.description}</div>
+                    {/if}
+                  </div>
+                  <div class="pack-arrow">{selectedBattlePack === pack.id ? '✓' : '→'}</div>
+                </div>
+              {/each}
+            </div>
+          </div>
         {/if}
-        <button 
-          class="submit-btn"
-          on:click={createBattlePack}
-          disabled={!newPackName.trim() || creatingPack}
-        >
-          {creatingPack ? '⏳ Создание...' : '✓ Создать пак'}
-        </button>
       </div>
 
-      <!-- Выбор пака для загрузки аниме -->
-      {#if battlePacks.length > 0}
-        <div class="pack-selection">
-          <h3>Выберите пак для загрузки аниме</h3>
-          <div class="packs-list">
-            {#each battlePacks as pack}
-              <div 
-                class="pack-item" 
-                class:selected={selectedBattlePack === pack.id}
-                on:click={() => selectedBattlePack = pack.id}
-              >
-                <div class="pack-info">
-                  <div class="pack-name">{pack.name}</div>
-                  {#if pack.description}
-                    <div class="pack-description">{pack.description}</div>
-                  {/if}
-                </div>
-                <div class="pack-arrow">{selectedBattlePack === pack.id ? '✓' : '→'}</div>
-              </div>
-            {/each}
-          </div>
-        </div>
-      {/if}
-    </div>
-
-    <!-- === ЗАГРУЗКА АНИМЕ В БАТТЛ ПАК === -->
-    {#if selectedBattlePack}
-      <div class="upload-section">
-        <div class="section-title">📦 Загрузка аниме в выбранный пак (8-16 аниме)</div>
+      <!-- Загрузка аниме -->
+      <div class="section-title">📦 Загрузка аниме (8-16 аниме)</div>
       
       <div class="battle-grid">
         {#each battleSlots as slot, idx}
@@ -859,12 +852,11 @@
       <button 
         class="submit-btn"
         on:click={submitBattlePack}
-        disabled={!canSubmitBattlePack || battlePackUploading}
+        disabled={!canSubmitBattlePack || battlePackUploading || creatingPack}
       >
-        {battlePackUploading ? '⏳ Загрузка...' : '✓ Загрузить баттл пак'}
+        {battlePackUploading ? '⏳ Загрузка...' : creatingPack ? '⏳ Создание пака...' : '✓ Загрузить баттл пак'}
       </button>
-      </div>
-    {/if}
+    </div>
 
     <!-- === ПРОСМОТР ЗАГРУЖЕННЫХ КАРТИНОК === -->
     <div class="view-section">
@@ -1296,6 +1288,13 @@
     font-size: 1.2rem;
     font-weight: 600;
     margin: 0 0 15px 0;
+  }
+
+  .pack-selection h4 {
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 15px 0 10px 0;
   }
 
   .packs-list {
