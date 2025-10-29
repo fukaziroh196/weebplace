@@ -494,11 +494,7 @@
         
         <!-- Большая картинка по центру -->
         <div class="image-container">
-          {#if displayedImageMode === 'firstLetter' && showTitle}
-            <div class="first-letter-display">
-              <div class="first-letter-text">{getFirstLetterHint(animeGuesses[currentImageIndex].title)}</div>
-            </div>
-          {:else if displayedImageMode === 'hint2' && unlockedClues.includes(1) && currentGuess?.hint2_image}
+          {#if displayedImageMode === 'hint2' && unlockedClues.includes(1) && currentGuess?.hint2_image}
             <img 
               src="{import.meta.env.VITE_API_URL.replace('/api', '')}{currentGuess.hint2_image}" 
               alt="Подсказка 2"
@@ -549,6 +545,13 @@
             }}
           >Первая буква</button>
         </div>
+        
+        <!-- Первая буква (показывается между подсказками и полем ввода) -->
+        {#if displayedImageMode === 'firstLetter' && showTitle}
+          <div class="first-letter-display">
+            <div class="first-letter-text">{getFirstLetterHint(animeGuesses[currentImageIndex].title)}</div>
+          </div>
+        {/if}
         
         <!-- Поле ввода ответа -->
         <div class="answer-container" use:clickOutside={{ enabled: showUserSuggestions, callback: () => showUserSuggestions = false }}>
@@ -797,26 +800,23 @@
   
   .first-letter-display {
     width: 100%;
-    height: 45vh;
+    max-width: 400px;
+    margin: 0 auto 20px;
+    padding: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
     border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(162, 57, 202, 0.3);
   }
   
   .first-letter-text {
-    font-size: clamp(8rem, 15vw, 12rem);
+    font-size: clamp(4rem, 8vw, 6rem);
     font-weight: 900;
     color: white;
     text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     letter-spacing: 0.1em;
-  }
-  
-  @media (max-width: 768px) {
-    .first-letter-display {
-      height: 35vh;
-    }
   }
   
   .clue-btn {
