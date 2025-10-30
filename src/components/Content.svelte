@@ -198,7 +198,7 @@
     width: 100%;
     max-width: 1600px;
     margin: 0 auto;
-    padding: 2rem 1.5rem;
+    padding: 0.75rem 1.5rem 2rem 1.5rem;
   }
   
   .main-container {
