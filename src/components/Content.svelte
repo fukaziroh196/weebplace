@@ -398,7 +398,7 @@
     top: 2rem;
     box-shadow: 0 4px 12px rgba(91, 117, 83, 0.12);
     margin-top: 7rem; /* Увеличен отступ сверху для опускания ещё ниже */
-    height: 516px; /* Фиксированная высота */
+    height: 600px; /* Увеличена фиксированная высота */
     display: flex;
     flex-direction: column;
   }
@@ -499,7 +499,7 @@
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    height: 380px; /* Фиксированная высота списка */
+    height: 464px; /* Увеличена фиксированная высота списка */
   }
   
   /* Hide scrollbar */
