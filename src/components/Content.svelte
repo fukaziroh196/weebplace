@@ -260,7 +260,7 @@
   
   .quiz-card {
     position: relative;
-    background: linear-gradient(135deg, rgba(255, 184, 28, 0.08) 0%, rgba(139, 164, 127, 0.12) 100%);
+    background: var(--panelStrong);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 20px;
     padding: 2.5rem 2rem;
@@ -297,13 +297,13 @@
   
   .quiz-card:hover {
     transform: translateY(-8px) scale(1.02);
-    background: linear-gradient(135deg, rgba(255, 184, 28, 0.15) 0%, rgba(139, 164, 127, 0.2) 100%);
+    background: var(--extra);
     border-color: rgba(255, 255, 255, 0.2);
     box-shadow: 
       0 20px 60px rgba(0, 0, 0, 0.3),
       inset 0 1px 0 rgba(255, 255, 255, 0.25),
       0 0 0 1px rgba(255, 255, 255, 0.1),
-      0 0 40px rgba(255, 184, 28, 0.15);
+      0 0 40px rgba(91, 117, 83, 0.2);
   }
   
   .quiz-card:active {
