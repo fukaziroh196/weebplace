@@ -229,7 +229,7 @@
   .quiz-cards-section {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1rem; /* Уменьшен отступ между элементами */
   }
   
   .main-title {
@@ -238,13 +238,13 @@
     text-align: center;
     color: var(--text);
     letter-spacing: 0.02em;
-    margin-bottom: 1rem;
+    margin: 0; /* Убран нижний отступ чтобы поднять выше */
   }
   
   .quiz-cards {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 0.75rem;
   }
   
   @media (max-width: 768px) {
@@ -265,12 +265,11 @@
     border-radius: 20px;
     padding: 2.5rem 2rem;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
     box-shadow: 
-      0 8px 32px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15),
-      0 0 0 1px rgba(255, 255, 255, 0.05);
+      0 4px 12px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
     max-width: 600px;
     width: 100%;
   }
@@ -285,10 +284,10 @@
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(255, 255, 255, 0.1),
+      rgba(255, 255, 255, 0.06),
       transparent
     );
-    transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .quiz-card:hover::before {
@@ -296,18 +295,17 @@
   }
   
   .quiz-card:hover {
-    transform: translateY(-8px) scale(1.02);
+    transform: translateY(-4px) scale(1.01);
     background: var(--extra);
-    border-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.15);
     box-shadow: 
-      0 20px 60px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.25),
-      0 0 0 1px rgba(255, 255, 255, 0.1),
-      0 0 40px rgba(91, 117, 83, 0.2);
+      0 8px 24px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      0 0 0 1px rgba(255, 255, 255, 0.08);
   }
   
   .quiz-card:active {
-    transform: translateY(-4px) scale(1.01);
+    transform: translateY(-2px) scale(1.005);
   }
   
   @media (max-width: 768px) {
@@ -316,7 +314,7 @@
     }
     
     .quiz-card:hover {
-      transform: translateY(-4px) scale(1.01);
+      transform: translateY(-2px) scale(1.005);
     }
   }
   
@@ -332,12 +330,12 @@
     color: var(--text);
     letter-spacing: 0.02em;
     line-height: 1.4;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
   }
   
   .quiz-card:hover .card-title {
-    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
   }
   
   @media (max-width: 768px) {
