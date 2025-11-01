@@ -233,7 +233,7 @@
   }
   
   .main-title {
-    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-size: 3.5rem; /* Фиксированный размер вместо clamp */
     font-weight: 900;
     text-align: center;
     color: var(--text);
@@ -249,7 +249,7 @@
   
   @media (max-width: 768px) {
     .main-title {
-      font-size: clamp(2rem, 8vw, 2.5rem);
+      font-size: 2rem;
       margin-bottom: 0.75rem;
     }
     
@@ -270,8 +270,7 @@
     box-shadow: 
       0 4px 12px rgba(0, 0, 0, 0.15),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    max-width: 600px;
-    width: 100%;
+    width: 600px; /* Фиксированная ширина */
   }
   
   .quiz-card::before {
@@ -310,6 +309,8 @@
   
   @media (max-width: 768px) {
     .quiz-card {
+      width: 100%;
+      max-width: 600px;
       padding: 2rem 1.5rem;
     }
     
@@ -325,7 +326,7 @@
   }
   
   .card-title {
-    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+    font-size: 1.3rem; /* Фиксированный размер вместо clamp */
     font-weight: 800;
     color: var(--text);
     letter-spacing: 0.02em;
@@ -340,7 +341,7 @@
   
   @media (max-width: 768px) {
     .card-title {
-      font-size: clamp(1rem, 4vw, 1.2rem);
+      font-size: 1rem;
     }
   }
   
@@ -361,8 +362,7 @@
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     margin: 0;
     box-shadow: 0 4px 12px rgba(139, 164, 127, 0.25);
-    max-width: 600px;
-    width: 100%;
+    width: 600px; /* Фиксированная ширина */
   }
   
   .replay-btn-new:hover {
@@ -380,7 +380,7 @@
       padding: 0.875rem 1.5rem;
       font-size: 0.9rem;
       width: 100%;
-      max-width: 350px;
+      max-width: 600px;
     }
   }
   
@@ -398,7 +398,7 @@
     top: 2rem;
     box-shadow: 0 4px 12px rgba(91, 117, 83, 0.12);
     margin-top: 7rem; /* Увеличен отступ сверху для опускания ещё ниже */
-    max-height: 516px; /* Увеличена максимальная высота ещё на 20% */
+    height: 516px; /* Фиксированная высота */
     display: flex;
     flex-direction: column;
   }
@@ -499,7 +499,7 @@
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    max-height: 440px; /* Ограничена максимальная высота списка */
+    height: 380px; /* Фиксированная высота списка */
   }
   
   /* Hide scrollbar */
