@@ -397,7 +397,7 @@
     position: sticky;
     top: 2rem;
     box-shadow: 0 4px 12px rgba(91, 117, 83, 0.12);
-    margin-top: 3.5rem; /* Увеличен отступ сверху для опускания ниже */
+    margin-top: 5rem; /* Увеличен отступ сверху для опускания ещё ниже */
     max-height: 516px; /* Увеличена максимальная высота ещё на 20% */
     display: flex;
     flex-direction: column;
