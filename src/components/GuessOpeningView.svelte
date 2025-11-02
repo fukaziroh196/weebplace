@@ -382,7 +382,11 @@
       </div>
 
       <!-- YouTube Player с оверлеем -->
-      <div class="player-wrapper">
+      <div 
+        class="player-wrapper"
+        class:state-blur={state === 'blur'}
+        class:state-revealed={state === 'revealed'}
+      >
         <!-- IFrame для YouTube -->
         <div id="youtube-player" class="youtube-iframe"></div>
         
@@ -601,6 +605,7 @@
     position: absolute;
     top: 0;
     left: 0;
+    transition: all 0.6s ease-in-out;
   }
 
   /* === Оверлей === */
@@ -613,6 +618,7 @@
     justify-content: center;
     transition: all 0.6s ease-in-out;
     border-radius: 12px;
+    z-index: 1;
   }
 
   .overlay-idle {
@@ -627,25 +633,27 @@
   }
 
   .overlay-blur {
-    background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(20px);
-    opacity: 1;
-  }
-  
-  .overlay-blur .youtube-iframe {
-    opacity: 1;
-    position: relative;
-    pointer-events: all;
+    background: transparent;
+    pointer-events: none;
   }
 
   .overlay-revealed {
     background: transparent;
+    pointer-events: none;
   }
   
-  .overlay-revealed .youtube-iframe {
+  /* Когда состояние blur или revealed - показываем iframe */
+  .player-wrapper.state-blur .youtube-iframe,
+  .player-wrapper.state-revealed .youtube-iframe {
     opacity: 1;
-    position: relative;
     pointer-events: all;
+    position: relative;
+  }
+  
+  /* Размытие для blur состояния */
+  .player-wrapper.state-blur .youtube-iframe {
+    filter: blur(30px);
+    transition: filter 0.6s ease-in-out;
   }
 
   .play-overlay-btn {
