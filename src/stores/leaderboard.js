@@ -7,7 +7,7 @@ export const leaderboardPeriod = writable('all');
 export async function refreshLeaderboard(period = 'all') {
   try {
     console.log('[refreshLeaderboard] Loading for period:', period);
-    const top = await leaderboardApi.list(20, period);
+    const top = await leaderboardApi.list(5, period); // Загружаем только 5 игроков
     if (Array.isArray(top) && top.length) {
       const data = top.map((r) => ({ 
         name: r.username, 
