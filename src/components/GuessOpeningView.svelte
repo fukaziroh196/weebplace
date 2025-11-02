@@ -647,7 +647,6 @@
   .player-wrapper.state-revealed .youtube-iframe {
     opacity: 1;
     pointer-events: all;
-    position: relative;
   }
   
   /* Размытие для blur состояния */
