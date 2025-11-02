@@ -651,7 +651,7 @@
   
   /* Размытие для blur состояния */
   .player-wrapper.state-blur .youtube-iframe {
-    filter: blur(30px);
+    filter: blur(15px);
     transition: filter 0.6s ease-in-out;
   }
 
