@@ -493,11 +493,12 @@
         </div>
         
         <div class="rounds-summary">
-          {#each roundScores as score, idx}
+          {#each openings as opening, idx}
             <div class="round-item">
               <div class="round-label">Раунд {idx + 1}</div>
-              <div class="round-score {score > 0 ? 'correct' : 'incorrect'}">
-                {score > 0 ? '✓' : '✗'} {score.toLocaleString()} очков
+              <div class="round-anime-title">{opening.title}</div>
+              <div class="round-score {roundScores[idx] > 0 ? 'correct' : 'incorrect'}">
+                {roundScores[idx] > 0 ? '✓' : '✗'} {roundScores[idx]?.toLocaleString() || 0} очков
               </div>
             </div>
           {/each}
@@ -977,8 +978,8 @@
 
   .round-item {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 8px;
     padding: 14px 18px;
     background: rgba(0, 0, 0, 0.2);
     border-radius: 10px;
@@ -1007,6 +1008,13 @@
 
   .round-score.incorrect {
     color: #f44336;
+  }
+
+  .round-anime-title {
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    opacity: 0.9;
   }
 
   .final-done-btn {
