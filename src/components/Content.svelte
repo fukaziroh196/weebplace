@@ -100,13 +100,13 @@
         
         <div class="lb-tabs-new">
           <button class="lb-tab-new {$leaderboardPeriod==='day'?'active':''}" on:click={() => { leaderboardPeriod.set('day'); refreshLeaderboard('day'); }}>
-            CURRENT STREAK
+            ТЕКУЩАЯ СЕРИЯ
           </button>
           <button class="lb-tab-new {$leaderboardPeriod==='week'?'active':''}" on:click={() => { leaderboardPeriod.set('week'); refreshLeaderboard('week'); }}>
-            BEST STREAK
+            ЛУЧШАЯ СЕРИЯ
           </button>
           <button class="lb-tab-new {$leaderboardPeriod==='all'?'active':''}" on:click={() => { leaderboardPeriod.set('all'); refreshLeaderboard('all'); }}>
-            MOST ACTIVE
+            САМЫЙ АКТИВНЫЙ
           </button>
         </div>
         
