@@ -59,12 +59,9 @@
         
         <div class="quiz-cards">
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessAnime'); activeView.set('guessAnime'); }}>
-            <div class="speed-lines"></div>
-            <div class="energy-bubbles">
-              <div class="bubble bubble-1"></div>
-              <div class="bubble bubble-2"></div>
-              <div class="bubble bubble-3"></div>
-            </div>
+            <div class="manga-speed-lines"></div>
+            <div class="manga-impact-lines"></div>
+            <div class="manga-emotion-lines"></div>
             <div class="quiz-icon" style="--quiz-color: #FF6B6B;">
               <div class="icon-glow"></div>
               <div class="sparkle sparkle-1"></div>
@@ -77,12 +74,9 @@
           </button>
           
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessOpening'); activeView.set('guessOpening'); }}>
-            <div class="speed-lines"></div>
-            <div class="energy-bubbles">
-              <div class="bubble bubble-1"></div>
-              <div class="bubble bubble-2"></div>
-              <div class="bubble bubble-3"></div>
-            </div>
+            <div class="manga-speed-lines"></div>
+            <div class="manga-impact-lines"></div>
+            <div class="manga-emotion-lines"></div>
             <div class="quiz-icon" style="--quiz-color: #4ECDC4;">
               <div class="icon-glow"></div>
               <div class="sparkle sparkle-1"></div>
@@ -95,12 +89,9 @@
           </button>
           
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessBattle'); activeView.set('guessBattle'); }}>
-            <div class="speed-lines"></div>
-            <div class="energy-bubbles">
-              <div class="bubble bubble-1"></div>
-              <div class="bubble bubble-2"></div>
-              <div class="bubble bubble-3"></div>
-            </div>
+            <div class="manga-speed-lines"></div>
+            <div class="manga-impact-lines"></div>
+            <div class="manga-emotion-lines"></div>
             <div class="quiz-icon" style="--quiz-color: #FF9F66;">
               <div class="icon-glow"></div>
               <div class="sparkle sparkle-1"></div>
@@ -113,12 +104,9 @@
             </button>
           
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessCharacter'); activeView.set('guessCharacter'); }}>
-            <div class="speed-lines"></div>
-            <div class="energy-bubbles">
-              <div class="bubble bubble-1"></div>
-              <div class="bubble bubble-2"></div>
-              <div class="bubble bubble-3"></div>
-            </div>
+            <div class="manga-speed-lines"></div>
+            <div class="manga-impact-lines"></div>
+            <div class="manga-emotion-lines"></div>
             <div class="quiz-icon" style="--quiz-color: #A8E6CF;">
               <div class="icon-glow"></div>
               <div class="sparkle sparkle-1"></div>
@@ -480,46 +468,91 @@
     }
   }
 
-  /* Speed lines effect */
-  .speed-lines {
+  /* Manga-style speed lines */
+  .manga-speed-lines {
     position: absolute;
     inset: 0;
     opacity: 0;
     pointer-events: none;
-    border-radius: 20px;
     overflow: hidden;
+    border-radius: 20px;
   }
 
-  .speed-lines::before,
-  .speed-lines::after {
+  .manga-speed-lines::before,
+  .manga-speed-lines::after {
     content: '';
     position: absolute;
-    width: 100%;
-    height: 2px;
+    left: 10%;
+    width: 3px;
+    height: 100%;
     background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.3),
-      transparent
+      180deg,
+      transparent 0%,
+      rgba(0, 0, 0, 0.4) 50%,
+      transparent 100%
     );
-    animation: speed-line-move 1s linear infinite;
   }
 
-  .speed-lines::before {
-    top: 20%;
-    animation-delay: 0s;
+  .manga-speed-lines::before {
+    animation: manga-speed 0.8s linear infinite;
   }
 
-  .speed-lines::after {
-    bottom: 20%;
-    animation-delay: 0.5s;
+  .manga-speed-lines::after {
+    left: 85%;
+    animation: manga-speed 0.6s linear infinite 0.3s;
   }
 
-  .quiz-card:hover .speed-lines {
+  .quiz-card:hover .manga-speed-lines {
     opacity: 1;
   }
 
-  @keyframes speed-line-move {
+  @keyframes manga-speed {
+    from {
+      top: -100%;
+    }
+    to {
+      top: 100%;
+    }
+  }
+
+  /* Manga impact lines */
+  .manga-impact-lines {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .manga-impact-lines::before,
+  .manga-impact-lines::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 4px;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 10px,
+      rgba(0, 0, 0, 0.3) 10px,
+      rgba(0, 0, 0, 0.3) 20px
+    );
+    animation: manga-impact 1.2s linear infinite;
+  }
+
+  .manga-impact-lines::before {
+    top: 15%;
+  }
+
+  .manga-impact-lines::after {
+    bottom: 15%;
+    animation-delay: 0.6s;
+  }
+
+  .quiz-card:hover .manga-impact-lines {
+    opacity: 1;
+  }
+
+  @keyframes manga-impact {
     from {
       left: -100%;
     }
@@ -528,57 +561,50 @@
     }
   }
 
-  /* Energy bubbles */
-  .energy-bubbles {
+  /* Manga emotion lines (radial) */
+  .manga-emotion-lines {
     position: absolute;
     inset: 0;
     opacity: 0;
     pointer-events: none;
-    overflow: hidden;
-    border-radius: 20px;
   }
 
-  .bubble {
+  .manga-emotion-lines::before,
+  .manga-emotion-lines::after,
+  .manga-emotion-lines {
+    background-image: 
+      radial-gradient(circle at 20% 30%, rgba(0, 0, 0, 0.15) 1px, transparent 1px),
+      radial-gradient(circle at 80% 70%, rgba(0, 0, 0, 0.15) 1px, transparent 1px),
+      radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
+    background-size: 30px 30px, 35px 35px, 25px 25px;
+  }
+
+  .manga-emotion-lines::before {
+    content: '';
     position: absolute;
-    width: 8px;
-    height: 8px;
-    background: var(--quiz-color);
-    border-radius: 50%;
-    opacity: 0.6;
-    box-shadow: 0 0 10px var(--quiz-color);
-    animation: bubble-float 3s ease-in-out infinite;
+    inset: 0;
+    animation: manga-emotion 2s linear infinite;
   }
 
-  .bubble-1 {
-    left: 10%;
-    animation-delay: 0s;
+  .manga-emotion-lines::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    animation: manga-emotion 1.5s linear infinite 1s;
   }
 
-  .bubble-2 {
-    left: 50%;
-    animation-delay: 1s;
-  }
-
-  .bubble-3 {
-    left: 80%;
-    animation-delay: 2s;
-  }
-
-  .quiz-card:hover .energy-bubbles {
+  .quiz-card:hover .manga-emotion-lines {
     opacity: 1;
   }
 
-  @keyframes bubble-float {
-    0% {
-      bottom: -10px;
-      transform: scale(0);
+  @keyframes manga-emotion {
+    0%, 100% {
+      transform: scale(1) rotate(0deg);
+      opacity: 0;
     }
     50% {
-      transform: scale(1);
-    }
-    100% {
-      bottom: 100%;
-      transform: scale(0.5);
+      transform: scale(1.2) rotate(180deg);
+      opacity: 1;
     }
   }
   
