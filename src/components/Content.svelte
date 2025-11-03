@@ -59,27 +59,43 @@
         
         <div class="quiz-cards">
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessAnime'); activeView.set('guessAnime'); }}>
+            <div class="quiz-icon" style="--quiz-color: #FF6B6B;">
+              <div class="icon-glow"></div>
+              <span class="icon-emoji">🎬</span>
+            </div>
             <div class="card-content">
               <h3 class="card-title">Угадай аниме по случайным кадрам</h3>
-      </div>
+            </div>
           </button>
           
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessOpening'); activeView.set('guessOpening'); }}>
+            <div class="quiz-icon" style="--quiz-color: #4ECDC4;">
+              <div class="icon-glow"></div>
+              <span class="icon-emoji">🎵</span>
+            </div>
             <div class="card-content">
               <h3 class="card-title">Угадай аниме по опенингу</h3>
-          </div>
+            </div>
           </button>
           
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessBattle'); activeView.set('guessBattle'); }}>
+            <div class="quiz-icon" style="--quiz-color: #FF9F66;">
+              <div class="icon-glow"></div>
+              <span class="icon-emoji">⚔️</span>
+            </div>
             <div class="card-content">
               <h3 class="card-title">Аниме Баттл</h3>
             </div>
             </button>
           
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessCharacter'); activeView.set('guessCharacter'); }}>
+            <div class="quiz-icon" style="--quiz-color: #A8E6CF;">
+              <div class="icon-glow"></div>
+              <span class="icon-emoji">👤</span>
+            </div>
             <div class="card-content">
               <h3 class="card-title">Угадай персонажа по силуэту</h3>
-          </div>
+            </div>
           </button>
     </div>
     
@@ -263,14 +279,17 @@
     background: var(--panelStrong);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 20px;
-    padding: 2.5rem 2rem;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
     box-shadow: 
       0 4px 12px rgba(0, 0, 0, 0.15),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    width: 600px; /* Фиксированная ширина */
+    width: 600px;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem 2rem;
   }
   
   .quiz-card::before {
@@ -306,23 +325,81 @@
   .quiz-card:active {
     transform: translateY(-2px) scale(1.005);
   }
-  
+
   @media (max-width: 768px) {
     .quiz-card {
       width: 100%;
       max-width: 600px;
-      padding: 2rem 1.5rem;
+      padding: 1.25rem 1.5rem;
+      gap: 1rem;
     }
     
     .quiz-card:hover {
       transform: translateY(-2px) scale(1.005);
     }
   }
+
+  .quiz-icon {
+    position: relative;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--quiz-color), rgba(255, 255, 255, 0.2));
+    border-radius: 50%;
+    border: 3px solid var(--quiz-color);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+  }
+
+  .quiz-card:hover .quiz-icon {
+    transform: scale(1.1) rotate(5deg);
+  }
+
+  .icon-glow {
+    position: absolute;
+    inset: -10px;
+    background: radial-gradient(circle, var(--quiz-color), transparent);
+    opacity: 0.3;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 0.3;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(1.1);
+    }
+  }
+
+  .icon-emoji {
+    font-size: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (max-width: 768px) {
+    .quiz-icon {
+      width: 60px;
+      height: 60px;
+    }
+    
+    .icon-emoji {
+      font-size: 1.5rem;
+    }
+  }
   
   .card-content {
     position: relative;
     z-index: 1;
-    text-align: center;
+    text-align: left;
+    flex: 1;
   }
   
   .card-title {
