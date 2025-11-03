@@ -76,8 +76,6 @@
             </div>
           </button>
           
-          <div class="hex-spacer"></div>
-          
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessBattle'); activeView.set('guessBattle'); }}>
             <div class="quiz-icon" style="--quiz-color: #FF9F66;">
               <div class="icon-glow"></div>
@@ -331,19 +329,8 @@
     transform: translateY(-2px) scale(1.005);
   }
 
-  .hex-spacer {
-    width: 120px;
-    height: 138px;
-    visibility: hidden;
-  }
-
   @media (max-width: 768px) {
     .quiz-card {
-      width: 100px;
-      height: 100px;
-    }
-
-    .hex-spacer {
       width: 100px;
       height: 100px;
     }
