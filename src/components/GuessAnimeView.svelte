@@ -123,7 +123,7 @@
       loading = false;
     }
   }
-
+  
   // Автоперезагрузка при смене выбранной даты сета
   let lastLoadedDate = '';
   $: (async () => {
@@ -279,7 +279,7 @@
             title: anime.russian || anime.name,
             titleAlt: anime.name !== anime.russian ? anime.name : null
           }));
-          showUserSuggestions = true;
+        showUserSuggestions = true;
         } else {
           userSuggestions = [];
           showUserSuggestions = false;
@@ -341,12 +341,12 @@
     try {
       const res = await apiGuesses.checkAnswer(guessId, answer);
       console.log('[checkAnswer] Response:', res);
-      
+    
       if (res?.correct) {
-        const userId = $currentUser?.id;
+      const userId = $currentUser?.id;
         const guess = animeGuesses.find(g => g.id === guessId);
         if (guess && userId && Array.isArray(guess.guessedBy) && !guess.guessedBy.includes(userId)) {
-          guess.guessedBy.push(userId);
+        guess.guessedBy.push(userId);
         }
         
         // Начисляем очки
@@ -363,14 +363,14 @@
         if (currentImageIndex < animeGuesses.length - 1) {
           setTimeout(() => {
             currentImageIndex++;
-            userAnswer = '';
+      userAnswer = '';
             unlockedClues = [];
             showTitle = false;
             displayedImageMode = 'original';
             answerFeedback = '';
             isChecking = false;
           }, 800);
-        } else {
+    } else {
           // Все раунды пройдены - показываем финальные результаты
           setTimeout(async () => {
             userAnswer = '';
@@ -504,7 +504,7 @@
   {#if animeGuesses.length === 0}
     <div class="quiz-container text-center">
       <div class="text-white/80 text-lg">Пока нет картинок для угадывания 😔</div>
-    </div>
+        </div>
   {:else}
     <div class="quiz-container">
         <!-- Заголовок с раундом и очками -->
@@ -514,12 +514,12 @@
             <div class="round-badge">
               <span class="round-text">Раунд {currentImageIndex + 1}</span>
               <span class="difficulty-badge">Легко</span>
-            </div>
-          </div>
+                  </div>
+                </div>
           <div class="score-display">
             <span class="score-value">{totalScore.toLocaleString()}</span>
             <span class="score-label">очков</span>
-          </div>
+            </div>
         </div>
         
         <!-- Большая картинка по центру -->
@@ -542,12 +542,12 @@
               alt="Угадай аниме"
               class="quiz-image"
             />
-          {/if}
-        </div>
-
+            {/if}
+            </div>
+        
         <!-- Переключатель вида изображения -->
         <div class="view-toggle">
-          <button 
+        <button 
             class="view-btn {displayedImageMode === 'original' ? 'active' : ''}"
             on:click={() => displayedImageMode = 'original'}
           >Оригинал</button>
@@ -574,14 +574,14 @@
               displayedImageMode = 'firstLetter';
             }}
           >Первая буква</button>
-        </div>
-        
+    </div>
+    
         <!-- Первая буква (показывается между подсказками и полем ввода) -->
         {#if displayedImageMode === 'firstLetter' && showTitle}
           <div class="first-letter-display">
             <div class="first-letter-text">{getTitleWithUnderscores(animeGuesses[currentImageIndex].title)}</div>
-          </div>
-        {/if}
+        </div>
+      {/if}
         
         <!-- Поле ввода ответа -->
         <div class="answer-container" use:clickOutside={{ enabled: showUserSuggestions, callback: () => showUserSuggestions = false }}>
@@ -623,22 +623,22 @@
                 </div>
               {/each}
             </div>
-          {/if}
-        </div>
+                  {/if}
+                </div>
         
         <!-- Прогресс -->
         <div class="progress-container">
           <div class="progress-dots">
             {#each animeGuesses as _, idx}
               <div class="progress-dot {idx < currentImageIndex ? 'completed' : idx === currentImageIndex ? 'active' : ''}"></div>
-            {/each}
+              {/each}
           </div>
           <div class="progress-text">{currentImageIndex + 1} / {animeGuesses.length}</div>
         </div>
-      </div>
-  {/if}
-</div>
-
+            </div>
+          {/if}
+        </div>
+        
 <!-- Модальное окно с финальными результатами -->
 {#if showFinalResults}
   <div class="final-results-overlay" on:click={() => showFinalResults = false}>
@@ -668,10 +668,10 @@
       
       <button class="close-results-btn" on:click={() => showFinalResults = false}>
         Закрыть
-      </button>
-    </div>
-  </div>
-{/if}
+          </button>
+        </div>
+      </div>
+    {/if}
 
 <style>
   .glass-frame {

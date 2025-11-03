@@ -580,7 +580,7 @@
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.2s;
     white-space: nowrap;
   }
 
@@ -666,13 +666,13 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     box-shadow: 0 8px 24px rgba(91, 117, 83, 0.4);
   }
 
   .play-overlay-btn:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 32px rgba(91, 117, 83, 0.6);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 28px rgba(91, 117, 83, 0.5);
     background: var(--extra);
   }
 
@@ -715,7 +715,7 @@
     border-radius: 8px;
     color: white;
     font-size: 1rem;
-    transition: all 0.3s;
+    transition: all 0.2s;
   }
 
   .answer-input:focus {
@@ -754,14 +754,14 @@
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.2s;
     white-space: nowrap;
   }
 
   .answer-btn:hover:not(:disabled) {
     background: var(--extra);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(91, 117, 83, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(91, 117, 83, 0.3);
   }
 
   .answer-btn:disabled {
@@ -834,7 +834,7 @@
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.2s;
   }
 
   .hint-btn {
@@ -843,8 +843,8 @@
   }
 
   .hint-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 183, 77, 0.5);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(255, 183, 77, 0.4);
   }
 
   .reset-btn {
@@ -932,7 +932,7 @@
 
   .final-close-btn:hover {
     background: rgba(0, 0, 0, 0.4);
-    transform: rotate(90deg);
+    transform: rotate(45deg);
   }
 
   .final-score-box {
@@ -1028,14 +1028,14 @@
     border: none;
     border-radius: 10px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     letter-spacing: 1px;
   }
 
   .final-done-btn:hover {
     background: var(--extra);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(91, 117, 83, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(91, 117, 83, 0.3);
   }
 
   /* === Адаптивность === */

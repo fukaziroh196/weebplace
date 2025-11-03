@@ -30,7 +30,7 @@
     { title: "Фильм 3", rating: "8.2", year: "2024" },
     { title: "Сериал 3", rating: "9.3", year: "2023" }
   ];
-  
+
   onMount(async () => {
     refreshQuizDates();
     await refreshLeaderboard($leaderboardPeriod);
@@ -61,28 +61,28 @@
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessAnime'); activeView.set('guessAnime'); }}>
             <div class="card-content">
               <h3 class="card-title">Угадай аниме по случайным кадрам</h3>
-            </div>
+      </div>
           </button>
           
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessOpening'); activeView.set('guessOpening'); }}>
             <div class="card-content">
               <h3 class="card-title">Угадай аниме по опенингу</h3>
-            </div>
+          </div>
           </button>
           
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessBattle'); activeView.set('guessBattle'); }}>
             <div class="card-content">
               <h3 class="card-title">Аниме Баттл</h3>
             </div>
-          </button>
+            </button>
           
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessCharacter'); activeView.set('guessCharacter'); }}>
             <div class="card-content">
               <h3 class="card-title">Угадай персонажа по силуэту</h3>
-            </div>
+          </div>
           </button>
-        </div>
-        
+    </div>
+    
         <button class="replay-btn-new" on:click={openReplay}>
           <span class="replay-icon">↺</span>
           ПОВТОРИТЬ ПРЕДЫДУЩИЕ ДНИ
@@ -96,20 +96,20 @@
           {#if $userStats?.data}
             <span class="streak-badge">🔥 {$userStats.data.currentStreak}</span>
           {/if}
-        </div>
-        
+    </div>
+    
         <div class="lb-tabs-new">
           <button class="lb-tab-new {$leaderboardPeriod==='day'?'active':''}" on:click={() => { leaderboardPeriod.set('day'); refreshLeaderboard('day'); }}>
             ТЕКУЩАЯ СЕРИЯ
           </button>
           <button class="lb-tab-new {$leaderboardPeriod==='week'?'active':''}" on:click={() => { leaderboardPeriod.set('week'); refreshLeaderboard('week'); }}>
             ЛУЧШАЯ СЕРИЯ
-          </button>
+    </button>
           <button class="lb-tab-new {$leaderboardPeriod==='all'?'active':''}" on:click={() => { leaderboardPeriod.set('all'); refreshLeaderboard('all'); }}>
             САМЫЙ АКТИВНЫЙ
-          </button>
-        </div>
-        
+    </button>
+  </div>
+
         <div class="lb-list">
           {#each $leaderboard as r, idx}
             <div class="lb-item {r.highlight ? 'top-three' : ''}">
@@ -120,12 +120,12 @@
               <div class="lb-info">
                 <div class="lb-username">{r.name}</div>
                 <div class="lb-score">{r.days?.toLocaleString() || 0} очков</div>
-              </div>
-            </div>
-          {/each}
+          </div>
         </div>
-      </aside>
+      {/each}
     </div>
+      </aside>
+  </div>
   {:else if $activeView === 'search'}
   <!-- Search View -->
   <div class="mt-2">

@@ -15,7 +15,7 @@
   function closeProfileMenu() {
     showProfileMenu = false;
   }
-  
+
   // Закрытие меню при клике вне его
   function handleClickOutside(event) {
     if (showProfileMenu) {
@@ -38,7 +38,7 @@
       <span>work in progress • work in progress • work in progress • work in progress • work in progress • work in progress • work in progress • work in progress • </span>
     </div>
   </div>
-
+  
   <!-- Шапка -->
   <header class="app-header">
     <div class="header-content">

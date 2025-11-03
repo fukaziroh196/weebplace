@@ -22,11 +22,11 @@
     <div class="icon-wrapper">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
         <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-      </svg>
+    </svg>
     </div>
     <span class="nav-label">Главная</span>
   </button>
-  
+
   <button class="nav-item {isActive('aniquiz') ? 'is-active' : ''}" on:click={goToAniQuiz}>
     <div class="icon-wrapper">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
