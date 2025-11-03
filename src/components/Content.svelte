@@ -600,43 +600,38 @@
     padding: 0.5rem 0.6rem;
     background: var(--panel);
     border: none;
-    border-radius: 0;
+    border-radius: 12px;
     color: var(--muted);
-    font-weight: 800;
+    font-weight: 600;
     font-size: 0.65rem;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.02em;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
     text-transform: uppercase;
-    position: relative;
-    clip-path: polygon(15% 0%, 100% 0%, 85% 100%, 0% 100%);
   }
   
   .lb-tab-new:hover {
     background: var(--extra);
     color: #FFFFFF;
-    transform: scale(1.05);
   }
   
   .lb-tab-new.active {
     background: var(--accent);
     color: #FFFFFF;
-    box-shadow: 0 4px 12px rgba(91, 117, 83, 0.3);
   }
   
   @media (max-width: 768px) {
     .lb-tab-new {
       font-size: 0.6rem;
       padding: 0.4rem 0.5rem;
-      clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
     }
   }
   
   .lb-list {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.75rem;
     padding-right: 12px;
     padding-bottom: 8px;
     flex: 1;
@@ -657,128 +652,75 @@
   
   .lb-item {
     display: grid;
-    grid-template-columns: 40px 44px 1fr;
+    grid-template-columns: 32px 36px 1fr;
     align-items: center;
-    gap: 0.8rem;
-    padding: 0.8rem 1rem;
+    gap: 0.6rem;
+    padding: 0.6rem;
     background: var(--panel);
-    border: 2px solid rgba(91, 117, 83, 0.2);
-    border-radius: 0;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-    clip-path: polygon(15% 0%, 100% 0%, 85% 100%, 0% 100%);
-  }
-
-  .lb-item::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background: var(--accent);
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    border: none;
+    border-radius: 12px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .lb-item:hover {
-    background: var(--panelStrong);
-    transform: translateX(8px);
-    border-color: var(--accent);
-    box-shadow: -8px 0 20px rgba(91, 117, 83, 0.15);
-  }
-
-  .lb-item:hover::before {
-    opacity: 1;
+    background: rgba(139, 164, 127, 0.15);
+    transform: translateX(2px);
   }
   
   .lb-item.top-three {
-    background: var(--extra);
-    border-color: var(--accent);
-  }
-
-  .lb-item.top-three::before {
-    opacity: 1;
+    background: rgba(139, 164, 127, 0.2);
   }
   
   .lb-position {
-    width: 36px;
-    height: 36px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--accent);
-    color: white;
-    font-weight: 900;
-    font-size: 1.1rem;
-    letter-spacing: -0.05em;
-    position: relative;
-    clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
-    border: 2px solid transparent;
-    box-shadow: 0 4px 12px rgba(91, 117, 83, 0.3);
+    background: var(--panel);
+    border-radius: 8px;
+    font-weight: 800;
+    color: var(--accent);
+    font-size: 0.85rem;
   }
   
-  .lb-position::after {
-    content: '';
-    position: absolute;
-    inset: -3px;
-    background: linear-gradient(45deg, var(--accent), transparent);
-    opacity: 0.5;
-    z-index: -1;
-    clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
-  }
-
   .lb-item.top-three .lb-position {
     background: var(--accent);
     color: #FFFFFF;
-    box-shadow: 0 4px 16px rgba(91, 117, 83, 0.5);
-  }
-
-  .lb-item.top-three .lb-position::after {
-    opacity: 0.7;
   }
   
   .lb-avatar {
-    width: 44px;
-    height: 44px;
-    position: relative;
+    width: 36px;
+    height: 36px;
   }
   
   .avatar-placeholder {
     width: 100%;
     height: 100%;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 0;
-    clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
-    border: 3px solid var(--accent);
-    box-shadow: 0 4px 12px rgba(91, 117, 83, 0.2);
+    border-radius: 50%;
+    border: 2px solid rgba(91, 117, 83, 0.3);
   }
   
   .lb-info {
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: 0.25rem;
     min-width: 0;
-    position: relative;
   }
   
   .lb-username {
-    font-weight: 800;
+    font-weight: 700;
     color: var(--text);
-    font-size: 1rem;
+    font-size: 0.9rem;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    font-family: 'Arial Black', sans-serif;
   }
   
   .lb-score {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     color: var(--accent);
-    font-weight: 700;
-    letter-spacing: 0.05em;
+    font-weight: 600;
   }
 </style>
