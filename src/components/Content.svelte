@@ -292,7 +292,7 @@
     align-items: center;
     justify-content: center;
     padding: 0;
-    clip-path: polygon(50% 0%, 90% 20%, 100% 60%, 75% 100%, 25% 100%, 0% 60%, 10% 20%);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   }
   
   .quiz-card::before {
