@@ -356,16 +356,15 @@
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, var(--quiz-color), rgba(255, 255, 255, 0.2));
-    border-radius: 0;
+    border-radius: 50%;
     border: 3px solid var(--quiz-color);
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     flex-shrink: 0;
-    clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
   }
 
   .quiz-card:hover .quiz-icon {
-    transform: scale(1.15) rotate(18deg);
+    transform: scale(1.15) rotate(8deg);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 30px var(--quiz-color);
   }
 
@@ -374,7 +373,7 @@
     inset: -10px;
     background: radial-gradient(circle, var(--quiz-color), transparent);
     opacity: 0;
-    clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+    border-radius: 50%;
   }
 
   .quiz-card:hover .icon-glow {
