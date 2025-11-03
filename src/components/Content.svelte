@@ -61,6 +61,8 @@
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessAnime'); activeView.set('guessAnime'); }}>
             <div class="quiz-icon" style="--quiz-color: #FF6B6B;">
               <div class="icon-glow"></div>
+              <div class="sparkle sparkle-1"></div>
+              <div class="sparkle sparkle-2"></div>
               <span class="icon-emoji">🎬</span>
             </div>
             <div class="card-content">
@@ -71,6 +73,8 @@
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessOpening'); activeView.set('guessOpening'); }}>
             <div class="quiz-icon" style="--quiz-color: #4ECDC4;">
               <div class="icon-glow"></div>
+              <div class="sparkle sparkle-1"></div>
+              <div class="sparkle sparkle-2"></div>
               <span class="icon-emoji">🎵</span>
             </div>
             <div class="card-content">
@@ -81,6 +85,8 @@
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessBattle'); activeView.set('guessBattle'); }}>
             <div class="quiz-icon" style="--quiz-color: #FF9F66;">
               <div class="icon-glow"></div>
+              <div class="sparkle sparkle-1"></div>
+              <div class="sparkle sparkle-2"></div>
               <span class="icon-emoji">⚔️</span>
             </div>
             <div class="card-content">
@@ -91,6 +97,8 @@
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessCharacter'); activeView.set('guessCharacter'); }}>
             <div class="quiz-icon" style="--quiz-color: #A8E6CF;">
               <div class="icon-glow"></div>
+              <div class="sparkle sparkle-1"></div>
+              <div class="sparkle sparkle-2"></div>
               <span class="icon-emoji">👤</span>
             </div>
             <div class="card-content">
@@ -349,13 +357,14 @@
     background: linear-gradient(135deg, var(--quiz-color), rgba(255, 255, 255, 0.2));
     border-radius: 50%;
     border: 3px solid var(--quiz-color);
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     flex-shrink: 0;
   }
 
   .quiz-card:hover .quiz-icon {
-    transform: scale(1.1) rotate(5deg);
+    transform: scale(1.15) rotate(8deg);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 30px var(--quiz-color);
   }
 
   .icon-glow {
@@ -365,6 +374,11 @@
     opacity: 0.3;
     border-radius: 50%;
     animation: pulse 2s ease-in-out infinite;
+  }
+
+  .quiz-card:hover .icon-glow {
+    opacity: 0.5;
+    animation: pulse-intense 1s ease-in-out infinite;
   }
 
   @keyframes pulse {
@@ -378,10 +392,69 @@
     }
   }
 
+  @keyframes pulse-intense {
+    0%, 100% {
+      opacity: 0.5;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.2);
+    }
+  }
+
   .icon-emoji {
     font-size: 2rem;
     position: relative;
     z-index: 1;
+    transition: transform 0.3s ease;
+  }
+
+  .quiz-card:hover .icon-emoji {
+    transform: scale(1.2);
+  }
+
+  .sparkle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--quiz-color);
+    border-radius: 50%;
+    opacity: 0;
+    box-shadow: 0 0 6px var(--quiz-color);
+  }
+
+  .sparkle-1 {
+    top: 10%;
+    left: 20%;
+  }
+
+  .sparkle-2 {
+    bottom: 15%;
+    right: 25%;
+  }
+
+  .quiz-card:hover .sparkle {
+    opacity: 1;
+    animation: sparkle-move 1s ease-out infinite;
+  }
+
+  .quiz-card:hover .sparkle-2 {
+    animation-delay: 0.3s;
+  }
+
+  @keyframes sparkle-move {
+    0% {
+      transform: scale(0) translate(0, 0);
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1) translate(var(--sparkle-x, 30px), var(--sparkle-y, -30px));
+      opacity: 0;
+    }
   }
 
   @media (max-width: 768px) {
