@@ -69,8 +69,6 @@
               <div class="icon-glow"></div>
               <div class="sparkle sparkle-1"></div>
               <div class="sparkle sparkle-2"></div>
-              <div class="aura aura-1"></div>
-              <div class="aura aura-2"></div>
               <span class="icon-emoji">🎬</span>
             </div>
             <div class="card-content">
@@ -89,8 +87,6 @@
               <div class="icon-glow"></div>
               <div class="sparkle sparkle-1"></div>
               <div class="sparkle sparkle-2"></div>
-              <div class="aura aura-1"></div>
-              <div class="aura aura-2"></div>
               <span class="icon-emoji">🎵</span>
             </div>
             <div class="card-content">
@@ -109,8 +105,6 @@
               <div class="icon-glow"></div>
               <div class="sparkle sparkle-1"></div>
               <div class="sparkle sparkle-2"></div>
-              <div class="aura aura-1"></div>
-              <div class="aura aura-2"></div>
               <span class="icon-emoji">⚔️</span>
             </div>
             <div class="card-content">
@@ -129,8 +123,6 @@
               <div class="icon-glow"></div>
               <div class="sparkle sparkle-1"></div>
               <div class="sparkle sparkle-2"></div>
-              <div class="aura aura-1"></div>
-              <div class="aura aura-2"></div>
               <span class="icon-emoji">👤</span>
             </div>
             <div class="card-content">
@@ -403,28 +395,16 @@
     position: absolute;
     inset: -10px;
     background: radial-gradient(circle, var(--quiz-color), transparent);
-    opacity: 0.3;
+    opacity: 0;
     border-radius: 50%;
-    animation: pulse 2s ease-in-out infinite;
   }
 
   .quiz-card:hover .icon-glow {
     opacity: 0.5;
-    animation: pulse-intense 1s ease-in-out infinite;
+    animation: pulse 1s ease-in-out infinite;
   }
 
   @keyframes pulse {
-    0%, 100% {
-      opacity: 0.3;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.5;
-      transform: scale(1.1);
-    }
-  }
-
-  @keyframes pulse-intense {
     0%, 100% {
       opacity: 0.5;
       transform: scale(1);
@@ -497,45 +477,6 @@
     
     .icon-emoji {
       font-size: 1.5rem;
-    }
-  }
-
-  /* Aura effect - swirling energy */
-  .aura {
-    position: absolute;
-    inset: -15px;
-    border: 2px solid var(--quiz-color);
-    border-radius: 50%;
-    opacity: 0;
-    animation: aura-rotate 2s linear infinite;
-  }
-
-  .aura-1 {
-    border-style: dashed;
-    animation-duration: 3s;
-  }
-
-  .aura-2 {
-    border-style: dotted;
-    animation-duration: 4s;
-    animation-direction: reverse;
-  }
-
-  .quiz-card:hover .aura {
-    opacity: 0.4;
-  }
-
-  @keyframes aura-rotate {
-    from {
-      transform: rotate(0deg) scale(1);
-      opacity: 0;
-    }
-    50% {
-      opacity: 0.4;
-    }
-    to {
-      transform: rotate(360deg) scale(1.2);
-      opacity: 0;
     }
   }
 
