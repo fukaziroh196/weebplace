@@ -298,7 +298,7 @@
     align-items: center;
     gap: 1.5rem;
     padding: 1.5rem 2rem;
-    clip-path: polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%);
+    clip-path: polygon(5% 0%, 95% 0%, 100% 50%, 95% 100%, 5% 100%, 0% 50%);
   }
   
   .quiz-card::before {
