@@ -65,9 +65,6 @@
               <div class="sparkle sparkle-2"></div>
               <span class="icon-emoji">🎬</span>
             </div>
-            <div class="card-content">
-              <h3 class="card-title">Угадай аниме по случайным кадрам</h3>
-            </div>
           </button>
           
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessOpening'); activeView.set('guessOpening'); }}>
@@ -76,9 +73,6 @@
               <div class="sparkle sparkle-1"></div>
               <div class="sparkle sparkle-2"></div>
               <span class="icon-emoji">🎵</span>
-            </div>
-            <div class="card-content">
-              <h3 class="card-title">Угадай аниме по опенингу</h3>
             </div>
           </button>
           
@@ -89,9 +83,6 @@
               <div class="sparkle sparkle-2"></div>
               <span class="icon-emoji">⚔️</span>
             </div>
-            <div class="card-content">
-              <h3 class="card-title">Аниме Баттл</h3>
-            </div>
             </button>
           
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessCharacter'); activeView.set('guessCharacter'); }}>
@@ -100,9 +91,6 @@
               <div class="sparkle sparkle-1"></div>
               <div class="sparkle sparkle-2"></div>
               <span class="icon-emoji">👤</span>
-            </div>
-            <div class="card-content">
-              <h3 class="card-title">Угадай персонажа по силуэту</h3>
             </div>
           </button>
     </div>
@@ -267,8 +255,12 @@
   
   .quiz-cards {
     display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    max-width: 800px;
+    margin: 0 auto;
   }
   
   @media (max-width: 768px) {
@@ -279,6 +271,7 @@
     
     .quiz-cards {
       gap: 1rem;
+      max-width: 400px;
     }
   }
   
@@ -293,12 +286,13 @@
     box-shadow: 
       0 4px 12px rgba(0, 0, 0, 0.15),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    width: 600px;
+    width: 120px;
+    height: 120px;
     display: flex;
     align-items: center;
-    gap: 1.5rem;
-    padding: 1.5rem 2rem;
-    clip-path: polygon(5% 0%, 95% 0%, 100% 50%, 95% 100%, 5% 100%, 0% 50%);
+    justify-content: center;
+    padding: 0;
+    clip-path: polygon(50% 0%, 90% 20%, 100% 60%, 75% 100%, 25% 100%, 0% 60%, 10% 20%);
   }
   
   .quiz-card::before {
@@ -337,14 +331,12 @@
 
   @media (max-width: 768px) {
     .quiz-card {
-      width: 100%;
-      max-width: 600px;
-      padding: 1.25rem 1.5rem;
-      gap: 1rem;
+      width: 100px;
+      height: 100px;
     }
     
     .quiz-card:hover {
-      transform: translateY(-2px) scale(1.005);
+      transform: translateY(-2px) scale(1.05);
     }
   }
 
@@ -454,33 +446,6 @@
     
     .icon-emoji {
       font-size: 1.5rem;
-    }
-  }
-
-  .card-content {
-    position: relative;
-    z-index: 1;
-    text-align: left;
-    flex: 1;
-  }
-  
-  .card-title {
-    font-size: 1.3rem; /* Фиксированный размер вместо clamp */
-    font-weight: 800;
-    color: var(--text);
-    letter-spacing: 0.02em;
-    line-height: 1.4;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-  }
-  
-  .quiz-card:hover .card-title {
-    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
-  }
-  
-  @media (max-width: 768px) {
-    .card-title {
-      font-size: 1rem;
     }
   }
   
