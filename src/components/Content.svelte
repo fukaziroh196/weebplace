@@ -59,10 +59,18 @@
         
         <div class="quiz-cards">
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessAnime'); activeView.set('guessAnime'); }}>
+            <div class="speed-lines"></div>
+            <div class="energy-bubbles">
+              <div class="bubble bubble-1"></div>
+              <div class="bubble bubble-2"></div>
+              <div class="bubble bubble-3"></div>
+            </div>
             <div class="quiz-icon" style="--quiz-color: #FF6B6B;">
               <div class="icon-glow"></div>
               <div class="sparkle sparkle-1"></div>
               <div class="sparkle sparkle-2"></div>
+              <div class="aura aura-1"></div>
+              <div class="aura aura-2"></div>
               <span class="icon-emoji">🎬</span>
             </div>
             <div class="card-content">
@@ -71,10 +79,18 @@
           </button>
           
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessOpening'); activeView.set('guessOpening'); }}>
+            <div class="speed-lines"></div>
+            <div class="energy-bubbles">
+              <div class="bubble bubble-1"></div>
+              <div class="bubble bubble-2"></div>
+              <div class="bubble bubble-3"></div>
+            </div>
             <div class="quiz-icon" style="--quiz-color: #4ECDC4;">
               <div class="icon-glow"></div>
               <div class="sparkle sparkle-1"></div>
               <div class="sparkle sparkle-2"></div>
+              <div class="aura aura-1"></div>
+              <div class="aura aura-2"></div>
               <span class="icon-emoji">🎵</span>
             </div>
             <div class="card-content">
@@ -83,10 +99,18 @@
           </button>
           
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessBattle'); activeView.set('guessBattle'); }}>
+            <div class="speed-lines"></div>
+            <div class="energy-bubbles">
+              <div class="bubble bubble-1"></div>
+              <div class="bubble bubble-2"></div>
+              <div class="bubble bubble-3"></div>
+            </div>
             <div class="quiz-icon" style="--quiz-color: #FF9F66;">
               <div class="icon-glow"></div>
               <div class="sparkle sparkle-1"></div>
               <div class="sparkle sparkle-2"></div>
+              <div class="aura aura-1"></div>
+              <div class="aura aura-2"></div>
               <span class="icon-emoji">⚔️</span>
             </div>
             <div class="card-content">
@@ -95,10 +119,18 @@
             </button>
           
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessCharacter'); activeView.set('guessCharacter'); }}>
+            <div class="speed-lines"></div>
+            <div class="energy-bubbles">
+              <div class="bubble bubble-1"></div>
+              <div class="bubble bubble-2"></div>
+              <div class="bubble bubble-3"></div>
+            </div>
             <div class="quiz-icon" style="--quiz-color: #A8E6CF;">
               <div class="icon-glow"></div>
               <div class="sparkle sparkle-1"></div>
               <div class="sparkle sparkle-2"></div>
+              <div class="aura aura-1"></div>
+              <div class="aura aura-2"></div>
               <span class="icon-emoji">👤</span>
             </div>
             <div class="card-content">
@@ -465,6 +497,147 @@
     
     .icon-emoji {
       font-size: 1.5rem;
+    }
+  }
+
+  /* Aura effect - swirling energy */
+  .aura {
+    position: absolute;
+    inset: -15px;
+    border: 2px solid var(--quiz-color);
+    border-radius: 50%;
+    opacity: 0;
+    animation: aura-rotate 2s linear infinite;
+  }
+
+  .aura-1 {
+    border-style: dashed;
+    animation-duration: 3s;
+  }
+
+  .aura-2 {
+    border-style: dotted;
+    animation-duration: 4s;
+    animation-direction: reverse;
+  }
+
+  .quiz-card:hover .aura {
+    opacity: 0.4;
+  }
+
+  @keyframes aura-rotate {
+    from {
+      transform: rotate(0deg) scale(1);
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.4;
+    }
+    to {
+      transform: rotate(360deg) scale(1.2);
+      opacity: 0;
+    }
+  }
+
+  /* Speed lines effect */
+  .speed-lines {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .speed-lines::before,
+  .speed-lines::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    animation: speed-line-move 1s linear infinite;
+  }
+
+  .speed-lines::before {
+    top: 20%;
+    animation-delay: 0s;
+  }
+
+  .speed-lines::after {
+    bottom: 20%;
+    animation-delay: 0.5s;
+  }
+
+  .quiz-card:hover .speed-lines {
+    opacity: 1;
+  }
+
+  @keyframes speed-line-move {
+    from {
+      left: -100%;
+    }
+    to {
+      left: 100%;
+    }
+  }
+
+  /* Energy bubbles */
+  .energy-bubbles {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: 20px;
+  }
+
+  .bubble {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--quiz-color);
+    border-radius: 50%;
+    opacity: 0.6;
+    box-shadow: 0 0 10px var(--quiz-color);
+    animation: bubble-float 3s ease-in-out infinite;
+  }
+
+  .bubble-1 {
+    left: 10%;
+    animation-delay: 0s;
+  }
+
+  .bubble-2 {
+    left: 50%;
+    animation-delay: 1s;
+  }
+
+  .bubble-3 {
+    left: 80%;
+    animation-delay: 2s;
+  }
+
+  .quiz-card:hover .energy-bubbles {
+    opacity: 1;
+  }
+
+  @keyframes bubble-float {
+    0% {
+      bottom: -10px;
+      transform: scale(0);
+    }
+    50% {
+      transform: scale(1);
+    }
+    100% {
+      bottom: 100%;
+      transform: scale(0.5);
     }
   }
   
