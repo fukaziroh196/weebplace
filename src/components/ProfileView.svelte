@@ -110,99 +110,99 @@
     {:else}
       <div class="info-tab-content">
         <div class="grid grid-cols-2 gap-6">
-      <div>
-        <h2 class="text-white font-semibold mb-2">Друзья</h2>
-        <div class="bg-pink-900/50 rounded-xl p-3 glass-frame space-y-2">
-          {#if $friends.length}
-            {#each $friends as fid}
-              <div class="flex items-center justify-between bg-white/10 rounded px-3 py-2">
-                <div class="text-white">{@html ($users.find(u=>u.id===fid)?.username || fid)}</div>
-                <button class="text-white/90 hover:text-white" on:click={() => removeFriend(fid)}>Удалить</button>
-              </div>
-            {/each}
-          {:else}
-            <div class="text-white/70">Пока нет друзей</div>
-          {/if}
-        </div>
-        <!-- Блок заявок в друзья перенесён в меню сообщений -->
-      </div>
-      <div>
-        <h2 class="text-white font-semibold mb-2">Просмотренное</h2>
-        {#if $watched.length}
-          <div class="grid grid-cols-3 gap-3">
-            {#each $watched as it}
-              <div class="bg-pink-900/50 rounded-xl h-32 overflow-hidden relative">
-                {#if it.image}
-                  <img src={it.image} alt={it.title} class="absolute inset-0 w-full h-full object-cover opacity-90" loading="lazy" />
-                {/if}
-                <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent text-white text-xs">{it.title}</div>
-              </div>
-            {/each}
-          </div>
-        {:else}
-          <div class="text-white/70">Пока пусто</div>
-        {/if}
-      </div>
-
-      <div>
-        <h2 class="text-white font-semibold mb-2">Избранное</h2>
-        {#if $favorites.length}
-          <div class="grid grid-cols-3 gap-3">
-            {#each $favorites as it}
-              <div class="bg-pink-900/50 rounded-xl h-32 overflow-hidden relative cursor-pointer"
-                   on:click={() => window.open(it.url || '#', '_blank')}>
-                {#if it.image}
-                  <img src={it.image} alt={it.title} class="absolute inset-0 w-full h-full object-cover opacity-80" />
-                {/if}
-                <button class="absolute top-1 right-1 bg-white/90 text-pink-700 rounded-full w-6 h-6 text-xs flex items-center justify-center hover:bg-white"
-                        title="Удалить из избранного"
-                        on:click|stopPropagation={() => removeFromFavorites(it.id)}>×</button>
-                <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent text-white text-xs">{it.title}</div>
-              </div>
-            {/each}
-          </div>
-        {:else}
-          <div class="text-white/70">Пока пусто</div>
-        {/if}
-      </div>
-    </div>
-
-    <div class="mt-6">
-      <h2 class="text-white font-semibold mb-2">Комментарии</h2>
-      <div class="bg-pink-900/50 rounded-xl p-3 glass-frame">
-        <div class="flex gap-2 mb-3">
-          <input class="flex-1 px-3 py-2 rounded border border-white/30 bg-white/80 text-black" placeholder="Оставьте комментарий" bind:value={commentText} />
-          <button class="bg-pink-600 text-white rounded px-3 py-2 font-semibold" on:click={postComment}>Отправить</button>
-        </div>
-        {#if $comments.length}
-          <div class="flex flex-col gap-2 max-h-[220px] overflow-auto pr-2 scrollable scrollable--active">
-            {#each $comments as c}
-              <div class="bg-white/10 rounded px-3 py-2 text-white/90 text-sm">
-                <div class="text-white font-medium text-xs mb-1">{new Date(c.createdAt).toLocaleString()}</div>
-                {c.text}
-              </div>
-            {/each}
-          </div>
-        {:else}
-          <div class="text-white/70">Комментариев пока нет</div>
-        {/if}
-        </div>
-      </div>
-
-      {#if !$currentUser?.isAdmin}
-        <div class="mt-6">
-          <div class="bg-pink-900/40 rounded-xl p-3 glass-frame">
-            <div class="text-white/80 mb-2">Хотите права администратора (для установки обложек)?</div>
-            <div class="flex gap-2 items-center">
-              <input class="px-3 py-2 rounded border border-white/30 bg-white/80 text-black w-56" placeholder="Секрет администратора" bind:value={adminSecret} />
-              <button class="bg-pink-600 text-white rounded px-3 py-2 font-semibold" on:click={() => { try { promoteToAdmin(adminSecret); adminError=''; } catch(e){ adminError = e?.message || 'Ошибка'; } }}>Получить доступ</button>
-              {#if adminError}
-                <span class="text-red-300 text-sm">{adminError}</span>
+          <div>
+            <h2 class="text-white font-semibold mb-2">Друзья</h2>
+            <div class="bg-pink-900/50 rounded-xl p-3 glass-frame space-y-2">
+              {#if $friends.length}
+                {#each $friends as fid}
+                  <div class="flex items-center justify-between bg-white/10 rounded px-3 py-2">
+                    <div class="text-white">{@html ($users.find(u=>u.id===fid)?.username || fid)}</div>
+                    <button class="text-white/90 hover:text-white" on:click={() => removeFriend(fid)}>Удалить</button>
+                  </div>
+                {/each}
+              {:else}
+                <div class="text-white/70">Пока нет друзей</div>
               {/if}
             </div>
+            <!-- Блок заявок в друзья перенесён в меню сообщений -->
+          </div>
+          <div>
+            <h2 class="text-white font-semibold mb-2">Просмотренное</h2>
+            {#if $watched.length}
+              <div class="grid grid-cols-3 gap-3">
+                {#each $watched as it}
+                  <div class="bg-pink-900/50 rounded-xl h-32 overflow-hidden relative">
+                    {#if it.image}
+                      <img src={it.image} alt={it.title} class="absolute inset-0 w-full h-full object-cover opacity-90" loading="lazy" />
+                    {/if}
+                    <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent text-white text-xs">{it.title}</div>
+                  </div>
+                {/each}
+              </div>
+            {:else}
+              <div class="text-white/70">Пока пусто</div>
+            {/if}
+          </div>
+
+          <div>
+            <h2 class="text-white font-semibold mb-2">Избранное</h2>
+            {#if $favorites.length}
+              <div class="grid grid-cols-3 gap-3">
+                {#each $favorites as it}
+                  <div class="bg-pink-900/50 rounded-xl h-32 overflow-hidden relative cursor-pointer"
+                       on:click={() => window.open(it.url || '#', '_blank')}>
+                    {#if it.image}
+                      <img src={it.image} alt={it.title} class="absolute inset-0 w-full h-full object-cover opacity-80" />
+                    {/if}
+                    <button class="absolute top-1 right-1 bg-white/90 text-pink-700 rounded-full w-6 h-6 text-xs flex items-center justify-center hover:bg-white"
+                            title="Удалить из избранного"
+                            on:click|stopPropagation={() => removeFromFavorites(it.id)}>×</button>
+                    <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent text-white text-xs">{it.title}</div>
+                  </div>
+                {/each}
+              </div>
+            {:else}
+              <div class="text-white/70">Пока пусто</div>
+            {/if}
           </div>
         </div>
-      {/if}
+
+        <div class="mt-6">
+          <h2 class="text-white font-semibold mb-2">Комментарии</h2>
+          <div class="bg-pink-900/50 rounded-xl p-3 glass-frame">
+            <div class="flex gap-2 mb-3">
+              <input class="flex-1 px-3 py-2 rounded border border-white/30 bg-white/80 text-black" placeholder="Оставьте комментарий" bind:value={commentText} />
+              <button class="bg-pink-600 text-white rounded px-3 py-2 font-semibold" on:click={postComment}>Отправить</button>
+            </div>
+            {#if $comments.length}
+              <div class="flex flex-col gap-2 max-h-[220px] overflow-auto pr-2 scrollable scrollable--active">
+                {#each $comments as c}
+                  <div class="bg-white/10 rounded px-3 py-2 text-white/90 text-sm">
+                    <div class="text-white font-medium text-xs mb-1">{new Date(c.createdAt).toLocaleString()}</div>
+                    {c.text}
+                  </div>
+                {/each}
+              </div>
+            {:else}
+              <div class="text-white/70">Комментариев пока нет</div>
+            {/if}
+          </div>
+        </div>
+
+        {#if !$currentUser?.isAdmin}
+          <div class="mt-6">
+            <div class="bg-pink-900/40 rounded-xl p-3 glass-frame">
+              <div class="text-white/80 mb-2">Хотите права администратора (для установки обложек)?</div>
+              <div class="flex gap-2 items-center">
+                <input class="px-3 py-2 rounded border border-white/30 bg-white/80 text-black w-56" placeholder="Секрет администратора" bind:value={adminSecret} />
+                <button class="bg-pink-600 text-white rounded px-3 py-2 font-semibold" on:click={() => { try { promoteToAdmin(adminSecret); adminError=''; } catch(e){ adminError = e?.message || 'Ошибка'; } }}>Получить доступ</button>
+                {#if adminError}
+                  <span class="text-red-300 text-sm">{adminError}</span>
+                {/if}
+              </div>
+            </div>
+          </div>
+        {/if}
       </div>
     {/if}
   </div>
