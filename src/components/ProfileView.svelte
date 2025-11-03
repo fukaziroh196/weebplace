@@ -1,6 +1,6 @@
 <script>
   import { currentUser, login, register } from '../stores/authApi';
-  import { watched, favorites, comments, addComment, removeFromFavorites, promoteToAdmin, setCurrentUserAvatar, clearCurrentUserAvatar, users, friends, friendRequestsIncoming, friendRequestsOutgoing } from '../stores/auth';
+  import { favorites, comments, addComment, removeFromFavorites, setCurrentUserAvatar, clearCurrentUserAvatar, users, friends, friendRequestsIncoming, friendRequestsOutgoing } from '../stores/auth';
   import { sendFriendRequest, acceptFriendRequest, declineFriendRequest, removeFriend, refreshFriendState } from '../stores/auth';
   import { profileTab } from '../stores/ui';
   import AvatarCropper from './AvatarCropper.svelte';
@@ -10,8 +10,6 @@
   let password = '';
   let error = '';
   let commentText = '';
-  let adminSecret = '';
-  let adminError = '';
   let showCropper = false;
   let tempImage = '';
 
@@ -109,7 +107,7 @@
       </div>
     {:else}
       <div class="info-tab-content">
-        <div class="grid grid-cols-2 gap-6">
+        <div class="space-y-6">
           <div>
             <h2 class="text-white font-semibold mb-2">Друзья</h2>
             <div class="bg-pink-900/50 rounded-xl p-3 glass-frame space-y-2">
@@ -125,23 +123,6 @@
               {/if}
             </div>
             <!-- Блок заявок в друзья перенесён в меню сообщений -->
-          </div>
-          <div>
-            <h2 class="text-white font-semibold mb-2">Просмотренное</h2>
-            {#if $watched.length}
-              <div class="grid grid-cols-3 gap-3">
-                {#each $watched as it}
-                  <div class="bg-pink-900/50 rounded-xl h-32 overflow-hidden relative">
-                    {#if it.image}
-                      <img src={it.image} alt={it.title} class="absolute inset-0 w-full h-full object-cover opacity-90" loading="lazy" />
-                    {/if}
-                    <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent text-white text-xs">{it.title}</div>
-                  </div>
-                {/each}
-              </div>
-            {:else}
-              <div class="text-white/70">Пока пусто</div>
-            {/if}
           </div>
 
           <div>
@@ -188,21 +169,6 @@
             {/if}
           </div>
         </div>
-
-        {#if !$currentUser?.isAdmin}
-          <div class="mt-6">
-            <div class="bg-pink-900/40 rounded-xl p-3 glass-frame">
-              <div class="text-white/80 mb-2">Хотите права администратора (для установки обложек)?</div>
-              <div class="flex gap-2 items-center">
-                <input class="px-3 py-2 rounded border border-white/30 bg-white/80 text-black w-56" placeholder="Секрет администратора" bind:value={adminSecret} />
-                <button class="bg-pink-600 text-white rounded px-3 py-2 font-semibold" on:click={() => { try { promoteToAdmin(adminSecret); adminError=''; } catch(e){ adminError = e?.message || 'Ошибка'; } }}>Получить доступ</button>
-                {#if adminError}
-                  <span class="text-red-300 text-sm">{adminError}</span>
-                {/if}
-              </div>
-            </div>
-          </div>
-        {/if}
       </div>
     {/if}
   </div>
