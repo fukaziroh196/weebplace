@@ -59,9 +59,6 @@
         
         <div class="quiz-cards">
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessAnime'); activeView.set('guessAnime'); }}>
-            <div class="manga-speed-lines"></div>
-            <div class="manga-impact-lines"></div>
-            <div class="manga-emotion-lines"></div>
             <div class="quiz-icon" style="--quiz-color: #FF6B6B;">
               <div class="icon-glow"></div>
               <div class="sparkle sparkle-1"></div>
@@ -74,9 +71,6 @@
           </button>
           
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessOpening'); activeView.set('guessOpening'); }}>
-            <div class="manga-speed-lines"></div>
-            <div class="manga-impact-lines"></div>
-            <div class="manga-emotion-lines"></div>
             <div class="quiz-icon" style="--quiz-color: #4ECDC4;">
               <div class="icon-glow"></div>
               <div class="sparkle sparkle-1"></div>
@@ -89,9 +83,6 @@
           </button>
           
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessBattle'); activeView.set('guessBattle'); }}>
-            <div class="manga-speed-lines"></div>
-            <div class="manga-impact-lines"></div>
-            <div class="manga-emotion-lines"></div>
             <div class="quiz-icon" style="--quiz-color: #FF9F66;">
               <div class="icon-glow"></div>
               <div class="sparkle sparkle-1"></div>
@@ -104,9 +95,6 @@
             </button>
           
           <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessCharacter'); activeView.set('guessCharacter'); }}>
-            <div class="manga-speed-lines"></div>
-            <div class="manga-impact-lines"></div>
-            <div class="manga-emotion-lines"></div>
             <div class="quiz-icon" style="--quiz-color: #A8E6CF;">
               <div class="icon-glow"></div>
               <div class="sparkle sparkle-1"></div>
@@ -468,146 +456,6 @@
     }
   }
 
-  /* Manga-style speed lines */
-  .manga-speed-lines {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    pointer-events: none;
-    overflow: hidden;
-    border-radius: 20px;
-  }
-
-  .manga-speed-lines::before,
-  .manga-speed-lines::after {
-    content: '';
-    position: absolute;
-    left: 10%;
-    width: 3px;
-    height: 100%;
-    background: linear-gradient(
-      180deg,
-      transparent 0%,
-      rgba(0, 0, 0, 0.4) 50%,
-      transparent 100%
-    );
-  }
-
-  .manga-speed-lines::before {
-    animation: manga-speed 0.8s linear infinite;
-  }
-
-  .manga-speed-lines::after {
-    left: 85%;
-    animation: manga-speed 0.6s linear infinite 0.3s;
-  }
-
-  .quiz-card:hover .manga-speed-lines {
-    opacity: 1;
-  }
-
-  @keyframes manga-speed {
-    from {
-      top: -100%;
-    }
-    to {
-      top: 100%;
-    }
-  }
-
-  /* Manga impact lines */
-  .manga-impact-lines {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .manga-impact-lines::before,
-  .manga-impact-lines::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 4px;
-    background: repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 10px,
-      rgba(0, 0, 0, 0.3) 10px,
-      rgba(0, 0, 0, 0.3) 20px
-    );
-    animation: manga-impact 1.2s linear infinite;
-  }
-
-  .manga-impact-lines::before {
-    top: 15%;
-  }
-
-  .manga-impact-lines::after {
-    bottom: 15%;
-    animation-delay: 0.6s;
-  }
-
-  .quiz-card:hover .manga-impact-lines {
-    opacity: 1;
-  }
-
-  @keyframes manga-impact {
-    from {
-      left: -100%;
-    }
-    to {
-      left: 100%;
-    }
-  }
-
-  /* Manga emotion lines (radial) */
-  .manga-emotion-lines {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .manga-emotion-lines::before,
-  .manga-emotion-lines::after,
-  .manga-emotion-lines {
-    background-image: 
-      radial-gradient(circle at 20% 30%, rgba(0, 0, 0, 0.15) 1px, transparent 1px),
-      radial-gradient(circle at 80% 70%, rgba(0, 0, 0, 0.15) 1px, transparent 1px),
-      radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
-    background-size: 30px 30px, 35px 35px, 25px 25px;
-  }
-
-  .manga-emotion-lines::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    animation: manga-emotion 2s linear infinite;
-  }
-
-  .manga-emotion-lines::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    animation: manga-emotion 1.5s linear infinite 1s;
-  }
-
-  .quiz-card:hover .manga-emotion-lines {
-    opacity: 1;
-  }
-
-  @keyframes manga-emotion {
-    0%, 100% {
-      transform: scale(1) rotate(0deg);
-      opacity: 0;
-    }
-    50% {
-      transform: scale(1.2) rotate(180deg);
-      opacity: 1;
-    }
-  }
-  
   .card-content {
     position: relative;
     z-index: 1;
@@ -752,38 +600,43 @@
     padding: 0.5rem 0.6rem;
     background: var(--panel);
     border: none;
-    border-radius: 12px;
+    border-radius: 0;
     color: var(--muted);
-    font-weight: 600;
+    font-weight: 800;
     font-size: 0.65rem;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.05em;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
     text-transform: uppercase;
+    position: relative;
+    clip-path: polygon(15% 0%, 100% 0%, 85% 100%, 0% 100%);
   }
   
   .lb-tab-new:hover {
     background: var(--extra);
     color: #FFFFFF;
+    transform: scale(1.05);
   }
   
   .lb-tab-new.active {
     background: var(--accent);
     color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(91, 117, 83, 0.3);
   }
   
   @media (max-width: 768px) {
     .lb-tab-new {
       font-size: 0.6rem;
       padding: 0.4rem 0.5rem;
+      clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
     }
   }
   
   .lb-list {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
     padding-right: 12px;
     padding-bottom: 8px;
     flex: 1;
@@ -804,75 +657,128 @@
   
   .lb-item {
     display: grid;
-    grid-template-columns: 32px 36px 1fr;
+    grid-template-columns: 40px 44px 1fr;
     align-items: center;
-    gap: 0.6rem;
-    padding: 0.6rem;
+    gap: 0.8rem;
+    padding: 0.8rem 1rem;
     background: var(--panel);
-    border: none;
-    border-radius: 12px;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid rgba(91, 117, 83, 0.2);
+    border-radius: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    clip-path: polygon(15% 0%, 100% 0%, 85% 100%, 0% 100%);
+  }
+
+  .lb-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
   }
   
   .lb-item:hover {
-    background: rgba(139, 164, 127, 0.15);
-    transform: translateX(2px);
+    background: var(--panelStrong);
+    transform: translateX(8px);
+    border-color: var(--accent);
+    box-shadow: -8px 0 20px rgba(91, 117, 83, 0.15);
+  }
+
+  .lb-item:hover::before {
+    opacity: 1;
   }
   
   .lb-item.top-three {
-    background: rgba(139, 164, 127, 0.2);
+    background: var(--extra);
+    border-color: var(--accent);
+  }
+
+  .lb-item.top-three::before {
+    opacity: 1;
   }
   
   .lb-position {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--panel);
-    border-radius: 8px;
-    font-weight: 800;
-    color: var(--accent);
-    font-size: 0.85rem;
+    background: var(--accent);
+    color: white;
+    font-weight: 900;
+    font-size: 1.1rem;
+    letter-spacing: -0.05em;
+    position: relative;
+    clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
+    border: 2px solid transparent;
+    box-shadow: 0 4px 12px rgba(91, 117, 83, 0.3);
   }
   
+  .lb-position::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    background: linear-gradient(45deg, var(--accent), transparent);
+    opacity: 0.5;
+    z-index: -1;
+    clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
+  }
+
   .lb-item.top-three .lb-position {
     background: var(--accent);
     color: #FFFFFF;
+    box-shadow: 0 4px 16px rgba(91, 117, 83, 0.5);
+  }
+
+  .lb-item.top-three .lb-position::after {
+    opacity: 0.7;
   }
   
   .lb-avatar {
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
+    position: relative;
   }
   
   .avatar-placeholder {
     width: 100%;
     height: 100%;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 50%;
-    border: 2px solid rgba(91, 117, 83, 0.3);
+    border-radius: 0;
+    clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
+    border: 3px solid var(--accent);
+    box-shadow: 0 4px 12px rgba(91, 117, 83, 0.2);
   }
   
   .lb-info {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.3rem;
     min-width: 0;
+    position: relative;
   }
   
   .lb-username {
-    font-weight: 700;
+    font-weight: 800;
     color: var(--text);
-    font-size: 0.9rem;
+    font-size: 1rem;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    font-family: 'Arial Black', sans-serif;
   }
   
   .lb-score {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     color: var(--accent);
-    font-weight: 600;
+    font-weight: 700;
+    letter-spacing: 0.05em;
   }
 </style>
