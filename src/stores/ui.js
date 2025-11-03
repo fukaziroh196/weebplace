@@ -4,6 +4,7 @@ import { writable } from 'svelte/store';
 export const activeView = writable('home');
 export const detailsItem = writable(null); // { id, __sourceId, title?, image?, description? }
 export const sidebarCollapsed = writable(false);
+export const profileTab = writable('info'); // 'info' | 'achievements'
 
 export function goToSearch() {
   activeView.set('search');
@@ -17,10 +18,6 @@ export function goHome() {
 export function goToDetails(item) {
   detailsItem.set(item || null);
   activeView.set('details');
-}
-
-export function goToProfile() {
-  activeView.set('profile');
 }
 
 export function goToAdmin() {
@@ -61,6 +58,16 @@ export function goToGuessOpening() {
 
 export function goToAdminQuiz() {
   activeView.set('adminQuiz');
+}
+
+export function goToAchievements() {
+  activeView.set('profile');
+  profileTab.set('achievements');
+}
+
+export function goToProfile() {
+  activeView.set('profile');
+  profileTab.set('info');
 }
 
 

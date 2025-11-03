@@ -1,6 +1,6 @@
 <script>
   import { currentUser, login, register, logout } from '../stores/authApi';
-  import { goToProfile, goToAdmin, goToMessages } from '../stores/ui';
+  import { goToProfile, goToAdmin, goToMessages, goToAchievements } from '../stores/ui';
   import { clickOutside } from '../lib/clickOutside';
   import { unreadTotal } from '../stores/messages';
 
@@ -46,7 +46,7 @@
       {#if $currentUser?.isAdmin}
         <button class="w-full text-left menu-item" on:click={() => { goToAdmin(); showMenu = false; }}>Админ‑панель</button>
       {/if}
-      <button class="w-full text-left menu-item">Достижения</button>
+      <button class="w-full text-left menu-item" on:click={() => { goToAchievements(); showMenu = false; }}>Достижения</button>
       <button class="w-full text-left menu-item">Настройки</button>
       <button class="w-full text-left menu-item">Отчёт</button>
       <div class="menu-divider my-1"></div>

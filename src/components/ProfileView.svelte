@@ -2,6 +2,7 @@
   import { currentUser, login, register } from '../stores/authApi';
   import { watched, favorites, comments, addComment, removeFromFavorites, promoteToAdmin, setCurrentUserAvatar, clearCurrentUserAvatar, users, friends, friendRequestsIncoming, friendRequestsOutgoing } from '../stores/auth';
   import { sendFriendRequest, acceptFriendRequest, declineFriendRequest, removeFriend, refreshFriendState } from '../stores/auth';
+  import { profileTab } from '../stores/ui';
   import AvatarCropper from './AvatarCropper.svelte';
   import AchievementsView from './AchievementsView.svelte';
   let mode = 'login';
@@ -13,7 +14,6 @@
   let adminError = '';
   let showCropper = false;
   let tempImage = '';
-  let activeTab = 'info';
 
   async function submit() {
     error = '';
@@ -88,13 +88,13 @@
     <!-- Tabs -->
     <div class="profile-tabs">
       <button 
-        class="profile-tab {activeTab === 'info' ? 'active' : ''}" 
-        on:click={() => activeTab = 'info'}>
+        class="profile-tab {$profileTab === 'info' ? 'active' : ''}" 
+        on:click={() => profileTab.set('info')}>
         📋 Информация
       </button>
       <button 
-        class="profile-tab {activeTab === 'achievements' ? 'active' : ''}" 
-        on:click={() => activeTab = 'achievements'}>
+        class="profile-tab {$profileTab === 'achievements' ? 'active' : ''}" 
+        on:click={() => profileTab.set('achievements')}>
         🏆 Достижения
       </button>
     </div>
@@ -103,7 +103,7 @@
       <AvatarCropper src={tempImage} onCancel={() => { showCropper = false; tempImage = ''; }} onApply={(url) => { setCurrentUserAvatar(url); showCropper = false; tempImage = ''; }} />
     {/if}
 
-    {#if activeTab === 'achievements'}
+    {#if $profileTab === 'achievements'}
       <div class="achievements-tab-content">
         <AchievementsView />
       </div>

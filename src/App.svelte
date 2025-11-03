@@ -1,4 +1,5 @@
 <script>
+  import { onMount } from 'svelte';
   import Sidebar from './components/Sidebar.svelte';
   import Content from './components/Content.svelte';
   import ProfileMenu from './components/ProfileMenu.svelte';
@@ -26,6 +27,11 @@
       }
     }
   }
+
+  onMount(() => {
+    window.addEventListener('closeProfileMenu', closeProfileMenu);
+    return () => window.removeEventListener('closeProfileMenu', closeProfileMenu);
+  });
 </script>
 
 <svelte:window on:click={handleClickOutside} />

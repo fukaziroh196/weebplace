@@ -1,5 +1,6 @@
 <script>
   import { currentUser, login, register, logout } from '../stores/authApi';
+  import { goToProfile, goToAchievements } from '../stores/ui';
   
   let mode = 'login'; // 'login' | 'register'
   let username = '';
@@ -28,6 +29,16 @@
   function handleLogout() {
     logout();
   }
+
+  function handleProfileClick() {
+    goToProfile();
+    window.dispatchEvent(new CustomEvent('closeProfileMenu'));
+  }
+
+  function handleAchievementsClick() {
+    goToAchievements();
+    window.dispatchEvent(new CustomEvent('closeProfileMenu'));
+  }
 </script>
 
 {#if $currentUser}
@@ -45,14 +56,14 @@
     
     <div class="menu-divider"></div>
     
-    <button class="menu-item">
+    <button class="menu-item" on:click={handleProfileClick}>
       <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
       </svg>
       Профиль
     </button>
     
-    <button class="menu-item">
+    <button class="menu-item" on:click={handleAchievementsClick}>
       <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
       </svg>
