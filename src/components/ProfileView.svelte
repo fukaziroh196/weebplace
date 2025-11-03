@@ -3,6 +3,7 @@
   import { watched, favorites, comments, addComment, removeFromFavorites, promoteToAdmin, setCurrentUserAvatar, clearCurrentUserAvatar, users, friends, friendRequestsIncoming, friendRequestsOutgoing } from '../stores/auth';
   import { sendFriendRequest, acceptFriendRequest, declineFriendRequest, removeFriend, refreshFriendState } from '../stores/auth';
   import AvatarCropper from './AvatarCropper.svelte';
+  import AchievementsView from './AchievementsView.svelte';
   let mode = 'login';
   let username = '';
   let password = '';
@@ -12,6 +13,7 @@
   let adminError = '';
   let showCropper = false;
   let tempImage = '';
+  let activeTab = 'info';
 
   async function submit() {
     error = '';
@@ -83,11 +85,31 @@
       </div>
     </div>
 
+    <!-- Tabs -->
+    <div class="profile-tabs">
+      <button 
+        class="profile-tab {activeTab === 'info' ? 'active' : ''}" 
+        on:click={() => activeTab = 'info'}>
+        📋 Информация
+      </button>
+      <button 
+        class="profile-tab {activeTab === 'achievements' ? 'active' : ''}" 
+        on:click={() => activeTab = 'achievements'}>
+        🏆 Достижения
+      </button>
+    </div>
+
     {#if showCropper}
       <AvatarCropper src={tempImage} onCancel={() => { showCropper = false; tempImage = ''; }} onApply={(url) => { setCurrentUserAvatar(url); showCropper = false; tempImage = ''; }} />
     {/if}
 
-    <div class="grid grid-cols-2 gap-6">
+    {#if activeTab === 'achievements'}
+      <div class="achievements-tab-content">
+        <AchievementsView />
+      </div>
+    {:else}
+      <div class="info-tab-content">
+        <div class="grid grid-cols-2 gap-6">
       <div>
         <h2 class="text-white font-semibold mb-2">Друзья</h2>
         <div class="bg-pink-900/50 rounded-xl p-3 glass-frame space-y-2">
@@ -164,24 +186,65 @@
         {:else}
           <div class="text-white/70">Комментариев пока нет</div>
         {/if}
-      </div>
-    </div>
-  </div>
-
-  {#if !$currentUser?.isAdmin}
-    <div class="mt-6">
-      <div class="bg-pink-900/40 rounded-xl p-3 glass-frame">
-        <div class="text-white/80 mb-2">Хотите права администратора (для установки обложек)?</div>
-        <div class="flex gap-2 items-center">
-          <input class="px-3 py-2 rounded border border-white/30 bg-white/80 text-black w-56" placeholder="Секрет администратора" bind:value={adminSecret} />
-          <button class="bg-pink-600 text-white rounded px-3 py-2 font-semibold" on:click={() => { try { promoteToAdmin(adminSecret); adminError=''; } catch(e){ adminError = e?.message || 'Ошибка'; } }}>Получить доступ</button>
-          {#if adminError}
-            <span class="text-red-300 text-sm">{adminError}</span>
-          {/if}
         </div>
       </div>
-    </div>
-  {/if}
+
+      {#if !$currentUser?.isAdmin}
+        <div class="mt-6">
+          <div class="bg-pink-900/40 rounded-xl p-3 glass-frame">
+            <div class="text-white/80 mb-2">Хотите права администратора (для установки обложек)?</div>
+            <div class="flex gap-2 items-center">
+              <input class="px-3 py-2 rounded border border-white/30 bg-white/80 text-black w-56" placeholder="Секрет администратора" bind:value={adminSecret} />
+              <button class="bg-pink-600 text-white rounded px-3 py-2 font-semibold" on:click={() => { try { promoteToAdmin(adminSecret); adminError=''; } catch(e){ adminError = e?.message || 'Ошибка'; } }}>Получить доступ</button>
+              {#if adminError}
+                <span class="text-red-300 text-sm">{adminError}</span>
+              {/if}
+            </div>
+          </div>
+        </div>
+      {/if}
+      </div>
+    {/if}
+  </div>
 {/if}
+
+<style>
+  .profile-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .profile-tab {
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+  }
+
+  .profile-tab:hover {
+    color: var(--text);
+  }
+
+  .profile-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .achievements-tab-content {
+    margin-top: 1rem;
+  }
+
+  .info-tab-content {
+    margin-top: 1rem;
+  }
+</style>
 
 
