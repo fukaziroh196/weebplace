@@ -52,26 +52,6 @@
 
   <div class="aniguessr-layout">
   {#if $activeView === 'home' || $activeView === 'aniquiz'}
-    <!-- SVG для скругленного шестиугольника -->
-    <svg width="0" height="0" style="position: absolute;">
-      <defs>
-        <clipPath id="hexagon-rounded" clipPathUnits="objectBoundingBox">
-          <!-- Правильный шестиугольник с равномерными скруглениями на всех 6 углах -->
-          <!-- Используем простой подход с квадратичными кривыми для плавных углов -->
-          <path d="M 0.5 0.08
-                   L 0.95 0.24
-                   Q 1 0.25 0.95 0.26
-                   L 0.95 0.74
-                   Q 1 0.75 0.95 0.76
-                   L 0.5 0.92
-                   L 0.05 0.76
-                   Q 0 0.75 0.05 0.74
-                   L 0.05 0.26
-                   Q 0 0.25 0.05 0.24
-                   Z" />
-        </clipPath>
-      </defs>
-    </svg>
 
     <div class="main-container">
       <!-- Left: Quiz cards -->
@@ -330,14 +310,13 @@
       0 4px 12px rgba(0, 0, 0, 0.15),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
     width: 120px;
-    height: 138px;
+    height: 120px;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
-    clip-path: url(#hexagon-rounded);
-    -webkit-clip-path: url(#hexagon-rounded);
-    border-radius: 10px;
+    border-radius: 16px;
+    transform: rotate(45deg);
   }
   
   .quiz-card::before {
@@ -354,8 +333,7 @@
       transparent
     );
     transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    clip-path: url(#hexagon-rounded);
-    -webkit-clip-path: url(#hexagon-rounded);
+    border-radius: 16px;
     z-index: 1;
   }
   
@@ -364,7 +342,7 @@
   }
   
   .quiz-card:hover {
-    transform: translateY(-4px) scale(1.01);
+    transform: rotate(45deg) translateY(-4px) scale(1.01);
     background: var(--extra);
     border-color: rgba(255, 255, 255, 0.15);
     box-shadow: 
@@ -374,7 +352,7 @@
   }
   
   .quiz-card:active {
-    transform: translateY(-2px) scale(1.005);
+    transform: rotate(45deg) translateY(-2px) scale(1.005);
   }
 
   @media (max-width: 768px) {
@@ -384,7 +362,7 @@
     }
     
     .quiz-card:hover {
-      transform: translateY(-2px) scale(1.05);
+      transform: rotate(45deg) translateY(-2px) scale(1.05);
     }
   }
 
@@ -403,8 +381,12 @@
     flex-shrink: 0;
   }
 
+  .quiz-icon {
+    transform: rotate(-45deg);
+  }
+
   .quiz-card:hover .quiz-icon {
-    transform: scale(1.15) rotate(8deg);
+    transform: rotate(-45deg) scale(1.15) rotate(8deg);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 30px var(--quiz-color);
   }
 
