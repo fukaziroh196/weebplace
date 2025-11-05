@@ -264,25 +264,43 @@
     max-width: 800px;
     margin: 0 auto;
     align-items: flex-start;
+    position: relative;
   }
   
   .hex-spacer {
-    width: 68px; /* Половина ширины гексагона + половина gap */
+    width: 68px; /* Половина ширины гексагона (120px/2) + половина gap (16px/2) = 60px + 8px */
     height: 0;
     flex-shrink: 0;
   }
   
   .quiz-card-honeycomb {
-    margin-top: -103px; /* Примерно 75% высоты для перекрытия в сотах */
+    position: relative;
+    transform: translateY(-69px); /* Половина высоты гексагона (138px/2) для правильного сотообразного перекрытия */
+  }
+  
+  .quiz-card-honeycomb:hover {
+    transform: translateY(-69px) translateY(-4px) scale(1.01); /* Сохраняем смещение при hover */
+  }
+  
+  .quiz-card-honeycomb:active {
+    transform: translateY(-69px) translateY(-2px) scale(1.005); /* Сохраняем смещение при active */
   }
   
   @media (max-width: 768px) {
     .hex-spacer {
-      width: 58px; /* Половина ширины + gap для мобильных */
+      width: 58px; /* Половина ширины (100px/2) + половина gap (16px/2) = 50px + 8px */
     }
     
     .quiz-card-honeycomb {
-      margin-top: -75px; /* Адаптивное смещение для мобильных */
+      transform: translateY(-75px); /* Высота гексагона (100px) * 0.75 для мобильных */
+    }
+    
+    .quiz-card-honeycomb:hover {
+      transform: translateY(-75px) translateY(-2px) scale(1.05);
+    }
+    
+    .quiz-card-honeycomb:active {
+      transform: translateY(-75px) translateY(-2px) scale(1.005);
     }
   }
   
