@@ -76,16 +76,16 @@
             </div>
           </button>
           
-          <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessBattle'); activeView.set('guessBattle'); }}>
+          <button class="quiz-card quiz-card-honeycomb" on:click={() => { console.log('[Content] GoTo GuessBattle'); activeView.set('guessBattle'); }}>
             <div class="quiz-icon" style="--quiz-color: #FF9F66;">
               <div class="icon-glow"></div>
               <div class="sparkle sparkle-1"></div>
               <div class="sparkle sparkle-2"></div>
               <span class="icon-emoji">⚔️</span>
             </div>
-            </button>
+          </button>
           
-          <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessCharacter'); activeView.set('guessCharacter'); }}>
+          <button class="quiz-card quiz-card-honeycomb" on:click={() => { console.log('[Content] GoTo GuessCharacter'); activeView.set('guessCharacter'); }}>
             <div class="quiz-icon" style="--quiz-color: #A8E6CF;">
               <div class="icon-glow"></div>
               <div class="sparkle sparkle-1"></div>
@@ -261,6 +261,19 @@
     justify-content: center;
     max-width: 800px;
     margin: 0 auto;
+    align-items: flex-start;
+  }
+  
+  .quiz-card-honeycomb {
+    margin-top: -69px; /* Половина высоты гексагона минус перекрытие */
+    margin-left: 68px; /* Половина ширины гексагона + половина gap */
+  }
+  
+  @media (max-width: 768px) {
+    .quiz-card-honeycomb {
+      margin-top: -50px; /* Половина высоты для мобильных */
+      margin-left: 58px; /* Половина ширины + gap для мобильных */
+    }
   }
   
   @media (max-width: 768px) {
