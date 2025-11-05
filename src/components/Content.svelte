@@ -265,6 +265,7 @@
     gap: 0;
     max-width: 800px;
     margin: 0 auto;
+    margin-left: -100px; /* Сдвигаем все кнопки левее */
   }
   
   .hex-row {
