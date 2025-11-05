@@ -76,6 +76,8 @@
             </div>
           </button>
           
+          <div class="hex-spacer"></div>
+          
           <button class="quiz-card quiz-card-honeycomb" on:click={() => { console.log('[Content] GoTo GuessBattle'); activeView.set('guessBattle'); }}>
             <div class="quiz-icon" style="--quiz-color: #FF9F66;">
               <div class="icon-glow"></div>
@@ -264,15 +266,23 @@
     align-items: flex-start;
   }
   
+  .hex-spacer {
+    width: 68px; /* Половина ширины гексагона + половина gap */
+    height: 0;
+    flex-shrink: 0;
+  }
+  
   .quiz-card-honeycomb {
-    margin-top: -69px; /* Половина высоты гексагона минус перекрытие */
-    margin-left: 68px; /* Половина ширины гексагона + половина gap */
+    margin-top: -103px; /* Примерно 75% высоты для перекрытия в сотах */
   }
   
   @media (max-width: 768px) {
+    .hex-spacer {
+      width: 58px; /* Половина ширины + gap для мобильных */
+    }
+    
     .quiz-card-honeycomb {
-      margin-top: -50px; /* Половина высоты для мобильных */
-      margin-left: 58px; /* Половина ширины + gap для мобильных */
+      margin-top: -75px; /* Адаптивное смещение для мобильных */
     }
   }
   
