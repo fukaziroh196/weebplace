@@ -302,7 +302,7 @@
     position: relative;
     background: var(--panelStrong);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 0;
+    border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
@@ -332,10 +332,27 @@
       transparent
     );
     transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    border-radius: 12px;
+    z-index: 1;
   }
   
   .quiz-card:hover::before {
     left: 100%;
+  }
+  
+  .quiz-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    pointer-events: none;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    z-index: 2;
   }
   
   .quiz-card:hover {
