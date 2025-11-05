@@ -314,8 +314,8 @@
     box-shadow: 
       0 4px 12px rgba(0, 0, 0, 0.15),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    width: 120px;
-    height: 120px;
+    width: 150px;
+    height: 150px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -362,8 +362,8 @@
 
   @media (max-width: 768px) {
     .quiz-card {
-      width: 100px;
-      height: 100px;
+      width: 120px;
+      height: 120px;
     }
     
     .quiz-card:hover {
@@ -373,8 +373,8 @@
 
   .quiz-icon {
     position: relative;
-    width: 70px;
-    height: 70px;
+    width: 90px;
+    height: 90px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -475,8 +475,8 @@
 
   @media (max-width: 768px) {
     .quiz-icon {
-      width: 60px;
-      height: 60px;
+      width: 75px;
+      height: 75px;
     }
     
     .icon-emoji {
