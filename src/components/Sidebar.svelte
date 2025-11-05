@@ -91,7 +91,7 @@
   .sidebar { 
     background: transparent;
     padding: 0;
-    margin-left: 0;
+    margin-left: -20px; /* Сдвигаем элементы боковой панели сильно влево */
   }
   
   .nav-item { 
