@@ -57,45 +57,47 @@
       <div class="quiz-cards-section">
         <h1 class="main-title">otakuz.fun</h1>
         
-        <div class="quiz-cards">
-          <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessAnime'); activeView.set('guessAnime'); }}>
-            <div class="quiz-icon" style="--quiz-color: #FF6B6B;">
-              <div class="icon-glow"></div>
-              <div class="sparkle sparkle-1"></div>
-              <div class="sparkle sparkle-2"></div>
-              <span class="icon-emoji">🎬</span>
-            </div>
-          </button>
+        <div class="quiz-cards-honeycomb">
+          <div class="hex-row hex-row-1">
+            <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessAnime'); activeView.set('guessAnime'); }}>
+              <div class="quiz-icon" style="--quiz-color: #FF6B6B;">
+                <div class="icon-glow"></div>
+                <div class="sparkle sparkle-1"></div>
+                <div class="sparkle sparkle-2"></div>
+                <span class="icon-emoji">🎬</span>
+              </div>
+            </button>
+            
+            <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessOpening'); activeView.set('guessOpening'); }}>
+              <div class="quiz-icon" style="--quiz-color: #4ECDC4;">
+                <div class="icon-glow"></div>
+                <div class="sparkle sparkle-1"></div>
+                <div class="sparkle sparkle-2"></div>
+                <span class="icon-emoji">🎵</span>
+              </div>
+            </button>
+          </div>
           
-          <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessOpening'); activeView.set('guessOpening'); }}>
-            <div class="quiz-icon" style="--quiz-color: #4ECDC4;">
-              <div class="icon-glow"></div>
-              <div class="sparkle sparkle-1"></div>
-              <div class="sparkle sparkle-2"></div>
-              <span class="icon-emoji">🎵</span>
-            </div>
-          </button>
-          
-          <div class="hex-spacer"></div>
-          
-          <button class="quiz-card quiz-card-honeycomb" on:click={() => { console.log('[Content] GoTo GuessBattle'); activeView.set('guessBattle'); }}>
-            <div class="quiz-icon" style="--quiz-color: #FF9F66;">
-              <div class="icon-glow"></div>
-              <div class="sparkle sparkle-1"></div>
-              <div class="sparkle sparkle-2"></div>
-              <span class="icon-emoji">⚔️</span>
-            </div>
-          </button>
-          
-          <button class="quiz-card quiz-card-honeycomb" on:click={() => { console.log('[Content] GoTo GuessCharacter'); activeView.set('guessCharacter'); }}>
-            <div class="quiz-icon" style="--quiz-color: #A8E6CF;">
-              <div class="icon-glow"></div>
-              <div class="sparkle sparkle-1"></div>
-              <div class="sparkle sparkle-2"></div>
-              <span class="icon-emoji">👤</span>
-            </div>
-          </button>
-    </div>
+          <div class="hex-row hex-row-2">
+            <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessBattle'); activeView.set('guessBattle'); }}>
+              <div class="quiz-icon" style="--quiz-color: #FF9F66;">
+                <div class="icon-glow"></div>
+                <div class="sparkle sparkle-1"></div>
+                <div class="sparkle sparkle-2"></div>
+                <span class="icon-emoji">⚔️</span>
+              </div>
+            </button>
+            
+            <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessCharacter'); activeView.set('guessCharacter'); }}>
+              <div class="quiz-icon" style="--quiz-color: #A8E6CF;">
+                <div class="icon-glow"></div>
+                <div class="sparkle sparkle-1"></div>
+                <div class="sparkle sparkle-2"></div>
+                <span class="icon-emoji">👤</span>
+              </div>
+            </button>
+          </div>
+        </div>
     
         <button class="replay-btn-new" on:click={openReplay}>
           <span class="replay-icon">↺</span>
@@ -255,52 +257,32 @@
     margin: 0; /* Убран нижний отступ чтобы поднять выше */
   }
   
-  .quiz-cards {
+  .quiz-cards-honeycomb {
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 1rem;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
     max-width: 800px;
     margin: 0 auto;
+  }
+  
+  .hex-row {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    justify-content: center;
     align-items: flex-start;
-    position: relative;
   }
   
-  .hex-spacer {
-    width: 68px; /* Половина ширины гексагона (120px/2) + половина gap (16px/2) = 60px + 8px */
-    height: 0;
-    flex-shrink: 0;
-  }
-  
-  .quiz-card-honeycomb {
-    position: relative;
-    transform: translateY(-69px); /* Половина высоты гексагона (138px/2) для правильного сотообразного перекрытия */
-  }
-  
-  .quiz-card-honeycomb:hover {
-    transform: translateY(-69px) translateY(-4px) scale(1.01); /* Сохраняем смещение при hover */
-  }
-  
-  .quiz-card-honeycomb:active {
-    transform: translateY(-69px) translateY(-2px) scale(1.005); /* Сохраняем смещение при active */
+  .hex-row-2 {
+    margin-left: 68px; /* Половина ширины гексагона (120px/2) + половина gap (16px/2) = 60px + 8px */
+    margin-top: -104px; /* Для правильного сотообразного перекрытия: sqrt(3)/2 * width ≈ 0.866 * 120 ≈ 104px */
   }
   
   @media (max-width: 768px) {
-    .hex-spacer {
-      width: 58px; /* Половина ширины (100px/2) + половина gap (16px/2) = 50px + 8px */
-    }
-    
-    .quiz-card-honeycomb {
-      transform: translateY(-75px); /* Высота гексагона (100px) * 0.75 для мобильных */
-    }
-    
-    .quiz-card-honeycomb:hover {
-      transform: translateY(-75px) translateY(-2px) scale(1.05);
-    }
-    
-    .quiz-card-honeycomb:active {
-      transform: translateY(-75px) translateY(-2px) scale(1.005);
+    .hex-row-2 {
+      margin-left: 58px; /* Половина ширины (100px/2) + половина gap (16px/2) = 50px + 8px */
+      margin-top: -87px; /* 0.866 * 100 ≈ 87px для мобильных */
     }
   }
   
