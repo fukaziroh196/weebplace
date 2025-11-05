@@ -275,6 +275,10 @@
     align-items: flex-start;
   }
   
+  .hex-row-1 {
+    gap: 2rem; /* Увеличенный отступ между кнопками в верхнем ряду */
+  }
+  
   .hex-row-2 {
     margin-left: 60px; /* Сдвиг нижнего ряда вправо */
     margin-top: 0;
