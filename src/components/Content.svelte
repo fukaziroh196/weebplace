@@ -52,6 +52,25 @@
 
   <div class="aniguessr-layout">
   {#if $activeView === 'home' || $activeView === 'aniquiz'}
+    <!-- SVG для скругленного шестиугольника -->
+    <svg width="0" height="0" style="position: absolute;">
+      <defs>
+        <clipPath id="hexagon-rounded" clipPathUnits="objectBoundingBox">
+          <path d="M 0.5 0.03 
+                   L 0.97 0.22 
+                   Q 1 0.25 0.97 0.28 
+                   L 0.97 0.72 
+                   Q 1 0.75 0.97 0.78 
+                   L 0.5 0.97 
+                   L 0.03 0.78 
+                   Q 0 0.75 0.03 0.72 
+                   L 0.03 0.28 
+                   Q 0 0.25 0.03 0.22 
+                   Z" />
+        </clipPath>
+      </defs>
+    </svg>
+
     <div class="main-container">
       <!-- Left: Quiz cards -->
       <div class="quiz-cards-section">
@@ -302,7 +321,6 @@
     position: relative;
     background: var(--panelStrong);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
@@ -315,7 +333,8 @@
     align-items: center;
     justify-content: center;
     padding: 0;
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    clip-path: url(#hexagon-rounded);
+    -webkit-clip-path: url(#hexagon-rounded);
   }
   
   .quiz-card::before {
@@ -332,27 +351,13 @@
       transparent
     );
     transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    border-radius: 12px;
+    clip-path: url(#hexagon-rounded);
+    -webkit-clip-path: url(#hexagon-rounded);
     z-index: 1;
   }
   
   .quiz-card:hover::before {
     left: 100%;
-  }
-  
-  .quiz-card::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 12px;
-    pointer-events: none;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    z-index: 2;
   }
   
   .quiz-card:hover {
