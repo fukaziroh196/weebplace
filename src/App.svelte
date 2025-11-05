@@ -245,7 +245,7 @@
     width: auto;
     height: 100%;
     overflow: visible;
-    padding: 16px 8px 16px 2px; /* Сильно уменьшенный левый отступ */
+    padding: 16px 8px 16px 0; /* Убран левый отступ */
   }
   
   @media (max-width: 768px) {

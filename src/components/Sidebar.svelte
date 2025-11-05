@@ -91,6 +91,7 @@
   .sidebar { 
     background: transparent;
     padding: 0;
+    margin-left: 0;
   }
   
   .nav-item { 
