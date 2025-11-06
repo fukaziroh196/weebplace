@@ -145,21 +145,16 @@
               </div>
             </button>
             
-            <button class="quiz-card" on:click={() => { console.log('[Content] New quiz button'); }}>
+            <button class="quiz-card" on:click={openReplay}>
               <div class="quiz-icon" style="--quiz-color: #8E44AD;">
                 <div class="icon-glow"></div>
                 <div class="sparkle sparkle-1"></div>
                 <div class="sparkle sparkle-2"></div>
-                <span class="icon-emoji">🎲</span>
+                <span class="icon-emoji">↺</span>
               </div>
             </button>
           </div>
         </div>
-    
-        <button class="replay-btn-new" on:click={openReplay}>
-          <span class="replay-icon">↺</span>
-          ПОВТОРИТЬ ПРЕДЫДУЩИЕ ДНИ
-        </button>
       </div>
       
       <!-- Right sidebar: Leaderboard -->
