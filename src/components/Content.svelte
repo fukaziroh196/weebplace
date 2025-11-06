@@ -377,7 +377,7 @@
     background: var(--panelStrong);
     border: 1px solid rgba(255, 255, 255, 0.08);
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: visible;
     box-shadow: 
       0 4px 12px rgba(0, 0, 0, 0.15),
@@ -385,13 +385,11 @@
     width: 150px;
     height: 150px;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 0;
     border-radius: 16px;
     transform: rotate(45deg);
-    z-index: 1;
   }
   
   .quiz-card::before {
@@ -417,16 +415,13 @@
   }
   
   .quiz-card:hover {
-    width: 220px;
-    height: 150px;
-    transform: rotate(45deg) translateY(-4px) scaleX(1.47) scaleY(1.01);
+    transform: rotate(45deg) translateY(-4px) scale(1.01);
     background: var(--extra);
     border-color: rgba(255, 255, 255, 0.15);
     box-shadow: 
       0 8px 24px rgba(0, 0, 0, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.2),
       0 0 0 1px rgba(255, 255, 255, 0.08);
-    z-index: 100; /* Поднимаем кнопку поверх всех остальных */
   }
   
   .quiz-card:active {
@@ -435,23 +430,28 @@
   
   .quiz-mode-name {
     position: absolute;
-    bottom: -35px;
+    bottom: -40px;
     left: 50%;
     transform: translateX(-50%) rotate(-45deg);
     color: #FFFFFF;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.05em;
     white-space: nowrap;
     opacity: 0;
-    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 10;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
     pointer-events: none;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 6px 12px;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
   }
   
   .quiz-card:hover .quiz-mode-name {
     opacity: 1;
+    transform: translateX(-50%) rotate(-45deg) translateY(-5px);
   }
 
   @media (max-width: 768px) {
