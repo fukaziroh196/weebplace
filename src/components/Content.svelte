@@ -265,6 +265,7 @@
     gap: 0;
     max-width: 800px;
     margin: 0 auto;
+    margin-left: -150px; /* Сдвигаем только центральные кнопки влево */
   }
   
   .hex-row {
