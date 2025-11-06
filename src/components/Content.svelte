@@ -144,6 +144,15 @@
                 <span class="icon-emoji">🎪</span>
               </div>
             </button>
+            
+            <button class="quiz-card" on:click={() => { console.log('[Content] New quiz button'); }}>
+              <div class="quiz-icon" style="--quiz-color: #8E44AD;">
+                <div class="icon-glow"></div>
+                <div class="sparkle sparkle-1"></div>
+                <div class="sparkle sparkle-2"></div>
+                <span class="icon-emoji">🎲</span>
+              </div>
+            </button>
           </div>
         </div>
     
