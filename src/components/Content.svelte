@@ -599,6 +599,7 @@
     top: 2rem;
     box-shadow: 0 4px 12px rgba(91, 117, 83, 0.12);
     margin-top: 7rem;
+    margin-left: 100px; /* Сдвигаем лидерборд правее */
     height: 540px;
     display: flex;
     flex-direction: column;
