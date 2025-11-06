@@ -77,6 +77,15 @@
                 <span class="icon-emoji">🎵</span>
               </div>
             </button>
+            
+            <button class="quiz-card" on:click={() => { console.log('[Content] New quiz button'); }}>
+              <div class="quiz-icon" style="--quiz-color: #9B59B6;">
+                <div class="icon-glow"></div>
+                <div class="sparkle sparkle-1"></div>
+                <div class="sparkle sparkle-2"></div>
+                <span class="icon-emoji">🎨</span>
+              </div>
+            </button>
           </div>
           
           <div class="hex-row hex-row-2">
@@ -95,6 +104,15 @@
                 <div class="sparkle sparkle-1"></div>
                 <div class="sparkle sparkle-2"></div>
                 <span class="icon-emoji">👤</span>
+              </div>
+            </button>
+            
+            <button class="quiz-card" on:click={() => { console.log('[Content] New quiz button'); }}>
+              <div class="quiz-icon" style="--quiz-color: #E74C3C;">
+                <div class="icon-glow"></div>
+                <div class="sparkle sparkle-1"></div>
+                <div class="sparkle sparkle-2"></div>
+                <span class="icon-emoji">🌟</span>
               </div>
             </button>
           </div>
