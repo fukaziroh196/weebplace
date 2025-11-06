@@ -116,6 +116,35 @@
               </div>
             </button>
           </div>
+          
+          <div class="hex-row hex-row-3">
+            <button class="quiz-card" on:click={() => { console.log('[Content] New quiz button'); }}>
+              <div class="quiz-icon" style="--quiz-color: #F39C12;">
+                <div class="icon-glow"></div>
+                <div class="sparkle sparkle-1"></div>
+                <div class="sparkle sparkle-2"></div>
+                <span class="icon-emoji">📚</span>
+              </div>
+            </button>
+            
+            <button class="quiz-card" on:click={() => { console.log('[Content] New quiz button'); }}>
+              <div class="quiz-icon" style="--quiz-color: #3498DB;">
+                <div class="icon-glow"></div>
+                <div class="sparkle sparkle-1"></div>
+                <div class="sparkle sparkle-2"></div>
+                <span class="icon-emoji">🎯</span>
+              </div>
+            </button>
+            
+            <button class="quiz-card" on:click={() => { console.log('[Content] New quiz button'); }}>
+              <div class="quiz-icon" style="--quiz-color: #1ABC9C;">
+                <div class="icon-glow"></div>
+                <div class="sparkle sparkle-1"></div>
+                <div class="sparkle sparkle-2"></div>
+                <span class="icon-emoji">🎪</span>
+              </div>
+            </button>
+          </div>
         </div>
     
         <button class="replay-btn-new" on:click={openReplay}>
@@ -302,6 +331,11 @@
     margin-left: 240px; /* Чуть увеличенный сдвиг нижнего ряда вправо */
     margin-top: -20px; /* Поднимаем нижний ряд выше */
     gap: 5rem; /* Такой же увеличенный отступ между кнопками в нижнем ряду */
+  }
+  
+  .hex-row-3 {
+    gap: 5rem; /* Такой же отступ между кнопками в третьем ряду */
+    margin-left: 0; /* Без смещения вправо, как первый ряд */
   }
   
   @media (max-width: 768px) {
