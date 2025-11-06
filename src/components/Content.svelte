@@ -378,7 +378,7 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: visible;
+    overflow: hidden;
     box-shadow: 
       0 4px 12px rgba(0, 0, 0, 0.15),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -430,28 +430,29 @@
   
   .quiz-mode-name {
     position: absolute;
-    bottom: -40px;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%) rotate(-45deg);
+    transform: translate(-50%, -50%) rotate(-45deg) translateY(-120px);
     color: #FFFFFF;
-    font-size: 0.8rem;
+    font-size: 0.875rem;
     font-weight: 700;
     letter-spacing: 0.05em;
     white-space: nowrap;
     opacity: 0;
-    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity 0.2s ease, transform 0.2s ease;
     z-index: 1000;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
     pointer-events: none;
-    background: rgba(0, 0, 0, 0.8);
-    padding: 6px 12px;
+    background: rgba(0, 0, 0, 0.9);
+    padding: 0.5rem 1rem;
     border-radius: 8px;
     backdrop-filter: blur(10px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
   
   .quiz-card:hover .quiz-mode-name {
     opacity: 1;
-    transform: translateX(-50%) rotate(-45deg) translateY(-5px);
+    transform: translate(-50%, -50%) rotate(-45deg) translateY(-135px);
   }
 
   @media (max-width: 768px) {
