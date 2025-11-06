@@ -378,8 +378,8 @@
     background: var(--panelStrong);
     border: 1px solid rgba(255, 255, 255, 0.08);
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: visible;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
     box-shadow: 
       0 4px 12px rgba(0, 0, 0, 0.15),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -391,6 +391,7 @@
     padding: 0;
     border-radius: 16px;
     transform: rotate(45deg);
+    isolation: isolate; /* Создает новый stacking context */
   }
   
   .quiz-card::before {
@@ -423,6 +424,7 @@
       0 8px 24px rgba(0, 0, 0, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.2),
       0 0 0 1px rgba(255, 255, 255, 0.08);
+    z-index: 10;
   }
   
   .quiz-card:active {
@@ -431,17 +433,18 @@
   
   .quiz-mode-name {
     position: absolute;
-    bottom: 100%;
+    bottom: calc(100% + 15px);
     left: 50%;
-    transform: translateX(-50%) rotate(-45deg) translateY(-20px);
+    transform: translateX(-50%) rotate(-45deg);
     color: #FFFFFF;
     font-size: 0.875rem;
     font-weight: 700;
     letter-spacing: 0.05em;
     white-space: nowrap;
     opacity: 0;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    z-index: 1000;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0s linear 0.2s, transform 0.2s ease;
+    z-index: 1001;
     pointer-events: none;
     background: rgba(0, 0, 0, 0.95);
     padding: 0.5rem 1rem;
@@ -449,12 +452,14 @@
     backdrop-filter: blur(10px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    margin-bottom: 10px;
+    width: max-content;
   }
   
   .quiz-card:hover .quiz-mode-name {
     opacity: 1;
-    transform: translateX(-50%) rotate(-45deg) translateY(-30px);
+    visibility: visible;
+    transition: opacity 0.2s ease, visibility 0s linear 0s, transform 0.2s ease;
+    transform: translateX(-50%) rotate(-45deg) translateY(-5px);
   }
 
   @media (max-width: 768px) {
