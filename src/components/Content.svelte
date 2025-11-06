@@ -326,6 +326,7 @@
     gap: 0;
     max-width: 800px;
     margin: 0 auto;
+    overflow: visible; /* Позволяем tooltip выходить за границы */
   }
   
   .hex-row {
@@ -378,7 +379,7 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
+    overflow: visible;
     box-shadow: 
       0 4px 12px rgba(0, 0, 0, 0.15),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -430,9 +431,9 @@
   
   .quiz-mode-name {
     position: absolute;
-    top: 50%;
+    bottom: 100%;
     left: 50%;
-    transform: translate(-50%, -50%) rotate(-45deg) translateY(-120px);
+    transform: translateX(-50%) rotate(-45deg) translateY(-20px);
     color: #FFFFFF;
     font-size: 0.875rem;
     font-weight: 700;
@@ -442,17 +443,18 @@
     transition: opacity 0.2s ease, transform 0.2s ease;
     z-index: 1000;
     pointer-events: none;
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 0.95);
     padding: 0.5rem 1rem;
     border-radius: 8px;
     backdrop-filter: blur(10px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 10px;
   }
   
   .quiz-card:hover .quiz-mode-name {
     opacity: 1;
-    transform: translate(-50%, -50%) rotate(-45deg) translateY(-135px);
+    transform: translateX(-50%) rotate(-45deg) translateY(-30px);
   }
 
   @media (max-width: 768px) {
