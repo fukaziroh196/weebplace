@@ -89,6 +89,15 @@
           </div>
           
           <div class="hex-row hex-row-2">
+            <button class="quiz-card" on:click={() => { console.log('[Content] New quiz button'); }}>
+              <div class="quiz-icon" style="--quiz-color: #E91E63;">
+                <div class="icon-glow"></div>
+                <div class="sparkle sparkle-1"></div>
+                <div class="sparkle sparkle-2"></div>
+                <span class="icon-emoji">🎭</span>
+              </div>
+            </button>
+            
             <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessBattle'); activeView.set('guessBattle'); }}>
               <div class="quiz-icon" style="--quiz-color: #FF9F66;">
                 <div class="icon-glow"></div>
