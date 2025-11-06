@@ -337,18 +337,18 @@
   }
   
   .hex-row-1 {
-    gap: 7.5rem; /* Еще больше увеличенный отступ для расширения кнопок */
+    gap: 5rem; /* Вернули исходный отступ, т.к. теперь используем scale */
     margin-left: -350px; /* Сдвигаем первый ряд влево */
   }
   
   .hex-row-2 {
     margin-left: -110px; /* Сдвигаем второй ряд влево с учетом смещения вправо */
     margin-top: -20px; /* Поднимаем нижний ряд выше */
-    gap: 7.5rem; /* Еще больше увеличенный отступ для расширения кнопок */
+    gap: 5rem; /* Вернули исходный отступ, т.к. теперь используем scale */
   }
   
   .hex-row-3 {
-    gap: 6.5rem; /* Увеличенный отступ для расширения кнопок */
+    gap: 5rem; /* Вернули исходный отступ, т.к. теперь используем scale */
     margin-left: -120px; /* Сдвигаем обратно на 5px влево */
   }
   
@@ -391,6 +391,7 @@
     border-radius: 16px;
     transform: rotate(45deg);
     z-index: 1;
+    flex-shrink: 0; /* Предотвращаем сжатие кнопки */
   }
   
   .quiz-card::before {
@@ -416,9 +417,7 @@
   }
   
   .quiz-card:hover {
-    width: 220px;
-    height: 150px;
-    transform: rotate(45deg) translateY(-4px) scale(1.01);
+    transform: rotate(45deg) translateY(-4px) scaleX(1.47) scaleY(1.01);
     background: var(--extra);
     border-color: rgba(255, 255, 255, 0.15);
     box-shadow: 
