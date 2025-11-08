@@ -111,6 +111,9 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
             <span class="hero-nav-label">{item.label}</span>
           </button>
         {/each}
+        <button class="hero-auth-btn" on:click={goToProfile}>
+          Войти / Регистрация
+        </button>
       </nav>
     </header>
 
@@ -298,6 +301,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     display: flex;
     align-items: center;
     gap: 1.3rem;
+    flex-wrap: wrap;
   }
 
   .hero-nav-item {
@@ -331,6 +335,32 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     color: #ff78b4;
     padding: 0.38rem 0.62rem;
     border-radius: 999px;
+  }
+
+  .hero-auth-btn {
+    border: none;
+    border-radius: 999px;
+    padding: 0.9rem 1.9rem;
+    background: linear-gradient(135deg, #a8ccff 0%, #7fb1ff 100%);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 16px 32px rgba(123, 176, 255, 0.28);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .hero-auth-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 22px 42px rgba(123, 176, 255, 0.34);
+  }
+
+  .hero-auth-btn:focus-visible {
+    outline: 2px solid rgba(152, 196, 255, 0.55);
+    outline-offset: 4px;
   }
 
   .hero-banner {
@@ -544,6 +574,11 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       background: rgba(255, 218, 234, 0.42);
       padding: 0.35rem 0.8rem;
       border-radius: 16px;
+    }
+
+    .hero-auth-btn {
+      width: 100%;
+      justify-content: center;
     }
 
     .hero-main {
