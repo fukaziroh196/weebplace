@@ -21,54 +21,46 @@
   
   // Keep search view for future quiz search (placeholder)
   
-  onMount(async () => {
-    refreshQuizDates();
-    await refreshLeaderboard($leaderboardPeriod);
-    loadUserStats();
-  });
-  let showReplay = false;
+onMount(async () => {
+  refreshQuizDates();
+  await refreshLeaderboard($leaderboardPeriod);
+  loadUserStats();
+});
+let showReplay = false;
 
-const modeCards = [
+const menuItems = [
+  { icon: '🍿', label: 'Угадай аниме', action: () => activeView.set('guessAnime') },
+  { icon: '📅', label: 'Повторы', action: () => openReplay() },
+  { icon: '👑', label: 'Лидерборд', action: () => activeView.set('aniquiz') }
+];
+
+const goToHome = () => activeView.set('home');
+const goToProfile = () => activeView.set('profile');
+
+const gameCards = [
   {
-    title: 'УГАДАЙ АНИМЕ',
-    subtitle: 'Проверь знание сюжетов',
-    emoji: '🎧',
-    background: 'linear-gradient(140deg, #F6F9FF 0%, #E8F1FF 100%)',
+    title: 'Угадай аниме',
+    image: 'https://i.imgur.com/aO2zHwP.png',
+    background: 'linear-gradient(180deg, #DCEBFF 0%, #EFF5FF 100%)',
     action: () => activeView.set('guessAnime')
   },
   {
-    title: 'УГАДАЙ ПЕРСОНАЖА',
-    subtitle: 'Узнай героя по описанию',
-    emoji: '⚔️',
-    background: 'linear-gradient(140deg, #FFF4ED 0%, #FFE1D5 100%)',
+    title: 'Угадай персонажа',
+    image: 'https://i.imgur.com/AnQwC3u.png',
+    background: 'linear-gradient(180deg, #FFF2EA 0%, #FFE7DA 100%)',
     action: () => activeView.set('guessCharacter')
   },
   {
-    title: 'УГАДАЙ ОПЕНИНГ',
-    subtitle: 'Угадай музыку за секунды',
-    emoji: '🎵',
-    background: 'linear-gradient(140deg, #FFE9F5 0%, #FFDFF0 100%)',
+    title: 'Угадай опенинг',
+    image: 'https://i.imgur.com/8F1AUBe.png',
+    background: 'linear-gradient(180deg, #FFE6F4 0%, #FFD8EE 100%)',
     action: () => activeView.set('guessOpening')
   }
 ];
 
-const startGame = () => {
-  activeView.set('guessOpening');
-};
+const startGame = () => activeView.set('guessOpening');
 
-const goToHome = () => {
-  activeView.set('home');
-};
-
-const goToLeaderboard = () => {
-  activeView.set('aniquiz');
-};
-
-const goToProfile = () => {
-  activeView.set('profile');
-};
-
-$: achievementsToday = $userStats?.data?.achievementsToday ?? 24;
+$: achievementsToday = $userStats?.data?.achievementsToday ?? 3456;
 $: playersToday = $userStats?.data?.playersToday ?? 3456;
   
   function openReplay() {
@@ -83,65 +75,51 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   // No-op mounts for quizzes home
 </script>
 
-  <div class="aniguessr-layout">
+  <div class="animeguess-wrapper">
   {#if $activeView === 'home' || $activeView === 'aniquiz'}
 
-    <div class="animeguess-home">
-      <header class="ag-header">
-        <button class="ag-brand" on:click={goToHome}>
-          <span class="ag-brand-icon">🍥</span>
-          <span class="ag-brand-name">AnimeGuess!</span>
+    <div class="animeguess-shell">
+      <header class="hero-header">
+        <button class="home-button" on:click={goToHome} aria-label="Главная">
+          <span>🏠</span>
         </button>
-        <nav class="ag-nav">
-          <button class="ag-nav-item {($activeView === 'home' || $activeView === 'aniquiz') ? 'active' : ''}" on:click={goToHome}>
-            <span class="ag-nav-icon">🏠</span>
-            <span>Главная</span>
-          </button>
-          <button class="ag-nav-item {$activeView === 'guessAnime' ? 'active' : ''}" on:click={() => activeView.set('guessAnime')}>
-            <span class="ag-nav-icon">🍿</span>
-            <span>Угадай аниме</span>
-          </button>
-          <button class="ag-nav-item" on:click={openReplay}>
-            <span class="ag-nav-icon">📅</span>
-            <span>Повторы</span>
-          </button>
-          <button class="ag-nav-item {$activeView === 'aniquiz' ? 'active' : ''}" on:click={goToLeaderboard}>
-            <span class="ag-nav-icon">👑</span>
-            <span>Лидерборд</span>
-          </button>
+        <div class="hero-title">AnimeGuess!</div>
+        <nav class="hero-nav">
+          {#each menuItems as item (item.label)}
+            <button class="hero-nav-item" on:click={item.action}>
+              <span class="hero-nav-icon">{item.icon}</span>
+              <span class="hero-nav-label">{item.label}</span>
+            </button>
+          {/each}
         </nav>
       </header>
 
-      <main class="ag-card">
-        <div class="ag-hero">
-          <div class="ag-hero-copy">
-            <h1>Угадай как можно больше опенингов и соревнуйся с друзьями!</h1>
-            <p>Весёлые задания, милый интерфейс и ежедневные достижения ждут тебя.</p>
-          </div>
-          <button class="ag-start-btn" on:click={startGame}>Начать игру</button>
-        </div>
+      <section class="hero-banner">
+        <button class="start-button" on:click={startGame}>Начать игру</button>
+        <p class="hero-description">
+          Угадай как можно больше опенингов и соревнуйся с друзьями в ежедневных заданиях!
+        </p>
+      </section>
 
-        <div class="ag-mode-grid">
-          {#each modeCards as mode (mode.title)}
-            <button class="ag-mode-card" style={`background:${mode.background};`} on:click={mode.action}>
-              <div class="ag-mode-icon"><span>{mode.emoji}</span></div>
-              <h3 class="ag-mode-title">{mode.title}</h3>
-              <p class="ag-mode-subtitle">{mode.subtitle}</p>
-            </button>
-          {/each}
-        </div>
-
-        <div class="ag-footer">
-          <div class="ag-stats">
-            <div class="ag-stat-block">
-              <span class="ag-stat-label">Достижения дня</span>
-              <span class="ag-stat-value">{achievementsToday}</span>
+      <section class="mode-cards">
+        {#each gameCards as card (card.title)}
+          <button class="mode-card" style={`background:${card.background};`} on:click={card.action}>
+            <div class="mode-image">
+              <img src={card.image} alt={card.title} loading="lazy" />
             </div>
-            <span class="ag-stat-caption">{playersToday.toLocaleString()} пользователей сегодня</span>
-          </div>
-          <button class="ag-secondary-btn" on:click={goToProfile}>Войти / Регистрация</button>
+            <span class="mode-label">{card.title}</span>
+          </button>
+        {/each}
+      </section>
+
+      <footer class="hero-footer">
+        <div class="hero-achievements">
+          <span class="hero-achievements-title">Достижения дня</span>
+          <span class="hero-achievements-value">{achievementsToday.toLocaleString()}</span>
+          <span class="hero-achievements-meta">{playersToday.toLocaleString()} пользователей сегодня</span>
         </div>
-      </main>
+        <button class="auth-button" on:click={goToProfile}>Войти / Регистрация</button>
+      </footer>
     </div>
   {:else if $activeView === 'search'}
   <!-- Search View -->
@@ -206,318 +184,306 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 <style>
   :global(body) {
     background: linear-gradient(180deg, #fff5f7 0%, #ffeef8 100%);
-    color: #695d76;
-    font-family: 'Inter', 'SF Pro Display', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #735f7e;
+    font-family: "Inter", "SF Pro Display", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   }
 
-  .aniguessr-layout {
+  .animeguess-wrapper {
     width: 100%;
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 2rem 1.5rem 3rem;
     display: flex;
     justify-content: center;
+    padding: 2.5rem 1.5rem 3.5rem;
   }
 
-  .animeguess-home {
-    width: 100%;
+  .animeguess-shell {
+    width: min(960px, 100%);
+    background: #fffbfe;
+    border-radius: 36px;
+    padding: 2.75rem 3rem;
+    box-shadow: 0 28px 70px rgba(255, 182, 217, 0.28);
     display: flex;
     flex-direction: column;
-    gap: 1.75rem;
+    gap: 2.7rem;
   }
 
-  .ag-header {
-    display: flex;
+  .hero-header {
+    display: grid;
+    grid-template-columns: 70px 1fr auto;
     align-items: center;
-    justify-content: space-between;
-    padding: 1.25rem 1.75rem;
-    border-radius: 28px;
-    background: rgba(255, 255, 255, 0.72);
-    box-shadow: 0 26px 56px rgba(255, 176, 210, 0.28);
-    backdrop-filter: blur(14px);
+    gap: 1.5rem;
   }
 
-  .ag-brand {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    background: none;
+  .home-button {
+    width: 54px;
+    height: 54px;
+    border-radius: 18px;
     border: none;
     cursor: pointer;
-    color: #ff72ac;
-    font-size: 1.6rem;
-    font-weight: 800;
-    letter-spacing: 0.02em;
-    padding: 0;
+    font-size: 1.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #ffd6ec 0%, #ffb9df 100%);
+    box-shadow: 0 16px 34px rgba(255, 158, 205, 0.35);
+    color: #ff6aa3;
   }
 
-  .ag-brand:focus-visible {
-    outline: 2px solid rgba(255, 115, 174, 0.4);
+  .home-button:focus-visible {
+    outline: 2px solid rgba(255, 118, 186, 0.5);
     outline-offset: 4px;
   }
 
-  .ag-brand-icon {
-    font-size: 1.9rem;
-  }
-
-  .ag-nav {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .ag-nav-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    border: none;
-    border-radius: 18px;
-    padding: 0.65rem 1.05rem;
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: #8d7a9c;
-    background: transparent;
-    cursor: pointer;
-    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
-  }
-
-  .ag-nav-item:focus-visible {
-    outline: 2px solid rgba(255, 118, 186, 0.4);
-    outline-offset: 3px;
-  }
-
-  .ag-nav-icon {
-    font-size: 1.1rem;
-  }
-
-  .ag-nav-item:hover {
-    background: rgba(255, 176, 211, 0.22);
-    color: #ff6ea2;
-    transform: translateY(-1px);
-  }
-
-  .ag-nav-item.active {
-    background: linear-gradient(130deg, #ff92c2 0%, #ff78b4 100%);
-    color: #fff;
-    box-shadow: 0 20px 38px rgba(255, 138, 195, 0.4);
-  }
-
-  .ag-card {
-    background: #ffffff;
-    border-radius: 36px;
-    padding: 2.75rem 2.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 2.5rem;
-    box-shadow: 0 30px 70px rgba(255, 189, 218, 0.28);
-  }
-
-  .ag-hero {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .ag-hero-copy h1 {
-    margin: 0;
-    font-size: 2.05rem;
+  .hero-title {
+    font-size: 2.2rem;
     font-weight: 800;
-    color: #574663;
-    line-height: 1.25;
+    color: #ff74ad;
+    letter-spacing: 0.02em;
   }
 
-  .ag-hero-copy p {
-    margin: 0;
-    color: rgba(87, 70, 99, 0.72);
-    font-size: 1rem;
-    line-height: 1.6;
-    max-width: 420px;
+  .hero-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
   }
 
-  .ag-start-btn {
-    align-self: flex-start;
+  .hero-nav-item {
+    border: none;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    cursor: pointer;
+    color: #8b7aa1;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+  }
+
+  .hero-nav-item:focus-visible {
+    outline: 2px solid rgba(255, 118, 186, 0.4);
+    outline-offset: 4px;
+  }
+
+  .hero-nav-icon {
+    font-size: 1.35rem;
+    background: rgba(255, 201, 229, 0.4);
+    color: #ff78b4;
+    padding: 0.4rem 0.65rem;
+    border-radius: 999px;
+  }
+
+  .hero-banner {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 2.2rem;
+  }
+
+  .start-button {
     border: none;
     border-radius: 999px;
-    padding: 1rem 3rem;
-    font-size: 1.05rem;
-    font-weight: 700;
+    background: linear-gradient(135deg, #ff8abb 0%, #ff70aa 100%);
     color: #fff;
-    background: linear-gradient(135deg, #ff8bbc 0%, #ff71a7 100%);
-    box-shadow: 0 24px 48px rgba(255, 127, 186, 0.42);
+    font-size: 1.15rem;
+    font-weight: 700;
+    padding: 1.15rem 3.6rem;
+    box-shadow: 0 20px 50px rgba(255, 118, 178, 0.45);
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
-  .ag-start-btn:hover {
+  .start-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 28px 52px rgba(255, 118, 178, 0.45);
+    box-shadow: 0 24px 54px rgba(255, 120, 180, 0.5);
   }
 
-  .ag-start-btn:active {
-    transform: translateY(-1px);
+  .start-button:focus-visible {
+    outline: 2px solid rgba(255, 182, 217, 0.55);
+    outline-offset: 4px;
   }
 
-  .ag-mode-grid {
+  .hero-description {
+    margin: 0;
+    font-size: 1.02rem;
+    line-height: 1.55;
+    color: rgba(90, 67, 108, 0.78);
+  }
+
+  .mode-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1.5rem;
+    gap: 1.6rem;
   }
 
-  .ag-mode-card {
+  .mode-card {
     border: none;
-    border-radius: 26px;
-    padding: 1.8rem 1.5rem;
+    border-radius: 28px;
+    padding: 1.9rem 1.6rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
-    color: #574663;
-    text-align: center;
+    gap: 1.2rem;
     cursor: pointer;
+    box-shadow: 0 18px 36px rgba(186, 173, 255, 0.16);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
-  .ag-mode-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 36px rgba(173, 152, 255, 0.22);
+  .mode-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 44px rgba(173, 152, 255, 0.22);
   }
 
-  .ag-mode-icon {
-    width: 86px;
-    height: 86px;
-    border-radius: 30px;
-    background: rgba(255, 255, 255, 0.65);
+  .mode-card:focus-visible {
+    outline: 2px solid rgba(255, 160, 210, 0.4);
+    outline-offset: 5px;
+  }
+
+  .mode-image {
+    width: 108px;
+    height: 108px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.1rem;
-    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
   }
 
-  .ag-mode-title {
-    margin: 0;
-    font-size: 0.95rem;
-    font-weight: 800;
-    letter-spacing: 0.06em;
+  .mode-image img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
   }
 
-  .ag-mode-subtitle {
-    margin: 0;
-    font-size: 0.85rem;
-    color: rgba(87, 70, 99, 0.65);
+  .mode-label {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #635075;
+    letter-spacing: 0.04em;
   }
 
-  .ag-footer {
+  .hero-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1.25rem;
-    flex-wrap: wrap;
+    gap: 1.5rem;
   }
 
-  .ag-stats {
+  .hero-achievements {
+    background: rgba(255, 244, 251, 0.9);
+    border-radius: 22px;
+    padding: 1rem 1.8rem;
     display: flex;
     align-items: center;
-    gap: 1.5rem;
-    background: rgba(255, 245, 250, 0.95);
-    padding: 1rem 1.7rem;
-    border-radius: 22px;
-    box-shadow: 0 16px 30px rgba(255, 197, 220, 0.25);
+    gap: 1.4rem;
+    box-shadow: 0 16px 32px rgba(255, 188, 215, 0.22);
   }
 
-  .ag-stat-block {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .ag-stat-label {
-    font-size: 0.8rem;
+  .hero-achievements-title {
+    font-size: 0.85rem;
     font-weight: 600;
-    color: rgba(87, 70, 99, 0.62);
     letter-spacing: 0.08em;
     text-transform: uppercase;
+    color: rgba(90, 72, 108, 0.62);
   }
 
-  .ag-stat-value {
-    font-size: 1.7rem;
+  .hero-achievements-value {
+    font-size: 1.8rem;
     font-weight: 800;
-    color: #ff74ad;
-    line-height: 1.1;
+    color: #ff6ea2;
   }
 
-  .ag-stat-caption {
-    font-size: 0.85rem;
-    color: rgba(87, 70, 99, 0.62);
+  .hero-achievements-meta {
+    font-size: 0.88rem;
+    color: rgba(90, 72, 108, 0.58);
   }
 
-  .ag-secondary-btn {
+  .auth-button {
     border: none;
     border-radius: 18px;
-    padding: 0.9rem 1.9rem;
-    background: linear-gradient(135deg, #9fceff 0%, #6caeff 100%);
+    padding: 0.95rem 2rem;
+    background: linear-gradient(135deg, #9ccaff 0%, #6caeff 100%);
     color: #fff;
     font-weight: 700;
     font-size: 0.95rem;
-    box-shadow: 0 18px 36px rgba(111, 174, 255, 0.32);
+    box-shadow: 0 18px 40px rgba(109, 174, 255, 0.32);
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
-  .ag-secondary-btn:hover {
+  .auth-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 22px 40px rgba(111, 174, 255, 0.36);
+    box-shadow: 0 22px 46px rgba(109, 174, 255, 0.36);
   }
 
-  .ag-secondary-btn:active {
-    transform: translateY(-1px);
+  .auth-button:focus-visible {
+    outline: 2px solid rgba(136, 190, 255, 0.45);
+    outline-offset: 4px;
   }
 
-  @media (max-width: 900px) {
-    .ag-header {
-      flex-direction: column;
-      align-items: flex-start;
+  @media (max-width: 860px) {
+    .hero-header {
+      grid-template-columns: 54px 1fr;
+      grid-template-rows: auto auto;
       gap: 1rem;
     }
 
-    .ag-card {
-      padding: 2.2rem 1.8rem;
+    .hero-nav {
+      grid-column: 1 / -1;
+      justify-content: space-between;
     }
 
-    .ag-hero-copy h1 {
-      font-size: 1.8rem;
-    }
-  }
-
-  @media (max-width: 640px) {
-    .aniguessr-layout {
-      padding: 1.5rem 1rem 2.5rem;
+    .hero-banner {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      text-align: center;
     }
 
-    .ag-card {
-      padding: 1.8rem 1.25rem;
-      gap: 2rem;
+    .start-button {
+      justify-self: center;
     }
 
-    .ag-mode-grid {
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    .hero-description {
+      text-align: center;
     }
 
-    .ag-footer {
+    .hero-footer {
       flex-direction: column;
       align-items: stretch;
     }
 
-    .ag-stats {
-      width: 100%;
+    .hero-achievements {
       justify-content: space-between;
     }
 
-    .ag-secondary-btn,
-    .ag-start-btn {
+    .auth-button {
       width: 100%;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .animeguess-shell {
+      padding: 2.1rem 1.5rem;
+      gap: 2.1rem;
+    }
+
+    .hero-title {
+      font-size: 1.9rem;
       text-align: center;
+    }
+
+    .hero-nav {
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+
+    .hero-nav-item {
+      flex-direction: row;
+      gap: 0.4rem;
+      background: rgba(255, 218, 234, 0.45);
+      padding: 0.35rem 0.8rem;
+      border-radius: 16px;
     }
   }
 </style>
