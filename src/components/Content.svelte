@@ -81,27 +81,27 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   // No-op mounts for quizzes home
 </script>
 
-  <div class="animeguess-wrapper">
+  <div class="animeguess-page">
   {#if $activeView === 'home' || $activeView === 'aniquiz'}
 
-    <div class="animeguess-shell">
-      <header class="hero-header">
-        <div class="hero-logo">
-          <button class="home-button" on:click={goToHome} aria-label="Главная">
-            <span>🏠</span>
+    <header class="hero-header">
+      <div class="hero-logo">
+        <button class="home-button" on:click={goToHome} aria-label="Главная">
+          <span>🏠</span>
+        </button>
+        <div class="hero-title">AnimeGuess!</div>
+      </div>
+      <nav class="hero-nav">
+        {#each menuItems as item (item.label)}
+          <button class="hero-nav-item" on:click={item.action}>
+            <span class="hero-nav-icon">{item.icon}</span>
+            <span class="hero-nav-label">{item.label}</span>
           </button>
-          <div class="hero-title">AnimeGuess!</div>
-        </div>
-        <nav class="hero-nav">
-          {#each menuItems as item (item.label)}
-            <button class="hero-nav-item" on:click={item.action}>
-              <span class="hero-nav-icon">{item.icon}</span>
-              <span class="hero-nav-label">{item.label}</span>
-            </button>
-          {/each}
-        </nav>
-      </header>
+        {/each}
+      </nav>
+    </header>
 
+    <main class="hero-main">
       <section class="hero-banner">
         <div class="start-group">
           <button class="start-button" on:click={startGame}>Начать игру</button>
@@ -123,16 +123,16 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
           </button>
         {/each}
       </section>
+    </main>
 
-      <footer class="hero-footer">
-        <div class="hero-achievements">
-          <span class="hero-achievements-title">Достижения дня</span>
-          <span class="hero-achievements-value">{achievementsToday.toLocaleString()}</span>
-          <span class="hero-achievements-meta">{playersToday.toLocaleString()} пользователей сегодня</span>
-        </div>
-        <button class="auth-button" on:click={goToProfile}>Войти / Регистрация</button>
-      </footer>
-    </div>
+    <footer class="hero-footer">
+      <div class="hero-achievements">
+        <span class="hero-achievements-title">Достижения дня</span>
+        <span class="hero-achievements-value">{achievementsToday.toLocaleString()}</span>
+        <span class="hero-achievements-meta">{playersToday.toLocaleString()} пользователей сегодня</span>
+      </div>
+      <button class="auth-button" on:click={goToProfile}>Войти / Регистрация</button>
+    </footer>
   {:else if $activeView === 'search'}
   <!-- Search View -->
   <div class="mt-2">
@@ -203,33 +203,49 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     font-family: "Inter", "SF Pro Display", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   }
 
-  .animeguess-wrapper {
+  .animeguess-page {
     width: 100%;
     min-height: 100vh;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 3rem 1.5rem 3.5rem;
+    flex-direction: column;
+    padding: 3rem clamp(1.5rem, 4vw, 4rem) 3.5rem;
     box-sizing: border-box;
   }
 
-  .animeguess-shell {
-    width: min(940px, 100%);
-    background: #fffbfe;
-    border-radius: 36px;
-    padding: 3rem 3.25rem 3rem;
-    box-shadow: 0 28px 70px rgba(255, 182, 217, 0.28);
+  .hero-header {
+    position: sticky;
+    top: clamp(1rem, 4vh, 2rem);
     display: flex;
-    flex-direction: column;
-    gap: 2.6rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: min(3vw, 2.5rem);
+    padding: 1.2rem 2rem;
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(20px) saturation(130%);
+    box-shadow: 0 24px 60px rgba(255, 158, 205, 0.28);
+    margin-bottom: 2.5rem;
   }
 
-  .hero-header {
+  .hero-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3.2rem;
+  }
+
+  .hero-footer {
+    margin-top: 3.2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1.5rem;
     flex-wrap: wrap;
+    padding: 1.8rem 2rem;
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: 0 28px 60px rgba(161, 143, 255, 0.18);
   }
 
   .hero-logo {
@@ -409,14 +425,6 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     max-width: 220px;
   }
 
-  .hero-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-  }
-
   .hero-achievements {
     background: rgba(255, 244, 251, 0.92);
     border-radius: 22px;
@@ -470,34 +478,25 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   @media (max-width: 900px) {
-    .animeguess-shell {
-      padding: 2.4rem 2rem;
-      gap: 2.2rem;
+    .animeguess-page {
+      padding: 2.4rem clamp(1rem, 5vw, 2.2rem) 2.8rem;
     }
 
-    .hero-nav {
-      gap: 1rem;
-      flex-wrap: wrap;
-      justify-content: flex-start;
-    }
-
-    .hero-banner {
-      grid-template-columns: 1fr;
+    .hero-header {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 1rem 1.4rem;
       gap: 1.2rem;
     }
 
-    .start-group,
-    .hero-description {
-      text-align: center;
-    }
-
-    .start-group {
-      align-items: center;
+    .hero-main {
+      gap: 2.4rem;
     }
 
     .hero-footer {
       flex-direction: column;
       align-items: stretch;
+      padding: 1.4rem;
     }
 
     .hero-achievements {
@@ -506,8 +505,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   @media (max-width: 560px) {
-    .animeguess-shell {
-      padding: 2.2rem 1.4rem;
+    .animeguess-page {
+      padding: 1.8rem 1rem 2.4rem;
     }
 
     .hero-logo {
@@ -515,9 +514,15 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       justify-content: center;
     }
 
+    .hero-header {
+      align-items: center;
+      text-align: center;
+    }
+
     .hero-nav {
       width: 100%;
       justify-content: center;
+      flex-wrap: wrap;
     }
 
     .hero-nav-item {
@@ -526,6 +531,11 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       background: rgba(255, 218, 234, 0.42);
       padding: 0.35rem 0.8rem;
       border-radius: 16px;
+    }
+
+    .hero-main {
+      align-items: center;
+      text-align: center;
     }
 
     .mode-cards {
@@ -538,4 +548,5 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       text-align: center;
     }
   }
+</style>
 </style>
