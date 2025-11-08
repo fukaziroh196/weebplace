@@ -1,4 +1,4 @@
-<script>
+image.png<script>
   import { onMount } from 'svelte';
   import { searchResults, isSearching } from '../stores/sources';
   import { activeView } from '../stores/ui';
@@ -40,20 +40,26 @@ const goToProfile = () => activeView.set('profile');
 const gameCards = [
   {
     title: 'Угадай аниме',
-    image: 'https://i.imgur.com/aO2zHwP.png',
-    background: 'linear-gradient(180deg, #DCEBFF 0%, #EFF5FF 100%)',
+    description: 'Узнай тайтл по короткой подсказке',
+    accent: '#ff93c1',
+    background: 'linear-gradient(180deg, #dcebff 0%, #eff5ff 100%)',
+    emoji: '🎧',
     action: () => activeView.set('guessAnime')
   },
   {
     title: 'Угадай персонажа',
-    image: 'https://i.imgur.com/AnQwC3u.png',
-    background: 'linear-gradient(180deg, #FFF2EA 0%, #FFE7DA 100%)',
+    description: 'Отгадай героя по внешности',
+    accent: '#ffa17a',
+    background: 'linear-gradient(180deg, #fff2ea 0%, #ffe7da 100%)',
+    emoji: '🗡️',
     action: () => activeView.set('guessCharacter')
   },
   {
     title: 'Угадай опенинг',
-    image: 'https://i.imgur.com/8F1AUBe.png',
-    background: 'linear-gradient(180deg, #FFE6F4 0%, #FFD8EE 100%)',
+    description: 'Соревнуйся в скорости угадывания',
+    accent: '#ff96d6',
+    background: 'linear-gradient(180deg, #ffe6f4 0%, #ffd8ee 100%)',
+    emoji: '🎵',
     action: () => activeView.set('guessOpening')
   }
 ];
@@ -80,10 +86,12 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
     <div class="animeguess-shell">
       <header class="hero-header">
-        <button class="home-button" on:click={goToHome} aria-label="Главная">
-          <span>🏠</span>
-        </button>
-        <div class="hero-title">AnimeGuess!</div>
+        <div class="hero-logo">
+          <button class="home-button" on:click={goToHome} aria-label="Главная">
+            <span>🏠</span>
+          </button>
+          <div class="hero-title">AnimeGuess!</div>
+        </div>
         <nav class="hero-nav">
           {#each menuItems as item (item.label)}
             <button class="hero-nav-item" on:click={item.action}>
@@ -95,7 +103,10 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       </header>
 
       <section class="hero-banner">
-        <button class="start-button" on:click={startGame}>Начать игру</button>
+        <div class="start-group">
+          <button class="start-button" on:click={startGame}>Начать игру</button>
+          <div class="start-caption">Попробуй ежедневные задания и обновляй рекорды!</div>
+        </div>
         <p class="hero-description">
           Угадай как можно больше опенингов и соревнуйся с друзьями в ежедневных заданиях!
         </p>
@@ -104,10 +115,11 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       <section class="mode-cards">
         {#each gameCards as card (card.title)}
           <button class="mode-card" style={`background:${card.background};`} on:click={card.action}>
-            <div class="mode-image">
-              <img src={card.image} alt={card.title} loading="lazy" />
+            <div class="mode-avatar" style={`color:${card.accent}`}>
+              <span>{card.emoji}</span>
             </div>
             <span class="mode-label">{card.title}</span>
+            <span class="mode-description">{card.description}</span>
           </button>
         {/each}
       </section>
@@ -182,7 +194,10 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 </div>
 
 <style>
-  :global(body) {
+  :global(html, body, #app) {
+    height: 100%;
+    min-height: 100vh;
+    margin: 0;
     background: linear-gradient(180deg, #fff5f7 0%, #ffeef8 100%);
     color: #735f7e;
     font-family: "Inter", "SF Pro Display", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -190,41 +205,51 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .animeguess-wrapper {
     width: 100%;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
-    padding: 2.5rem 1.5rem 3.5rem;
+    align-items: center;
+    padding: 3rem 1.5rem 3.5rem;
+    box-sizing: border-box;
   }
 
   .animeguess-shell {
-    width: min(960px, 100%);
+    width: min(940px, 100%);
     background: #fffbfe;
     border-radius: 36px;
-    padding: 2.75rem 3rem;
+    padding: 3rem 3.25rem 3rem;
     box-shadow: 0 28px 70px rgba(255, 182, 217, 0.28);
     display: flex;
     flex-direction: column;
-    gap: 2.7rem;
+    gap: 2.6rem;
   }
 
   .hero-header {
-    display: grid;
-    grid-template-columns: 70px 1fr auto;
+    display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .hero-logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
   }
 
   .home-button {
-    width: 54px;
-    height: 54px;
-    border-radius: 18px;
+    width: 58px;
+    height: 58px;
+    border-radius: 20px;
     border: none;
     cursor: pointer;
-    font-size: 1.65rem;
+    font-size: 1.75rem;
     display: flex;
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, #ffd6ec 0%, #ffb9df 100%);
-    box-shadow: 0 16px 34px rgba(255, 158, 205, 0.35);
+    box-shadow: 0 18px 35px rgba(255, 158, 205, 0.35);
     color: #ff6aa3;
   }
 
@@ -234,7 +259,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .hero-title {
-    font-size: 2.2rem;
+    font-size: 2.25rem;
     font-weight: 800;
     color: #ff74ad;
     letter-spacing: 0.02em;
@@ -243,7 +268,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .hero-nav {
     display: flex;
     align-items: center;
-    gap: 1.4rem;
+    gap: 1.3rem;
   }
 
   .hero-nav-item {
@@ -254,10 +279,16 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     align-items: center;
     gap: 0.35rem;
     cursor: pointer;
-    color: #8b7aa1;
+    color: #8d7aa1;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     letter-spacing: 0.04em;
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+
+  .hero-nav-item:hover {
+    color: #ff6ea2;
+    transform: translateY(-2px);
   }
 
   .hero-nav-item:focus-visible {
@@ -266,10 +297,10 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .hero-nav-icon {
-    font-size: 1.35rem;
-    background: rgba(255, 201, 229, 0.4);
+    font-size: 1.2rem;
+    background: rgba(255, 201, 229, 0.45);
     color: #ff78b4;
-    padding: 0.4rem 0.65rem;
+    padding: 0.38rem 0.62rem;
     border-radius: 999px;
   }
 
@@ -277,7 +308,13 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     display: grid;
     grid-template-columns: auto 1fr;
     align-items: center;
-    gap: 2.2rem;
+    gap: 2.3rem;
+  }
+
+  .start-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
   .start-button {
@@ -290,11 +327,12 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     padding: 1.15rem 3.6rem;
     box-shadow: 0 20px 50px rgba(255, 118, 178, 0.45);
     cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
   .start-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 24px 54px rgba(255, 120, 180, 0.5);
+    box-shadow: 0 26px 54px rgba(255, 120, 180, 0.48);
   }
 
   .start-button:focus-visible {
@@ -302,10 +340,17 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     outline-offset: 4px;
   }
 
+  .start-caption {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: rgba(90, 67, 108, 0.66);
+    letter-spacing: 0.04em;
+  }
+
   .hero-description {
     margin: 0;
-    font-size: 1.02rem;
-    line-height: 1.55;
+    font-size: 1.01rem;
+    line-height: 1.6;
     color: rgba(90, 67, 108, 0.78);
   }
 
@@ -318,11 +363,12 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .mode-card {
     border: none;
     border-radius: 28px;
-    padding: 1.9rem 1.6rem;
+    padding: 1.9rem 1.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.2rem;
+    gap: 1rem;
+    text-align: center;
     cursor: pointer;
     box-shadow: 0 18px 36px rgba(186, 173, 255, 0.16);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -338,29 +384,29 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     outline-offset: 5px;
   }
 
-  .mode-image {
-    width: 108px;
-    height: 108px;
+  .mode-avatar {
+    width: 98px;
+    height: 98px;
     border-radius: 24px;
-    background: rgba(255, 255, 255, 0.8);
-    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.82);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
-  }
-
-  .mode-image img {
-    width: 120px;
-    height: 120px;
-    object-fit: cover;
+    font-size: 2.1rem;
   }
 
   .mode-label {
-    font-size: 1rem;
-    font-weight: 700;
+    font-size: 0.98rem;
+    font-weight: 800;
     color: #635075;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
+  }
+
+  .mode-description {
+    font-size: 0.82rem;
+    color: rgba(87, 70, 99, 0.62);
+    max-width: 220px;
   }
 
   .hero-footer {
@@ -368,34 +414,35 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     align-items: center;
     justify-content: space-between;
     gap: 1.5rem;
+    flex-wrap: wrap;
   }
 
   .hero-achievements {
-    background: rgba(255, 244, 251, 0.9);
+    background: rgba(255, 244, 251, 0.92);
     border-radius: 22px;
     padding: 1rem 1.8rem;
     display: flex;
     align-items: center;
-    gap: 1.4rem;
+    gap: 1.3rem;
     box-shadow: 0 16px 32px rgba(255, 188, 215, 0.22);
   }
 
   .hero-achievements-title {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: rgba(90, 72, 108, 0.62);
+    color: rgba(90, 72, 108, 0.6);
   }
 
   .hero-achievements-value {
-    font-size: 1.8rem;
+    font-size: 1.85rem;
     font-weight: 800;
     color: #ff6ea2;
   }
 
   .hero-achievements-meta {
-    font-size: 0.88rem;
+    font-size: 0.86rem;
     color: rgba(90, 72, 108, 0.58);
   }
 
@@ -403,12 +450,13 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     border: none;
     border-radius: 18px;
     padding: 0.95rem 2rem;
-    background: linear-gradient(135deg, #9ccaff 0%, #6caeff 100%);
+    background: linear-gradient(135deg, #9fceff 0%, #6caeff 100%);
     color: #fff;
     font-weight: 700;
     font-size: 0.95rem;
     box-shadow: 0 18px 40px rgba(109, 174, 255, 0.32);
     cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
   .auth-button:hover {
@@ -421,30 +469,30 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     outline-offset: 4px;
   }
 
-  @media (max-width: 860px) {
-    .hero-header {
-      grid-template-columns: 54px 1fr;
-      grid-template-rows: auto auto;
-      gap: 1rem;
+  @media (max-width: 900px) {
+    .animeguess-shell {
+      padding: 2.4rem 2rem;
+      gap: 2.2rem;
     }
 
     .hero-nav {
-      grid-column: 1 / -1;
-      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: flex-start;
     }
 
     .hero-banner {
       grid-template-columns: 1fr;
-      gap: 1rem;
-      text-align: center;
+      gap: 1.2rem;
     }
 
-    .start-button {
-      justify-self: center;
-    }
-
+    .start-group,
     .hero-description {
       text-align: center;
+    }
+
+    .start-group {
+      align-items: center;
     }
 
     .hero-footer {
@@ -455,35 +503,39 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     .hero-achievements {
       justify-content: space-between;
     }
-
-    .auth-button {
-      width: 100%;
-    }
   }
 
-  @media (max-width: 520px) {
+  @media (max-width: 560px) {
     .animeguess-shell {
-      padding: 2.1rem 1.5rem;
-      gap: 2.1rem;
+      padding: 2.2rem 1.4rem;
     }
 
-    .hero-title {
-      font-size: 1.9rem;
-      text-align: center;
+    .hero-logo {
+      width: 100%;
+      justify-content: center;
     }
 
     .hero-nav {
-      flex-wrap: wrap;
-      gap: 0.75rem;
+      width: 100%;
       justify-content: center;
     }
 
     .hero-nav-item {
       flex-direction: row;
       gap: 0.4rem;
-      background: rgba(255, 218, 234, 0.45);
+      background: rgba(255, 218, 234, 0.42);
       padding: 0.35rem 0.8rem;
       border-radius: 16px;
+    }
+
+    .mode-cards {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+
+    .hero-achievements {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
     }
   }
 </style>
