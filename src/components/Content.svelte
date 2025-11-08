@@ -60,98 +60,108 @@
         
         <div class="quiz-cards-honeycomb">
           <div class="hex-row hex-row-1">
-            <button class="quiz-card" title="УГАДАЙ АНИМЕ" on:click={() => { console.log('[Content] GoTo GuessAnime'); activeView.set('guessAnime'); }}>
+            <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessAnime'); activeView.set('guessAnime'); }}>
               <div class="quiz-icon" style="--quiz-color: #FF6B6B;">
                 <div class="icon-glow"></div>
                 <div class="sparkle sparkle-1"></div>
                 <div class="sparkle sparkle-2"></div>
                 <span class="icon-emoji">🎬</span>
               </div>
+              <span class="quiz-mode-name">УГАДАЙ АНИМЕ</span>
             </button>
             
-            <button class="quiz-card" title="УГАДАЙ ОПЕНИНГ" on:click={() => { console.log('[Content] GoTo GuessOpening'); activeView.set('guessOpening'); }}>
+            <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessOpening'); activeView.set('guessOpening'); }}>
               <div class="quiz-icon" style="--quiz-color: #4ECDC4;">
                 <div class="icon-glow"></div>
                 <div class="sparkle sparkle-1"></div>
                 <div class="sparkle sparkle-2"></div>
                 <span class="icon-emoji">🎵</span>
               </div>
+              <span class="quiz-mode-name">УГАДАЙ ОПЕНИНГ</span>
             </button>
             
-            <button class="quiz-card" title="РЕЖИМ 3" on:click={() => { console.log('[Content] New quiz button'); }}>
+            <button class="quiz-card" on:click={() => { console.log('[Content] New quiz button'); }}>
               <div class="quiz-icon" style="--quiz-color: #9B59B6;">
                 <div class="icon-glow"></div>
                 <div class="sparkle sparkle-1"></div>
                 <div class="sparkle sparkle-2"></div>
                 <span class="icon-emoji">🎨</span>
               </div>
+              <span class="quiz-mode-name">РЕЖИМ 3</span>
             </button>
           </div>
           
           <div class="hex-row hex-row-2">
-            <button class="quiz-card" title="БИТВА" on:click={() => { console.log('[Content] GoTo GuessBattle'); activeView.set('guessBattle'); }}>
+            <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessBattle'); activeView.set('guessBattle'); }}>
               <div class="quiz-icon" style="--quiz-color: #FF9F66;">
                 <div class="icon-glow"></div>
                 <div class="sparkle sparkle-1"></div>
                 <div class="sparkle sparkle-2"></div>
                 <span class="icon-emoji">⚔️</span>
               </div>
+              <span class="quiz-mode-name">БИТВА</span>
             </button>
             
-            <button class="quiz-card" title="УГАДАЙ ПЕРСОНАЖА" on:click={() => { console.log('[Content] GoTo GuessCharacter'); activeView.set('guessCharacter'); }}>
+            <button class="quiz-card" on:click={() => { console.log('[Content] GoTo GuessCharacter'); activeView.set('guessCharacter'); }}>
               <div class="quiz-icon" style="--quiz-color: #A8E6CF;">
                 <div class="icon-glow"></div>
                 <div class="sparkle sparkle-1"></div>
                 <div class="sparkle sparkle-2"></div>
                 <span class="icon-emoji">👤</span>
               </div>
+              <span class="quiz-mode-name">УГАДАЙ ПЕРСОНАЖА</span>
             </button>
             
-            <button class="quiz-card" title="РЕЖИМ 6" on:click={() => { console.log('[Content] New quiz button'); }}>
+            <button class="quiz-card" on:click={() => { console.log('[Content] New quiz button'); }}>
               <div class="quiz-icon" style="--quiz-color: #E74C3C;">
                 <div class="icon-glow"></div>
                 <div class="sparkle sparkle-1"></div>
                 <div class="sparkle sparkle-2"></div>
                 <span class="icon-emoji">🌟</span>
               </div>
+              <span class="quiz-mode-name">РЕЖИМ 6</span>
             </button>
           </div>
           
           <div class="hex-row hex-row-3">
-            <button class="quiz-card" title="РЕЖИМ 7" on:click={() => { console.log('[Content] New quiz button'); }}>
+            <button class="quiz-card" on:click={() => { console.log('[Content] New quiz button'); }}>
               <div class="quiz-icon" style="--quiz-color: #F39C12;">
                 <div class="icon-glow"></div>
                 <div class="sparkle sparkle-1"></div>
                 <div class="sparkle sparkle-2"></div>
                 <span class="icon-emoji">📚</span>
               </div>
+              <span class="quiz-mode-name">РЕЖИМ 7</span>
             </button>
             
-            <button class="quiz-card" title="РЕЖИМ 8" on:click={() => { console.log('[Content] New quiz button'); }}>
+            <button class="quiz-card" on:click={() => { console.log('[Content] New quiz button'); }}>
               <div class="quiz-icon" style="--quiz-color: #3498DB;">
                 <div class="icon-glow"></div>
                 <div class="sparkle sparkle-1"></div>
                 <div class="sparkle sparkle-2"></div>
                 <span class="icon-emoji">🎯</span>
               </div>
+              <span class="quiz-mode-name">РЕЖИМ 8</span>
             </button>
             
-            <button class="quiz-card" title="РЕЖИМ 9" on:click={() => { console.log('[Content] New quiz button'); }}>
+            <button class="quiz-card" on:click={() => { console.log('[Content] New quiz button'); }}>
               <div class="quiz-icon" style="--quiz-color: #1ABC9C;">
                 <div class="icon-glow"></div>
                 <div class="sparkle sparkle-1"></div>
                 <div class="sparkle sparkle-2"></div>
                 <span class="icon-emoji">🎪</span>
               </div>
+              <span class="quiz-mode-name">РЕЖИМ 9</span>
             </button>
             
-            <button class="quiz-card" title="ПОВТОРИТЬ" on:click={openReplay}>
+            <button class="quiz-card" on:click={openReplay}>
               <div class="quiz-icon" style="--quiz-color: #8E44AD;">
                 <div class="icon-glow"></div>
                 <div class="sparkle sparkle-1"></div>
                 <div class="sparkle sparkle-2"></div>
                 <span class="icon-emoji">↺</span>
               </div>
+              <span class="quiz-mode-name">ПОВТОРИТЬ</span>
             </button>
           </div>
         </div>
@@ -369,13 +379,14 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
+    overflow: visible;
     box-shadow: 
       0 4px 12px rgba(0, 0, 0, 0.15),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
     width: 150px;
     height: 150px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 0;
@@ -417,6 +428,25 @@
   
   .quiz-card:active {
     transform: rotate(45deg) translateY(-2px) scale(1.005);
+  }
+  
+  .quiz-mode-name {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%) rotate(-45deg) translateY(-45px);
+    color: #FFFFFF;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    z-index: 10;
+    pointer-events: none;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.7);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    backdrop-filter: blur(5px);
   }
 
   @media (max-width: 768px) {
