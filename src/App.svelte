@@ -1,6 +1,5 @@
 <script>
   import { onMount } from 'svelte';
-  import Sidebar from './components/Sidebar.svelte';
   import Content from './components/Content.svelte';
   import ProfileMenu from './components/ProfileMenu.svelte';
   import { currentUser } from './stores/authApi';
@@ -73,11 +72,6 @@
 
   <!-- Основная область -->
   <div class="main-layout">
-    <!-- Sidebar -->
-    <div class="sidebar-container">
-      <Sidebar />
-    </div>
-    
     <!-- Content область -->
     <div class="content-container">
       <div class="content-scroll" bind:this={scrollEl} on:scroll={(e) => {
@@ -236,22 +230,7 @@
     display: flex;
     width: 100%;
     flex: 1;
-    gap: 0;
     overflow: hidden;
-  }
-  
-  .sidebar-container {
-    flex-shrink: 0;
-    width: auto;
-    height: 100%;
-    overflow: visible;
-    padding: 16px 8px; /* Вернул обратно */
-  }
-  
-  @media (max-width: 768px) {
-    .sidebar-container {
-      display: none;
-    }
   }
   
   .content-container {

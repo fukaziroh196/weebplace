@@ -1,4 +1,4 @@
-image.png<script>
+<script>
   import { onMount } from 'svelte';
   import { searchResults, isSearching } from '../stores/sources';
   import { activeView } from '../stores/ui';
@@ -16,6 +16,7 @@ image.png<script>
   import { userStats, loadUserStats } from '../stores/stats';
   import { leaderboard, leaderboardPeriod, refreshLeaderboard } from '../stores/leaderboard';
   import ReplayDatesModal from './ReplayDatesModal.svelte';
+  import { currentUser } from '../stores/authApi';
 
   // Quizzes-first app: remove anime viewing and banners; home shows quiz menu.
   
@@ -28,11 +29,23 @@ onMount(async () => {
 });
 let showReplay = false;
 
-const menuItems = [
+const baseMenuItems = [
   { icon: '🍿', label: 'Угадай аниме', action: () => activeView.set('guessAnime') },
   { icon: '📅', label: 'Повторы', action: () => openReplay() },
   { icon: '👑', label: 'Лидерборд', action: () => activeView.set('aniquiz') }
 ];
+
+const adminMenuItem = {
+  icon: '🛠️',
+  label: 'Админ панель',
+  action: () => activeView.set('adminQuiz')
+};
+
+$: isAdmin = $currentUser?.role === 'admin' || $currentUser?.is_admin === 1 || $currentUser?.isAdmin === true;
+let menuItems = baseMenuItems;
+$: menuItems = isAdmin
+  ? [baseMenuItems[0], adminMenuItem, ...baseMenuItems.slice(1)]
+  : baseMenuItems;
 
 const goToHome = () => activeView.set('home');
 const goToProfile = () => activeView.set('profile');
