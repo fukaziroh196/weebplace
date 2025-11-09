@@ -469,7 +469,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .leaderboard-panel {
     width: clamp(320px, 30vw, 420px);
     flex-shrink: 0;
-    margin-left: auto;
+    margin-left: clamp(1rem, 2vw, 2.2rem);
     padding-right: clamp(0.5rem, 2vw, 1.6rem);
   }
 
