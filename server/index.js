@@ -103,6 +103,15 @@ db.serialize(() => {
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`);
 
+  // Таблица для новостей проекта
+  db.run(`CREATE TABLE IF NOT EXISTS project_news (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    text TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )`);
+
 // Таблица для баттл паков
 db.run(`CREATE TABLE IF NOT EXISTS battle_packs (
   id TEXT PRIMARY KEY,
@@ -339,6 +348,91 @@ app.get('/api/stats/me', authenticateToken, (req, res) => {
       perDayCounts: counts
     });
   });
+});
+
+// Новости проекта
+app.get('/api/news', (req, res) => {
+  let limit = parseInt(req.query.limit, 10);
+  if (Number.isNaN(limit) || limit <= 0) limit = 12;
+  limit = Math.min(Math.max(limit, 1), 50);
+
+  db.all(
+    `SELECT n.id, n.text, n.created_at, n.user_id, u.username 
+     FROM project_news n 
+     LEFT JOIN users u ON u.id = n.user_id 
+     ORDER BY n.created_at DESC 
+     LIMIT ?`,
+    [limit],
+    (err, rows) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      const items = (rows || []).map((row) => ({
+        id: row.id,
+        text: row.text,
+        createdAt: row.created_at,
+        author: {
+          id: row.user_id,
+          username: row.username || 'Администратор'
+        }
+      }));
+      res.json(items);
+    }
+  );
+});
+
+app.post('/api/news', authenticateToken, requireAdmin, (req, res) => {
+  const text = (req.body?.text || '').trim();
+  if (!text) {
+    return res.status(400).json({ error: 'Текст новости не может быть пустым' });
+  }
+  if (text.length > 280) {
+    return res.status(400).json({ error: 'Новость слишком длинная (максимум 280 символов)' });
+  }
+
+  const id = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  const createdAt = Date.now();
+
+  db.run(
+    'INSERT INTO project_news (id, user_id, text, created_at) VALUES (?, ?, ?, ?)',
+    [id, req.user.id, text, createdAt],
+    (err) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+
+      db.get(
+        `SELECT n.id, n.text, n.created_at, n.user_id, u.username 
+         FROM project_news n 
+         LEFT JOIN users u ON u.id = n.user_id 
+         WHERE n.id = ?`,
+        [id],
+        (selectErr, row) => {
+          if (selectErr || !row) {
+            return res.status(200).json({
+              id,
+              text,
+              createdAt,
+              author: {
+                id: req.user.id,
+                username: req.user.username || 'Администратор'
+              }
+            });
+          }
+
+          res.json({
+            id: row.id,
+            text: row.text,
+            createdAt: row.created_at,
+            author: {
+              id: row.user_id,
+              username: row.username || 'Администратор'
+            }
+          });
+        }
+      );
+    }
+  );
 });
 
 // Загрузка картинки для "Угадай аниме" (только админ)

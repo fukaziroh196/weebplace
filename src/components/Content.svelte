@@ -14,6 +14,7 @@
   import AdminQuizPanel from './AdminQuizPanel.svelte';
   import { availableQuizDates, refreshQuizDates } from '../stores/quizzes';
   import { userStats, loadUserStats, loadGlobalStats, globalStats } from '../stores/stats';
+  import { newsFeed, loadNews, publishNews } from '../stores/news';
   import { leaderboard, leaderboardPeriod, refreshLeaderboard } from '../stores/leaderboard';
   import ReplayDatesModal from './ReplayDatesModal.svelte';
   import { currentUser } from '../stores/authApi';
@@ -48,7 +49,17 @@ let currentLeaderboardPeriod = 'all';
 $: currentLeaderboardPeriod = $leaderboardPeriod;
 
 let newsDraft = '';
+let newsSubmitting = false;
+let newsSubmitError = '';
+let newsState = { loading: false, items: [], error: '' };
 let newsItems = [];
+let newsLoading = false;
+let newsError = '';
+
+$: newsState = $newsFeed || { loading: false, items: [], error: '' };
+$: newsItems = newsState.items || [];
+$: newsLoading = newsState.loading || false;
+$: newsError = newsState.error || '';
 $: globalStatsState = $globalStats || { loading: false, data: {}, error: '' };
 $: globalLoading = globalStatsState.loading || false;
 $: globalError = globalStatsState.error || '';
@@ -71,11 +82,33 @@ function formatLeaderboardMetric(entry) {
   return `${value} дней`;
 }
 
-function submitNews() {
+function formatNewsTimestamp(value) {
+  try {
+    const date = value instanceof Date ? value : new Date(value);
+    return date.toLocaleString('ru-RU', {
+      day: '2-digit',
+      month: 'long',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch (_) {
+    return '';
+  }
+}
+
+async function submitNews() {
   const text = newsDraft.trim();
-  if (!text) return;
-  newsItems = [{ id: Date.now(), text, createdAt: new Date() }, ...newsItems].slice(0, 8);
-  newsDraft = '';
+  if (!text || newsSubmitting) return;
+  newsSubmitting = true;
+  newsSubmitError = '';
+  try {
+    await publishNews(text);
+    newsDraft = '';
+  } catch (error) {
+    newsSubmitError = error?.message || 'Не удалось опубликовать новость';
+  } finally {
+    newsSubmitting = false;
+  }
 }
 
 function toggleProfileMenu() {
@@ -98,6 +131,7 @@ onMount(() => {
   refreshLeaderboard($leaderboardPeriod);
   loadUserStats();
   loadGlobalStats();
+  loadNews();
 
   window.addEventListener('click', handleClickOutside);
   window.addEventListener('closeProfileMenu', closeProfileMenu);
@@ -221,21 +255,36 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                       bind:value={newsDraft}
                       maxlength="280"
                       rows="5"
+                      disabled={newsSubmitting}
                     />
                     <div class="admin-news-actions">
                       <span class="admin-news-counter">{newsDraft.length}/280</span>
-                      <button type="submit" class="admin-news-submit" disabled={!newsDraft.trim()}>
+                      <button
+                        type="submit"
+                        class="admin-news-submit"
+                        disabled={!newsDraft.trim() || newsSubmitting}
+                        aria-busy={newsSubmitting}
+                      >
                         Опубликовать
                       </button>
                     </div>
+                    {#if newsSubmitError}
+                      <span class="admin-news-error">{newsSubmitError}</span>
+                    {/if}
                   </form>
                 {/if}
-                {#if newsItems.length}
+                {#if newsLoading}
+                  <div class="admin-news-empty">Загружаем объявления…</div>
+                {:else if newsError}
+                  <div class="admin-news-empty admin-news-error-state">
+                    Не удалось загрузить новости: {newsError}
+                  </div>
+                {:else if newsItems.length}
                   <ul class="admin-news-list">
                     {#each newsItems as item (item.id)}
                       <li>
                         <p>{item.text}</p>
-                        <span>{item.createdAt.toLocaleString()}</span>
+                        <span>{formatNewsTimestamp(item.createdAt)}</span>
                       </li>
                     {/each}
                   </ul>
@@ -708,6 +757,14 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     color: rgba(90, 67, 108, 0.6);
   }
 
+  .admin-news-error {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #d8587f;
+  }
+
   .admin-news-submit {
     border: none;
     border-radius: 999px;
@@ -771,6 +828,11 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     text-align: center;
     color: rgba(92, 74, 129, 0.6);
     box-shadow: inset 0 0 0 1px rgba(173, 149, 255, 0.12);
+  }
+
+  .admin-news-error-state {
+    color: #d8587f;
+    font-weight: 600;
   }
 
   .global-stats-panel {

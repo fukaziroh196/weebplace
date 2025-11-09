@@ -108,6 +108,25 @@ export const stats = {
   }
 };
 
+// News API
+export const news = {
+  async list(limit = 12) {
+    const params = new URLSearchParams();
+    if (limit) {
+      params.set('limit', String(limit));
+    }
+    const suffix = params.toString() ? `?${params.toString()}` : '';
+    return await apiRequest(`/news${suffix}`);
+  },
+
+  async create(text) {
+    return await apiRequest('/news', {
+      method: 'POST',
+      body: JSON.stringify({ text }),
+    });
+  }
+};
+
 // Anime Guesses API
 export const animeGuesses = {
   async getAll(date) {
