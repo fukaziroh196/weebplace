@@ -47,6 +47,9 @@ const leaderboardTabs = [
 let currentLeaderboardPeriod = 'all';
 $: currentLeaderboardPeriod = $leaderboardPeriod;
 
+let newsDraft = '';
+let newsItems = [];
+
 function changeLeaderboardPeriod(value) {
   if (currentLeaderboardPeriod === value) return;
   leaderboardPeriod.set(value);
@@ -61,6 +64,13 @@ function formatLeaderboardMetric(entry) {
   }
   const total = entry.days ?? entry.guesses ?? entry.score ?? entry.value ?? 0;
   return `${total} дней`;
+}
+
+function submitNews() {
+  const text = newsDraft.trim();
+  if (!text) return;
+  newsItems = [{ id: Date.now(), text, createdAt: new Date() }, ...newsItems].slice(0, 8);
+  newsDraft = '';
 }
 
 function toggleProfileMenu() {
@@ -127,8 +137,6 @@ const gameCards = [
   }
 ];
 
-const startGame = () => activeView.set('guessOpening');
-  
 $: achievementsToday = $userStats?.data?.achievementsToday ?? 3456;
 $: playersToday = $userStats?.data?.playersToday ?? 3456;
   
@@ -188,17 +196,61 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       <div class="page-main">
         {#if $activeView === 'home' || $activeView === 'aniquiz'}
           <main class="hero-main">
-            <section class="mode-cards">
-              {#each gameCards as card (card.title)}
-                <button class="mode-card" style={`background:${card.background};`} on:click={card.action}>
-                  <div class="mode-avatar" style={`color:${card.accent}`}>
-                    <span>{card.emoji}</span>
-                  </div>
-                  <span class="mode-label">{card.title}</span>
-                  <span class="mode-description">{card.description}</span>
-                </button>
-              {/each}
-            </section>
+            <div class="dashboard-row">
+              {#if isAdmin}
+                <section class="admin-news-panel">
+                  <header class="admin-news-header">
+                    <div>
+                      <span class="admin-news-subtitle">Новости</span>
+                      <h3 class="admin-news-title">Панель администратора</h3>
+                    </div>
+                  </header>
+                  <form class="admin-news-form" on:submit|preventDefault={submitNews}>
+                    <textarea
+                      class="admin-news-input"
+                      placeholder="Напишите объявление для игроков…"
+                      bind:value={newsDraft}
+                      maxlength="280"
+                      rows="5"
+                    />
+                    <div class="admin-news-actions">
+                      <span class="admin-news-counter">{newsDraft.length}/280</span>
+                      <button type="submit" class="admin-news-submit" disabled={!newsDraft.trim()}>
+                        Опубликовать
+                      </button>
+                    </div>
+                  </form>
+                  {#if newsItems.length}
+                    <ul class="admin-news-list">
+                      {#each newsItems as item (item.id)}
+                        <li>
+                          <p>{item.text}</p>
+                          <span>{item.createdAt.toLocaleString()}</span>
+                        </li>
+                      {/each}
+                    </ul>
+                  {:else}
+                    <div class="admin-news-empty">
+                      Пока нет объявлений. Добавьте первое сообщение.
+                    </div>
+                  {/if}
+                </section>
+              {/if}
+
+              <section class="mode-cards-wrapper">
+                <section class="mode-cards">
+                  {#each gameCards as card (card.title)}
+                    <button class="mode-card" style={`background:${card.background};`} on:click={card.action}>
+                      <div class="mode-avatar" style={`color:${card.accent}`}>
+                        <span>{card.emoji}</span>
+                      </div>
+                      <span class="mode-label">{card.title}</span>
+                      <span class="mode-description">{card.description}</span>
+                    </button>
+                  {/each}
+                </section>
+              </section>
+            </div>
           </main>
 
           <footer class="hero-footer">
@@ -492,6 +544,151 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     font-weight: 700;
   }
 
+  .dashboard-row {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .mode-cards-wrapper {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .admin-news-panel {
+    width: clamp(240px, 24vw, 320px);
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.86);
+    border-radius: 26px;
+    padding: 1.4rem;
+    box-shadow: 0 24px 58px rgba(255, 179, 214, 0.24);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    backdrop-filter: blur(18px);
+  }
+
+  .admin-news-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .admin-news-subtitle {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: rgba(122, 88, 151, 0.6);
+    font-weight: 700;
+  }
+
+  .admin-news-title {
+    margin: 0.25rem 0 0;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #7a4ba7;
+  }
+
+  .admin-news-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .admin-news-input {
+    width: 100%;
+    border: none;
+    border-radius: 18px;
+    padding: 0.85rem 1rem;
+    background: rgba(248, 242, 255, 0.9);
+    box-shadow: inset 0 0 0 1px rgba(173, 149, 255, 0.18);
+    font-size: 0.9rem;
+    color: #5b4a7a;
+    resize: none;
+  }
+
+  .admin-news-input:focus-visible {
+    outline: 2px solid rgba(149, 118, 255, 0.45);
+    outline-offset: 3px;
+  }
+
+  .admin-news-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .admin-news-counter {
+    font-size: 0.78rem;
+    color: rgba(90, 67, 108, 0.6);
+  }
+
+  .admin-news-submit {
+    border: none;
+    border-radius: 999px;
+    padding: 0.6rem 1.4rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #ff8ccc 0%, #ff6fb3 100%);
+    color: #fff;
+    box-shadow: 0 16px 32px rgba(255, 111, 179, 0.32);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  }
+
+  .admin-news-submit:disabled {
+    opacity: 0.55;
+    cursor: default;
+    box-shadow: none;
+  }
+
+  .admin-news-submit:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 22px 42px rgba(255, 111, 179, 0.38);
+  }
+
+  .admin-news-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+
+  .admin-news-list li {
+    background: rgba(250, 247, 255, 0.92);
+    border-radius: 18px;
+    padding: 0.85rem 1rem;
+    box-shadow: inset 0 0 0 1px rgba(173, 149, 255, 0.14);
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .admin-news-list li p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #5c4a81;
+  }
+
+  .admin-news-list li span {
+    font-size: 0.7rem;
+    color: rgba(92, 74, 129, 0.6);
+    letter-spacing: 0.05em;
+  }
+
+  .admin-news-empty {
+    background: rgba(250, 247, 255, 0.85);
+    border-radius: 18px;
+    padding: 1rem;
+    font-size: 0.85rem;
+    text-align: center;
+    color: rgba(92, 74, 129, 0.6);
+    box-shadow: inset 0 0 0 1px rgba(173, 149, 255, 0.12);
+  }
+
   .hero-header {
     position: sticky;
     top: clamp(1rem, 4vh, 2rem);
@@ -772,6 +969,19 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
     .leaderboard-card {
       position: static;
+    }
+
+    .dashboard-row {
+      flex-direction: column;
+    }
+
+    .admin-news-panel {
+      width: 100%;
+      order: 2;
+    }
+
+    .mode-cards-wrapper {
+      width: 100%;
     }
   }
 
