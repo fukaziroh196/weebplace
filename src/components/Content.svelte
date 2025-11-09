@@ -776,7 +776,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .global-stats-panel {
     width: clamp(240px, 25vw, 320px);
     flex-shrink: 0;
-    margin-left: clamp(1rem, 2vw, 2.6rem);
+    margin-left: clamp(1.8rem, 3vw, 4rem);
     background: rgba(255, 255, 255, 0.86);
     border-radius: 26px;
     padding: 1.4rem;
