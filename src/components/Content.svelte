@@ -29,11 +29,8 @@ onMount(async () => {
 });
 let showReplay = false;
 
-const baseMenuItems = [
-  { icon: '🍿', label: 'Угадай аниме', action: () => activeView.set('guessAnime') },
-  { icon: '📅', label: 'Повторы', action: () => openReplay() },
-  { icon: '👑', label: 'Лидерборд', action: () => activeView.set('aniquiz') }
-];
+const goToHome = () => activeView.set('home');
+const goToProfile = () => activeView.set('profile');
 
 const adminMenuItem = {
   icon: '🛠️',
@@ -41,14 +38,24 @@ const adminMenuItem = {
   action: () => activeView.set('adminQuiz')
 };
 
+const authMenuItem = {
+  icon: '🔐',
+  label: 'Войти / Регистрация',
+  action: () => goToProfile()
+};
+
+const baseMenuItems = [
+  { icon: '🍿', label: 'Угадай аниме', action: () => activeView.set('guessAnime') },
+  { icon: '📅', label: 'Повторы', action: () => openReplay() },
+  { icon: '👑', label: 'Лидерборд', action: () => activeView.set('aniquiz') },
+  authMenuItem
+];
+
 $: isAdmin = $currentUser?.role === 'admin' || $currentUser?.is_admin === 1 || $currentUser?.isAdmin === true;
 let menuItems = baseMenuItems;
 $: menuItems = isAdmin
   ? [baseMenuItems[0], adminMenuItem, ...baseMenuItems.slice(1)]
   : baseMenuItems;
-
-const goToHome = () => activeView.set('home');
-const goToProfile = () => activeView.set('profile');
 
 const gameCards = [
   {
@@ -111,9 +118,6 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
             <span class="hero-nav-label">{item.label}</span>
           </button>
         {/each}
-        <button class="hero-auth-btn" on:click={goToProfile}>
-          Войти / Регистрация
-        </button>
       </nav>
     </header>
 
@@ -336,32 +340,6 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     border-radius: 999px;
   }
 
-  .hero-auth-btn {
-    border: none;
-    border-radius: 999px;
-    padding: 0.9rem 1.9rem;
-    background: linear-gradient(135deg, #a8ccff 0%, #7fb1ff 100%);
-    color: #fff;
-    font-weight: 700;
-    font-size: 0.95rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 16px 32px rgba(123, 176, 255, 0.28);
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .hero-auth-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 22px 42px rgba(123, 176, 255, 0.34);
-  }
-
-  .hero-auth-btn:focus-visible {
-    outline: 2px solid rgba(152, 196, 255, 0.55);
-    outline-offset: 4px;
-  }
-
   .hero-banner {
     display: grid;
     grid-template-columns: auto 1fr;
@@ -550,11 +528,6 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       background: rgba(255, 218, 234, 0.42);
       padding: 0.35rem 0.8rem;
       border-radius: 16px;
-    }
-
-    .hero-auth-btn {
-      width: 100%;
-      justify-content: center;
     }
 
     .hero-main {
