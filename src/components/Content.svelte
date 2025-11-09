@@ -116,6 +116,14 @@ const gameCards = [
     background: 'linear-gradient(180deg, #ffe6f4 0%, #ffd8ee 100%)',
     emoji: '🎵',
     action: () => activeView.set('guessOpening')
+  },
+  {
+    title: 'Аниме баттлы',
+    description: 'Соревнуйся за любимый тайтл в дуэлях',
+    accent: '#9b8bff',
+    background: 'linear-gradient(180deg, #eae6ff 0%, #dcd1ff 100%)',
+    emoji: '⚔️',
+    action: () => activeView.set('guessBattle')
   }
 ];
 
@@ -347,6 +355,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .leaderboard-panel {
     width: clamp(260px, 25vw, 340px);
     flex-shrink: 0;
+    margin-left: auto;
+    padding-right: clamp(0.5rem, 2vw, 1.6rem);
   }
 
   .leaderboard-card {
@@ -724,8 +734,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .mode-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1.6rem;
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+    gap: 1.8rem;
   }
 
   .mode-card {
@@ -817,6 +827,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
     .leaderboard-panel {
       width: 100%;
+      margin-left: 0;
+      padding-right: 0;
     }
 
     .leaderboard-card {
