@@ -31,12 +31,6 @@ let profileDropdownEl;
 const goToHome = () => activeView.set('home');
 const goToProfile = () => activeView.set('profile');
 
-const adminMenuItem = {
-  icon: '🛠️',
-  label: 'Админ панель',
-  action: () => activeView.set('adminQuiz')
-};
-
 const baseMenuItems = [
   { icon: '🍿', label: 'Угадай аниме', action: () => activeView.set('guessAnime') },
   { icon: '📅', label: 'Повторы', action: () => openReplay() },
@@ -44,10 +38,7 @@ const baseMenuItems = [
 ];
 
 $: isAdmin = $currentUser?.role === 'admin' || $currentUser?.is_admin === 1 || $currentUser?.isAdmin === true;
-let menuItems = baseMenuItems;
-$: menuItems = isAdmin
-  ? [baseMenuItems[0], adminMenuItem, ...baseMenuItems.slice(1)]
-  : baseMenuItems;
+const menuItems = baseMenuItems;
 
 function toggleProfileMenu() {
   showProfileMenu = !showProfileMenu;
@@ -155,7 +146,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
           </button>
           {#if showProfileMenu}
             <div class="profile-dropdown" bind:this={profileDropdownEl}>
-              <ProfileMenu />
+              <ProfileMenu {isAdmin} />
             </div>
           {/if}
         </div>

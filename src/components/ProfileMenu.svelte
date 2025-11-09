@@ -1,7 +1,8 @@
 <script>
   import { currentUser, login, register, logout } from '../stores/authApi';
-  import { goToProfile, goToAchievements } from '../stores/ui';
+  import { goToProfile, goToAchievements, goToAdminQuiz } from '../stores/ui';
   
+  export let isAdmin = false;
   let mode = 'login'; // 'login' | 'register'
   let username = '';
   let password = '';
@@ -37,6 +38,11 @@
 
   function handleAchievementsClick() {
     goToAchievements();
+    window.dispatchEvent(new CustomEvent('closeProfileMenu'));
+  }
+  
+  function handleAdminClick() {
+    goToAdminQuiz();
     window.dispatchEvent(new CustomEvent('closeProfileMenu'));
   }
 </script>
@@ -76,6 +82,15 @@
       </svg>
       Настройки
     </button>
+    
+    {#if isAdmin}
+      <button class="menu-item" on:click={handleAdminClick}>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+          <path d="M21.21 10.78l-1.59-.13a6.51 6.51 0 0 0-.51-1.24l.96-1.27a1 1 0 0 0-.08-1.28l-1.9-1.9a1 1 0 0 0-1.28-.08l-1.27.96a6.51 6.51 0 0 0-1.24-.51l-.13-1.59A1 1 0 0 0 12.19 2h-2.38a1 1 0 0 0-1 .92l-.13 1.59a6.51 6.51 0 0 0-1.24.51l-1.27-.96a1 1 0 0 0-1.28.08l-1.9 1.9a1 1 0 0 0-.08 1.28l.96 1.27a6.51 6.51 0 0 0-.51 1.24l-1.59.13a1 1 0 0 0-.92 1v2.38a1 1 0 0 0 .92 1l1.59.13c.12.43.29.84.51 1.24l-.96 1.27a1 1 0 0 0 .08 1.28l1.9 1.9a1 1 0 0 0 1.28.08l1.27-.96c.4.22.81.39 1.24.51l.13 1.59a1 1 0 0 0 .99.92h2.38a1 1 0 0 0 1-.92l.13-1.59c.43-.12.84-.29 1.24-.51l1.27.96a1 1 0 0 0 1.28-.08l1.9-1.9a1 1 0 0 0 .08-1.28l-.96-1.27c.22-.4.39-.81.51-1.24l1.59-.13a1 1 0 0 0 .92-1V11.7a1 1 0 0 0-.92-.92zM11 15a4 4 0 1 1 4-4 4 4 0 0 1-4 4zm8.63 1.76l-1.17.1a1 1 0 0 0-.9.74 8.38 8.38 0 0 1-.82 1.95 1 1 0 0 0 .09 1.06l.71.93-1 1-1-.71a1 1 0 0 0-1.06-.09 8.38 8.38 0 0 1-1.95.82 1 1 0 0 0-.74.9l-.1 1.17h-1.41l-.1-1.17a1 1 0 0 0-.74-.9 8.38 8.38 0 0 1-1.95-.82 1 1 0 0 0-1.06.09l-1 .71-1-1 .71-.93a1 1 0 0 0 .09-1.06 8.38 8.38 0 0 1-.82-1.95 1 1 0 0 0-.9-.74l-1.17-.1v-1.41l1.17-.1a1 1 0 0 0 .9-.74 8.38 8.38 0 0 1 .82-1.95 1 1 0 0 0-.09-1.06l-.71-.93 1-1 1 .71a1 1 0 0 0 1.06.09 8.38 8.38 0 0 1 1.95-.82 1 1 0 0 0 .74-.9l.1-1.17h1.41l.1 1.17a1 1 0 0 0 .74.9 8.38 8.38 0 0 1 1.95.82 1 1 0 0 0 1.06-.09l1-.71 1 1-.71.93a1 1 0 0 0-.09 1.06 8.38 8.38 0 0 1 .82 1.95 1 1 0 0 0 .9.74l1.17.1z"/>
+        </svg>
+        Админ‑панель
+      </button>
+    {/if}
     
     <div class="menu-divider"></div>
     
