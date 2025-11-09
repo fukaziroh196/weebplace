@@ -197,14 +197,17 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
         {#if $activeView === 'home' || $activeView === 'aniquiz'}
           <main class="hero-main">
             <div class="dashboard-row">
-              {#if isAdmin}
-                <section class="admin-news-panel">
-                  <header class="admin-news-header">
-                    <div>
-                      <span class="admin-news-subtitle">Новости</span>
-                      <h3 class="admin-news-title">Панель администратора</h3>
-                    </div>
-                  </header>
+              <section class="admin-news-panel">
+                <header class="admin-news-header">
+                  <div>
+                    <span class="admin-news-subtitle">Новости</span>
+                    <h3 class="admin-news-title">Объявления проекта</h3>
+                  </div>
+                  {#if isAdmin}
+                    <span class="admin-news-role">Админ может публиковать</span>
+                  {/if}
+                </header>
+                {#if isAdmin}
                   <form class="admin-news-form" on:submit|preventDefault={submitNews}>
                     <textarea
                       class="admin-news-input"
@@ -220,22 +223,22 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                       </button>
                     </div>
                   </form>
-                  {#if newsItems.length}
-                    <ul class="admin-news-list">
-                      {#each newsItems as item (item.id)}
-                        <li>
-                          <p>{item.text}</p>
-                          <span>{item.createdAt.toLocaleString()}</span>
-                        </li>
-                      {/each}
-                    </ul>
-                  {:else}
-                    <div class="admin-news-empty">
-                      Пока нет объявлений. Добавьте первое сообщение.
-                    </div>
-                  {/if}
-                </section>
-              {/if}
+                {/if}
+                {#if newsItems.length}
+                  <ul class="admin-news-list">
+                    {#each newsItems as item (item.id)}
+                      <li>
+                        <p>{item.text}</p>
+                        <span>{item.createdAt.toLocaleString()}</span>
+                      </li>
+                    {/each}
+                  </ul>
+                {:else}
+                  <div class="admin-news-empty">
+                    Пока нет объявлений. {#if isAdmin}Добавьте первое сообщение.{:else}Администратор ещё ничего не опубликовал.{/if}
+                  </div>
+                {/if}
+              </section>
 
               <section class="mode-cards-wrapper">
                 <section class="mode-cards">
@@ -588,6 +591,17 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     font-size: 1.3rem;
     font-weight: 800;
     color: #7a4ba7;
+  }
+
+  .admin-news-role {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: rgba(122, 88, 151, 0.55);
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    background: rgba(239, 229, 255, 0.6);
+    box-shadow: inset 0 0 0 1px rgba(130, 90, 190, 0.18);
   }
 
   .admin-news-form {
