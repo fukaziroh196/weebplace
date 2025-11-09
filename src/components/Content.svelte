@@ -123,8 +123,6 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 </script>
 
   <div class="animeguess-page">
-  {#if $activeView === 'home' || $activeView === 'aniquiz'}
-
     <header class="hero-header">
       <div class="hero-logo">
         <button class="home-button" on:click={goToHome} aria-label="Главная">
@@ -164,6 +162,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       </nav>
     </header>
 
+  {#if $activeView === 'home' || $activeView === 'aniquiz'}
     <main class="hero-main">
       <section class="hero-banner">
         <div class="start-group">
