@@ -58,12 +58,11 @@ function changeLeaderboardPeriod(value) {
 
 function formatLeaderboardMetric(entry) {
   if (!entry) return '';
-  if (entry.metric === 'guesses') {
-    const total = entry.guesses ?? entry.score ?? entry.value ?? 0;
-    return `${total} угадываний`;
+  const value = entry.days ?? entry.guesses ?? entry.score ?? entry.value ?? 0;
+  if ((entry.metric || '').toLowerCase() === 'guesses') {
+    return `${value} угадываний`;
   }
-  const total = entry.days ?? entry.guesses ?? entry.score ?? entry.value ?? 0;
-  return `${total} дней`;
+  return `${value} дней`;
 }
 
 function submitNews() {
@@ -346,7 +345,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                 <li class:top={idx < 3}>
                   <div class="leaderboard-rank">{entry.rank ?? idx + 1}</div>
                   <div class="leaderboard-info">
-                    <span class="leaderboard-name">{entry.username || `Игрок ${entry.userId}`}</span>
+                    <span class="leaderboard-name">{entry.name || entry.username || `Игрок ${entry.userId ?? ''}`}</span>
                     <span class="leaderboard-metric">{formatLeaderboardMetric(entry)}</span>
                   </div>
                 </li>
@@ -398,7 +397,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .leaderboard-panel {
-    width: clamp(260px, 25vw, 340px);
+    width: clamp(320px, 30vw, 420px);
     flex-shrink: 0;
     margin-left: auto;
     padding-right: clamp(0.5rem, 2vw, 1.6rem);
