@@ -39,22 +39,45 @@ const baseMenuItems = [
 
 $: isAdmin = $currentUser?.role === 'admin' || $currentUser?.is_admin === 1 || $currentUser?.isAdmin === true;
 const menuItems = baseMenuItems;
+const leaderboardTabs = [
+  { value: 'day', label: 'День' },
+  { value: 'week', label: 'Неделя' },
+  { value: 'all', label: 'Все' }
+];
+let currentLeaderboardPeriod = 'all';
+$: currentLeaderboardPeriod = $leaderboardPeriod;
+
+function changeLeaderboardPeriod(value) {
+  if (currentLeaderboardPeriod === value) return;
+  leaderboardPeriod.set(value);
+  refreshLeaderboard(value);
+}
+
+function formatLeaderboardMetric(entry) {
+  if (!entry) return '';
+  if (entry.metric === 'guesses') {
+    const total = entry.guesses ?? entry.score ?? entry.value ?? 0;
+    return `${total} угадываний`;
+  }
+  const total = entry.days ?? entry.guesses ?? entry.score ?? entry.value ?? 0;
+  return `${total} дней`;
+}
 
 function toggleProfileMenu() {
   showProfileMenu = !showProfileMenu;
-}
+  }
 
 function closeProfileMenu() {
   showProfileMenu = false;
-}
-
+  }
+  
 function handleClickOutside(event) {
   if (!showProfileMenu) return;
   if (profileDropdownEl && profileDropdownEl.contains(event.target)) return;
   if (profileButtonEl && profileButtonEl.contains(event.target)) return;
   showProfileMenu = false;
-}
-
+  }
+  
 onMount(() => {
   refreshQuizDates();
   refreshLeaderboard($leaderboardPeriod);
@@ -63,12 +86,12 @@ onMount(() => {
   window.addEventListener('click', handleClickOutside);
   window.addEventListener('closeProfileMenu', closeProfileMenu);
 
-  return () => {
+    return () => {
     window.removeEventListener('click', handleClickOutside);
     window.removeEventListener('closeProfileMenu', closeProfileMenu);
-  };
-});
-
+    };
+  });
+  
 const gameCards = [
   {
     title: 'Угадай аниме',
@@ -97,7 +120,7 @@ const gameCards = [
 ];
 
 const startGame = () => activeView.set('guessOpening');
-
+  
 $: achievementsToday = $userStats?.data?.achievementsToday ?? 3456;
 $: playersToday = $userStats?.data?.playersToday ?? 3456;
   
@@ -153,97 +176,139 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       </nav>
     </header>
 
-  {#if $activeView === 'home' || $activeView === 'aniquiz'}
-    <main class="hero-main">
-      <section class="hero-banner">
-        <div class="start-group">
-          <button class="start-button" on:click={startGame}>Начать игру</button>
-          <div class="start-caption">Попробуй ежедневные задания и обновляй рекорды!</div>
-        </div>
-        <p class="hero-description">
-          Угадай как можно больше опенингов и соревнуйся с друзьями в ежедневных заданиях!
-        </p>
-      </section>
-
-      <section class="mode-cards">
-        {#each gameCards as card (card.title)}
-          <button class="mode-card" style={`background:${card.background};`} on:click={card.action}>
-            <div class="mode-avatar" style={`color:${card.accent}`}>
-              <span>{card.emoji}</span>
-            </div>
-            <span class="mode-label">{card.title}</span>
-            <span class="mode-description">{card.description}</span>
-          </button>
-        {/each}
-      </section>
-    </main>
-
-    <footer class="hero-footer">
-      <div class="hero-achievements">
-        <span class="hero-achievements-title">Достижения дня</span>
-        <span class="hero-achievements-value">{achievementsToday.toLocaleString()}</span>
-        <span class="hero-achievements-meta">{playersToday.toLocaleString()} пользователей сегодня</span>
-      </div>
-    </footer>
-  {:else if $activeView === 'search'}
-  <!-- Search View -->
-  <div class="mt-2">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-bold text-white">Результаты поиска</h2>
-    </div>
-    {#if $isSearching}
-      <div class="text-white/80">Идёт поиск…</div>
-    {:else if $searchResults.length}
-      <div class="grid grid-cols-5 gap-6">
-        {#each $searchResults as item}
-          <div class="bg-pink-900/50 rounded-xl backdrop-blur-sm relative w-[204px] h-[240px] overflow-hidden">
-            {#if item.image}
-              <img src={item.image} alt={item.title} class="absolute inset-0 w-full h-full object-cover opacity-90" loading="lazy" />
-            {/if}
-            <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent rounded-b-xl">
-              <h3 class="text-white font-semibold text-sm truncate">{item.title}</h3>
-              <div class="flex items-center gap-2 text-xs">
-                {#if item.score}
-                  <span class="text-pink-300">★ {item.score}</span>
-                {/if}
-                {#if item.year}
-                  <span class="text-white/70">{item.year}</span>
-                {/if}
+    <div class="page-layout">
+      <div class="page-main">
+        {#if $activeView === 'home' || $activeView === 'aniquiz'}
+          <main class="hero-main">
+            <section class="hero-banner">
+              <div class="start-group">
+                <button class="start-button" on:click={startGame}>Начать игру</button>
+                <div class="start-caption">Попробуй ежедневные задания и обновляй рекорды!</div>
               </div>
+              <p class="hero-description">
+                Угадай как можно больше опенингов и соревнуйся с друзьями в ежедневных заданиях!
+              </p>
+            </section>
+
+            <section class="mode-cards">
+              {#each gameCards as card (card.title)}
+                <button class="mode-card" style={`background:${card.background};`} on:click={card.action}>
+                  <div class="mode-avatar" style={`color:${card.accent}`}>
+                    <span>{card.emoji}</span>
+                  </div>
+                  <span class="mode-label">{card.title}</span>
+                  <span class="mode-description">{card.description}</span>
+                </button>
+              {/each}
+            </section>
+          </main>
+
+          <footer class="hero-footer">
+            <div class="hero-achievements">
+              <span class="hero-achievements-title">Достижения дня</span>
+              <span class="hero-achievements-value">{achievementsToday.toLocaleString()}</span>
+              <span class="hero-achievements-meta">{playersToday.toLocaleString()} пользователей сегодня</span>
+            </div>
+          </footer>
+        {:else if $activeView === 'search'}
+          <!-- Search View -->
+          <div class="mt-2">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-xl font-bold text-white">Результаты поиска</h2>
+            </div>
+            {#if $isSearching}
+              <div class="text-white/80">Идёт поиск…</div>
+            {:else if $searchResults.length}
+              <div class="grid grid-cols-5 gap-6">
+                {#each $searchResults as item}
+                  <div class="bg-pink-900/50 rounded-xl backdrop-blur-sm relative w-[204px] h-[240px] overflow-hidden">
+                    {#if item.image}
+                      <img src={item.image} alt={item.title} class="absolute inset-0 w-full h-full object-cover opacity-90" loading="lazy" />
+                    {/if}
+                    <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent rounded-b-xl">
+                      <h3 class="text-white font-semibold text-sm truncate">{item.title}</h3>
+                      <div class="flex items-center gap-2 text-xs">
+                        {#if item.score}
+                          <span class="text-pink-300">★ {item.score}</span>
+                        {/if}
+                        {#if item.year}
+                          <span class="text-white/70">{item.year}</span>
+                        {/if}
+                      </div>
+                    </div>
+                  </div>
+                {/each}
+              </div>
+            {:else}
+              <div class="text-white/60">Нет результатов. Измените запрос.</div>
+            {/if}
+          </div>
+        {:else if $activeView === 'details'}
+          <!-- Details removed in quiz-only mode -->
+          <div class="text-white/80 mt-4">Просмотр аниме отключён. Выберите режим в AniQuiz.</div>
+        {:else if $activeView === 'profile'}
+          <ProfileView />
+        {:else if $activeView === 'admin'}
+          <AdminPanel />
+        {:else if $activeView === 'lists'}
+          <ListsView />
+        {:else if $activeView === 'messages'}
+          <MessagesView />
+        {:else if $activeView === 'catalog'}
+          <CatalogView />
+        {:else if $activeView === 'guessAnime'}
+          <GuessAnimeView />
+        {:else if $activeView === 'guessCharacter'}
+          <GuessCharacterView />
+        {:else if $activeView === 'guessOpening'}
+          <GuessOpeningView />
+        {:else if $activeView === 'guessBattle'}
+          <BattlePackSelector />
+        {:else if $activeView === 'adminQuiz'}
+          <AdminQuizPanel />
+        {/if}
+      </div>
+
+      <aside class="leaderboard-panel">
+        <div class="leaderboard-card">
+          <div class="leaderboard-header">
+            <div>
+              <span class="leaderboard-subtitle">Топ игроков</span>
+              <h3 class="leaderboard-title">Лидерборд</h3>
+            </div>
+            <div class="leaderboard-tabs">
+              {#each leaderboardTabs as tab}
+                <button
+                  class:active={currentLeaderboardPeriod === tab.value}
+                  on:click={() => changeLeaderboardPeriod(tab.value)}
+                >
+                  {tab.label}
+                </button>
+              {/each}
             </div>
           </div>
-        {/each}
-      </div>
-    {:else}
-      <div class="text-white/60">Нет результатов. Измените запрос.</div>
-    {/if}
+          <ol class="leaderboard-list">
+            {#if $leaderboard?.length}
+              {#each $leaderboard as entry, idx (entry.userId ?? idx)}
+                <li class:top={idx < 3}>
+                  <div class="leaderboard-rank">{entry.rank ?? idx + 1}</div>
+                  <div class="leaderboard-info">
+                    <span class="leaderboard-name">{entry.username || `Игрок ${entry.userId}`}</span>
+                    <span class="leaderboard-metric">{formatLeaderboardMetric(entry)}</span>
+                  </div>
+                </li>
+              {/each}
+            {:else}
+              <li class="leaderboard-empty">Данных пока нет</li>
+            {/if}
+          </ol>
+          <div class="leaderboard-footer">Обновляется ежедневно</div>
+        </div>
+      </aside>
+    </div>
+
+    <ReplayDatesModal onClose={closeReplay} bind:open={showReplay} />
   </div>
-  {:else if $activeView === 'details'}
-  <!-- Details removed in quiz-only mode -->
-  <div class="text-white/80 mt-4">Просмотр аниме отключён. Выберите режим в AniQuiz.</div>
-  {:else if $activeView === 'profile'}
-  <ProfileView />
-  {:else if $activeView === 'admin'}
-  <AdminPanel />
-  {:else if $activeView === 'lists'}
-  <ListsView />
-  {:else if $activeView === 'messages'}
-    <MessagesView />
-  {:else if $activeView === 'catalog'}
-  <CatalogView />
-  {:else if $activeView === 'guessAnime'}
-  <GuessAnimeView />
-  {:else if $activeView === 'guessCharacter'}
-  <GuessCharacterView />
-  {:else if $activeView === 'guessOpening'}
-  <GuessOpeningView />
-            {:else if $activeView === 'guessBattle'}
-            <BattlePackSelector />
-  {:else if $activeView === 'adminQuiz'}
-  <AdminQuizPanel />
-  {/if}
-  <ReplayDatesModal onClose={closeReplay} bind:open={showReplay} />
-</div>
 
 <style>
   :global(html, body, #app) {
@@ -262,6 +327,169 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     flex-direction: column;
     padding: 3rem clamp(1.5rem, 4vw, 4rem) 3.5rem;
     box-sizing: border-box;
+  }
+
+  .page-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 2.8rem;
+  }
+
+  .page-main {
+    flex: 1;
+    min-width: 0;
+    max-width: 860px;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .leaderboard-panel {
+    width: clamp(260px, 25vw, 340px);
+    flex-shrink: 0;
+  }
+
+  .leaderboard-card {
+    position: sticky;
+    top: calc(clamp(1rem, 4vh, 2rem) + 1.2rem);
+    background: rgba(255, 255, 255, 0.82);
+    border-radius: 28px;
+    padding: 1.6rem 1.4rem;
+    box-shadow: 0 24px 60px rgba(151, 168, 255, 0.24);
+    display: flex;
+    flex-direction: column;
+    gap: 1.3rem;
+    backdrop-filter: blur(18px);
+  }
+
+  .leaderboard-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .leaderboard-subtitle {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: rgba(82, 72, 120, 0.55);
+    font-weight: 700;
+  }
+
+  .leaderboard-title {
+    margin: 0;
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: #5a4a82;
+  }
+
+  .leaderboard-tabs {
+    display: inline-flex;
+    padding: 0.25rem;
+    border-radius: 999px;
+    background: rgba(122, 108, 190, 0.12);
+    gap: 0.25rem;
+  }
+
+  .leaderboard-tabs button {
+    border: none;
+    border-radius: 999px;
+    padding: 0.42rem 0.85rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    background: transparent;
+    color: rgba(76, 63, 120, 0.55);
+    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .leaderboard-tabs button.active {
+    background: linear-gradient(135deg, #a9c0ff 0%, #7f9eff 100%);
+    color: #fff;
+    box-shadow: 0 12px 26px rgba(125, 152, 255, 0.35);
+  }
+
+  .leaderboard-tabs button:not(.active):hover {
+    color: rgba(76, 63, 120, 0.85);
+  }
+
+  .leaderboard-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .leaderboard-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: 18px;
+    background: rgba(248, 249, 255, 0.75);
+    box-shadow: inset 0 0 0 1px rgba(149, 168, 255, 0.12);
+  }
+
+  .leaderboard-list li.top {
+    background: linear-gradient(135deg, rgba(255, 235, 246, 0.85) 0%, rgba(229, 240, 255, 0.88) 100%);
+    box-shadow: inset 0 0 0 1px rgba(255, 199, 236, 0.25);
+  }
+
+  .leaderboard-rank {
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    background: rgba(136, 161, 255, 0.16);
+    color: #6a7aff;
+    font-weight: 800;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .leaderboard-list li.top .leaderboard-rank {
+    background: linear-gradient(135deg, #ffdba5 0%, #ffc875 100%);
+    color: #825b0d;
+  }
+
+  .leaderboard-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+
+  .leaderboard-name {
+    font-weight: 700;
+    color: #4e3f6f;
+    font-size: 0.92rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .leaderboard-metric {
+    font-size: 0.78rem;
+    color: rgba(78, 63, 111, 0.6);
+    letter-spacing: 0.03em;
+  }
+
+  .leaderboard-empty {
+    justify-content: center;
+    font-weight: 600;
+    color: rgba(78, 63, 111, 0.56);
+  }
+
+  .leaderboard-footer {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: rgba(78, 63, 111, 0.42);
+    font-weight: 700;
   }
 
   .hero-header {
@@ -283,7 +511,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
+    align-items: flex-start;
     gap: 3.2rem;
   }
 
@@ -490,6 +719,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     font-size: 1.01rem;
     line-height: 1.6;
     color: rgba(90, 67, 108, 0.78);
+    max-width: 520px;
   }
 
   .mode-cards {
@@ -576,6 +806,24 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     color: rgba(90, 72, 108, 0.58);
   }
 
+  @media (max-width: 1200px) {
+    .page-layout {
+      flex-direction: column;
+    }
+
+    .page-main {
+      max-width: none;
+    }
+
+    .leaderboard-panel {
+      width: 100%;
+    }
+
+    .leaderboard-card {
+      position: static;
+    }
+  }
+
   @media (max-width: 900px) {
     .animeguess-page {
       padding: 2.4rem clamp(1rem, 5vw, 2.2rem) 2.8rem;
@@ -590,6 +838,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
     .hero-main {
       gap: 2.4rem;
+      align-items: flex-start;
     }
 
     .hero-footer {
