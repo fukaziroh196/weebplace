@@ -777,6 +777,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     width: clamp(240px, 25vw, 320px);
     flex-shrink: 0;
     margin-left: auto;
+    transform: translateX(clamp(0.6rem, 1.8vw, 2.4rem));
+    will-change: transform;
     background: rgba(255, 255, 255, 0.86);
     border-radius: 26px;
     padding: 1.4rem;
@@ -1166,6 +1168,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     .global-stats-panel {
       width: 100%;
       order: 3;
+      margin-left: 0;
+      transform: none;
     }
 
     .mode-cards-wrapper {
