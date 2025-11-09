@@ -1,39 +1,9 @@
 <script>
-  import { onMount } from 'svelte';
   import Content from './components/Content.svelte';
-  import ProfileMenu from './components/ProfileMenu.svelte';
-  import { currentUser } from './stores/authApi';
-  
+
   let showTop = false;
   let scrollEl;
-  let showProfileMenu = false;
-  
-  function toggleProfileMenu() {
-    showProfileMenu = !showProfileMenu;
-  }
-  
-  function closeProfileMenu() {
-    showProfileMenu = false;
-  }
-
-  // Закрытие меню при клике вне его
-  function handleClickOutside(event) {
-    if (showProfileMenu) {
-      const dropdown = document.querySelector('.profile-dropdown');
-      const button = document.querySelector('.profile-btn');
-      if (dropdown && button && !dropdown.contains(event.target) && !button.contains(event.target)) {
-        closeProfileMenu();
-      }
-    }
-  }
-
-  onMount(() => {
-    window.addEventListener('closeProfileMenu', closeProfileMenu);
-    return () => window.removeEventListener('closeProfileMenu', closeProfileMenu);
-  });
 </script>
-
-<svelte:window on:click={handleClickOutside} />
 
 <div class="app-container">
   <!-- Верхняя бегущая строка -->
@@ -44,32 +14,6 @@
     </div>
   </div>
   
-  <!-- Шапка -->
-  <header class="app-header">
-    <div class="header-content">
-      <div class="header-left">
-        <button class="profile-btn" on:click={toggleProfileMenu}>
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-          </svg>
-          {#if $currentUser}
-            <span class="username-text">{$currentUser.username || 'Профиль'}</span>
-          {:else}
-            <span class="username-text">Профиль</span>
-          {/if}
-        </button>
-        
-        {#if showProfileMenu}
-          <div class="profile-dropdown">
-            <ProfileMenu />
-          </div>
-        {/if}
-      </div>
-      <div class="header-controls">
-      </div>
-    </div>
-  </header>
-
   <!-- Основная область -->
   <div class="main-layout">
     <!-- Content область -->
@@ -106,124 +50,6 @@
     position: relative;
     display: flex;
     flex-direction: column;
-  }
-  
-  .app-header {
-    width: 100%;
-    height: 70px;
-    flex-shrink: 0;
-    background: transparent;
-    z-index: 100;
-  }
-  
-  .header-content {
-    height: 100%;
-    padding: 0 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  
-  .header-left {
-    position: relative;
-  }
-  
-  .profile-btn {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.9);
-    border: none;
-    border-radius: 12px;
-    color: var(--accent);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-weight: 600;
-    font-size: 14px;
-  }
-  
-  .profile-btn:hover {
-    background: var(--extra);
-    color: #FFFFFF;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(139, 164, 127, 0.3);
-  }
-  
-  .username-text {
-    max-width: 150px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  
-  .profile-dropdown {
-    position: absolute;
-    top: 60px;
-    left: 0;
-    background: var(--panelStrong);
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    padding: 8px;
-    min-width: 200px;
-    z-index: 1000;
-    animation: fadeInDown 0.2s ease;
-  }
-  
-  @keyframes fadeInDown {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .app-header {
-      height: 60px;
-    }
-    
-    .header-content {
-      padding: 0 16px;
-    }
-    
-    .username-text {
-      display: none;
-    }
-    
-    .profile-btn {
-      padding: 8px;
-      width: 40px;
-      height: 40px;
-      justify-content: center;
-    }
-  }
-  
-  .header-controls {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  
-  .control-btn {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  
-  .control-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
   }
   
   .main-layout {

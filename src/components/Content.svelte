@@ -17,17 +17,16 @@
   import { leaderboard, leaderboardPeriod, refreshLeaderboard } from '../stores/leaderboard';
   import ReplayDatesModal from './ReplayDatesModal.svelte';
   import { currentUser } from '../stores/authApi';
+  import ProfileMenu from './ProfileMenu.svelte';
 
   // Quizzes-first app: remove anime viewing and banners; home shows quiz menu.
   
   // Keep search view for future quiz search (placeholder)
   
-onMount(async () => {
-  refreshQuizDates();
-  await refreshLeaderboard($leaderboardPeriod);
-  loadUserStats();
-});
 let showReplay = false;
+let showProfileMenu = false;
+let profileButtonEl;
+let profileDropdownEl;
 
 const goToHome = () => activeView.set('home');
 const goToProfile = () => activeView.set('profile');
@@ -56,6 +55,35 @@ let menuItems = baseMenuItems;
 $: menuItems = isAdmin
   ? [baseMenuItems[0], adminMenuItem, ...baseMenuItems.slice(1)]
   : baseMenuItems;
+
+function toggleProfileMenu() {
+  showProfileMenu = !showProfileMenu;
+}
+
+function closeProfileMenu() {
+  showProfileMenu = false;
+}
+
+function handleClickOutside(event) {
+  if (!showProfileMenu) return;
+  if (profileDropdownEl && profileDropdownEl.contains(event.target)) return;
+  if (profileButtonEl && profileButtonEl.contains(event.target)) return;
+  showProfileMenu = false;
+}
+
+onMount(() => {
+  refreshQuizDates();
+  refreshLeaderboard($leaderboardPeriod);
+  loadUserStats();
+
+  window.addEventListener('click', handleClickOutside);
+  window.addEventListener('closeProfileMenu', closeProfileMenu);
+
+  return () => {
+    window.removeEventListener('click', handleClickOutside);
+    window.removeEventListener('closeProfileMenu', closeProfileMenu);
+  };
+});
 
 const gameCards = [
   {
@@ -118,6 +146,28 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
             <span class="hero-nav-label">{item.label}</span>
           </button>
         {/each}
+        <div class="profile-nav-wrapper">
+          <button
+            class="profile-nav-button"
+            type="button"
+            bind:this={profileButtonEl}
+            on:click={toggleProfileMenu}
+            aria-haspopup="true"
+            aria-expanded={showProfileMenu}
+          >
+            <span class="profile-nav-avatar">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2C6.485 2 2 6.485 2 12s4.485 10 10 10 10-4.485 10-10S17.515 2 12 2zm0 3.2a3.2 3.2 0 1 1 0 6.4 3.2 3.2 0 0 1 0-6.4zm0 14.56c-2.644 0-4.984-1.355-6.4-3.424.056-2.096 4.272-3.248 6.4-3.248 2.104 0 6.344 1.152 6.4 3.248-1.416 2.069-3.756 3.424-6.4 3.424z" />
+              </svg>
+            </span>
+            <span class="profile-nav-name">{$currentUser?.username || 'Профиль'}</span>
+          </button>
+          {#if showProfileMenu}
+            <div class="profile-dropdown" bind:this={profileDropdownEl}>
+              <ProfileMenu />
+            </div>
+          {/if}
+        </div>
       </nav>
     </header>
 
@@ -340,6 +390,75 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     border-radius: 999px;
   }
 
+  .profile-nav-wrapper {
+    position: relative;
+  }
+
+  .profile-nav-button {
+    border: none;
+    border-radius: 999px;
+    padding: 0.65rem 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    background: linear-gradient(135deg, #ffffff 0%, #f2f7ff 100%);
+    color: #6a6780;
+    font-weight: 700;
+    font-size: 0.9rem;
+    box-shadow: 0 18px 32px rgba(123, 176, 255, 0.22);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+  }
+
+  .profile-nav-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 24px 44px rgba(123, 176, 255, 0.28);
+    color: #4463ff;
+  }
+
+  .profile-nav-button:focus-visible {
+    outline: 2px solid rgba(123, 176, 255, 0.45);
+    outline-offset: 4px;
+  }
+
+  .profile-nav-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(172, 205, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b85ff;
+    box-shadow: inset 0 0 0 1px rgba(123, 176, 255, 0.24);
+  }
+
+  .profile-nav-avatar svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+  }
+
+  .profile-nav-name {
+    white-space: nowrap;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .profile-dropdown {
+    position: absolute;
+    top: calc(100% + 0.8rem);
+    right: 0;
+    min-width: 260px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 26px 60px rgba(98, 127, 255, 0.22);
+    padding: 1rem;
+    z-index: 60;
+    backdrop-filter: blur(20px);
+  }
+
   .hero-banner {
     display: grid;
     grid-template-columns: auto 1fr;
@@ -528,6 +647,23 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       background: rgba(255, 218, 234, 0.42);
       padding: 0.35rem 0.8rem;
       border-radius: 16px;
+    }
+
+    .profile-nav-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .profile-nav-button {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .profile-dropdown {
+      left: 50%;
+      right: auto;
+      transform: translateX(-50%);
     }
 
     .hero-main {
