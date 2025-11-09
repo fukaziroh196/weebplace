@@ -147,7 +147,6 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
         <span class="hero-achievements-value">{achievementsToday.toLocaleString()}</span>
         <span class="hero-achievements-meta">{playersToday.toLocaleString()} пользователей сегодня</span>
       </div>
-      <button class="auth-button" on:click={goToProfile}>Войти / Регистрация</button>
     </footer>
   {:else if $activeView === 'search'}
   <!-- Search View -->
@@ -495,29 +494,6 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .hero-achievements-meta {
     font-size: 0.86rem;
     color: rgba(90, 72, 108, 0.58);
-  }
-
-  .auth-button {
-    border: none;
-    border-radius: 18px;
-    padding: 0.95rem 2rem;
-    background: linear-gradient(135deg, #9fceff 0%, #6caeff 100%);
-    color: #fff;
-    font-weight: 700;
-    font-size: 0.95rem;
-    box-shadow: 0 18px 40px rgba(109, 174, 255, 0.32);
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .auth-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 22px 46px rgba(109, 174, 255, 0.36);
-  }
-
-  .auth-button:focus-visible {
-    outline: 2px solid rgba(136, 190, 255, 0.45);
-    outline-offset: 4px;
   }
 
   @media (max-width: 900px) {
