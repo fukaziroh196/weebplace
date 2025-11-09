@@ -1158,11 +1158,11 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    gap: 3.2rem;
+    gap: 2.6rem;
   }
 
   .hero-footer {
-    margin-top: 3.2rem;
+    margin-top: 1.8rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
