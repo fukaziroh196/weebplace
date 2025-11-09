@@ -460,7 +460,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .page-main {
     flex: 1;
     min-width: 0;
-    max-width: 860px;
+    max-width: 1040px;
     display: flex;
     flex-direction: column;
     gap: 2.5rem;
@@ -618,15 +618,15 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .dashboard-row {
     display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
+    flex-wrap: nowrap;
+    gap: 1.8rem;
     align-items: flex-start;
     width: 100%;
   }
 
   .mode-cards-wrapper {
     flex: 1;
-    min-width: 320px;
+    min-width: 280px;
   }
 
   .admin-news-panel {
@@ -774,7 +774,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .global-stats-panel {
-    width: clamp(280px, 28vw, 360px);
+    width: clamp(240px, 25vw, 320px);
     flex-shrink: 0;
     background: rgba(255, 255, 255, 0.86);
     border-radius: 26px;
