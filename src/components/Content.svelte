@@ -188,16 +188,6 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       <div class="page-main">
         {#if $activeView === 'home' || $activeView === 'aniquiz'}
           <main class="hero-main">
-            <section class="hero-banner">
-              <div class="start-group">
-                <button class="start-button" on:click={startGame}>Начать игру</button>
-                <div class="start-caption">Попробуй ежедневные задания и обновляй рекорды!</div>
-              </div>
-              <p class="hero-description">
-                Угадай как можно больше опенингов и соревнуйся с друзьями в ежедневных заданиях!
-              </p>
-            </section>
-
             <section class="mode-cards">
               {#each gameCards as card (card.title)}
                 <button class="mode-card" style={`background:${card.background};`} on:click={card.action}>
@@ -681,57 +671,6 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     backdrop-filter: blur(20px);
   }
 
-  .hero-banner {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    align-items: center;
-    gap: 2.3rem;
-  }
-
-  .start-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .start-button {
-    border: none;
-    border-radius: 999px;
-    background: linear-gradient(135deg, #ff8abb 0%, #ff70aa 100%);
-    color: #fff;
-    font-size: 1.15rem;
-    font-weight: 700;
-    padding: 1.15rem 3.6rem;
-    box-shadow: 0 20px 50px rgba(255, 118, 178, 0.45);
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .start-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 26px 54px rgba(255, 120, 180, 0.48);
-  }
-
-  .start-button:focus-visible {
-    outline: 2px solid rgba(255, 182, 217, 0.55);
-    outline-offset: 4px;
-  }
-
-  .start-caption {
-    font-size: 0.92rem;
-    font-weight: 600;
-    color: rgba(90, 67, 108, 0.66);
-    letter-spacing: 0.04em;
-  }
-
-  .hero-description {
-    margin: 0;
-    font-size: 1.01rem;
-    line-height: 1.6;
-    color: rgba(90, 67, 108, 0.78);
-    max-width: 520px;
-  }
-
   .mode-cards {
     display: grid;
     grid-template-columns: repeat(2, minmax(220px, 1fr));
@@ -846,11 +785,6 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       align-items: flex-start;
       padding: 1rem 1.4rem;
       gap: 1.2rem;
-    }
-
-    .hero-main {
-      gap: 2.4rem;
-      align-items: flex-start;
     }
 
     .hero-footer {
