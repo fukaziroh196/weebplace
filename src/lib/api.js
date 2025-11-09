@@ -102,6 +102,9 @@ export const auth = {
 export const stats = {
   async me() {
     return await apiRequest('/stats/me');
+  },
+  async global() {
+    return await apiRequest('/stats/global');
   }
 };
 

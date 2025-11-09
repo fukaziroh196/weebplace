@@ -13,7 +13,7 @@
   import BattlePackSelector from './BattlePackSelector.svelte';
   import AdminQuizPanel from './AdminQuizPanel.svelte';
   import { availableQuizDates, refreshQuizDates } from '../stores/quizzes';
-  import { userStats, loadUserStats } from '../stores/stats';
+  import { userStats, loadUserStats, loadGlobalStats, globalStats } from '../stores/stats';
   import { leaderboard, leaderboardPeriod, refreshLeaderboard } from '../stores/leaderboard';
   import ReplayDatesModal from './ReplayDatesModal.svelte';
   import { currentUser } from '../stores/authApi';
@@ -49,6 +49,12 @@ $: currentLeaderboardPeriod = $leaderboardPeriod;
 
 let newsDraft = '';
 let newsItems = [];
+$: globalStatsState = $globalStats || { loading: false, data: {}, error: '' };
+$: globalLoading = globalStatsState.loading || false;
+$: globalError = globalStatsState.error || '';
+$: globalTopAnime = globalStatsState.data?.mostGuessedAnime ?? [];
+$: globalFastPlayers = globalStatsState.data?.fastestPlayers ?? [];
+$: globalRecentModes = globalStatsState.data?.recentModes ?? [];
 
 function changeLeaderboardPeriod(value) {
   if (currentLeaderboardPeriod === value) return;
@@ -91,15 +97,16 @@ onMount(() => {
   refreshQuizDates();
   refreshLeaderboard($leaderboardPeriod);
   loadUserStats();
+  loadGlobalStats();
 
   window.addEventListener('click', handleClickOutside);
   window.addEventListener('closeProfileMenu', closeProfileMenu);
 
-    return () => {
+  return () => {
     window.removeEventListener('click', handleClickOutside);
     window.removeEventListener('closeProfileMenu', closeProfileMenu);
-    };
-  });
+  };
+});
   
 const gameCards = [
   {
@@ -251,6 +258,69 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                     </button>
                   {/each}
                 </section>
+              </section>
+
+              <section class="global-stats-panel">
+                <header class="global-stats-header">
+                  <div>
+                    <span class="global-stats-subtitle">Интересные факты</span>
+                    <h3 class="global-stats-title">Статистика игр</h3>
+                  </div>
+                </header>
+                <div class="global-stats-content">
+                  {#if globalLoading}
+                    <div class="stats-empty stats-loading">Загрузка…</div>
+                  {:else}
+                    {#if globalError}
+                      <div class="stats-empty stats-error">Не удалось загрузить статистику: {globalError}</div>
+                    {/if}
+                    <div class="stats-block">
+                      <h4>Самые угадываемые аниме</h4>
+                      {#if globalTopAnime.length}
+                        <ol>
+                          {#each globalTopAnime as item (item.title)}
+                            <li>
+                              <span class="stats-label">{item.title}</span>
+                              <span class="stats-value">{item.guesses ?? item.count ?? 0}</span>
+                            </li>
+                          {/each}
+                        </ol>
+                      {:else}
+                        <div class="stats-empty">Данных пока нет</div>
+                      {/if}
+                    </div>
+                    <div class="stats-block">
+                      <h4>Скоростные игроки</h4>
+                      {#if globalFastPlayers.length}
+                        <ol>
+                          {#each globalFastPlayers as item (item.userId || item.username)}
+                            <li>
+                              <span class="stats-label">{item.username || 'Игрок'}</span>
+                              <span class="stats-value">{item.score ?? item.wins ?? 0}</span>
+                            </li>
+                          {/each}
+                        </ol>
+                      {:else}
+                        <div class="stats-empty">Нет победителей</div>
+                      {/if}
+                    </div>
+                    <div class="stats-block">
+                      <h4>Популярные режимы</h4>
+                      {#if globalRecentModes.length}
+                        <ol>
+                          {#each globalRecentModes as item (item.mode)}
+                            <li>
+                              <span class="stats-label">{item.mode}</span>
+                              <span class="stats-value">{item.plays ?? item.count ?? 0}</span>
+                            </li>
+                          {/each}
+                        </ol>
+                      {:else}
+                        <div class="stats-empty">Статистика не собрана</div>
+                      {/if}
+                    </div>
+                  {/if}
+                </div>
               </section>
             </div>
           </main>
@@ -548,6 +618,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .dashboard-row {
     display: flex;
+    flex-wrap: wrap;
     gap: 2rem;
     align-items: flex-start;
     width: 100%;
@@ -555,7 +626,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .mode-cards-wrapper {
     flex: 1;
-    min-width: 0;
+    min-width: 320px;
   }
 
   .admin-news-panel {
@@ -700,6 +771,103 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     text-align: center;
     color: rgba(92, 74, 129, 0.6);
     box-shadow: inset 0 0 0 1px rgba(173, 149, 255, 0.12);
+  }
+
+  .global-stats-panel {
+    width: clamp(280px, 28vw, 360px);
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.86);
+    border-radius: 26px;
+    padding: 1.4rem;
+    box-shadow: 0 24px 58px rgba(174, 199, 255, 0.23);
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    backdrop-filter: blur(18px);
+  }
+
+  .global-stats-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .global-stats-subtitle {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: rgba(80, 88, 151, 0.55);
+    font-weight: 700;
+  }
+
+  .global-stats-title {
+    margin: 0.25rem 0 0;
+    font-size: 1.28rem;
+    font-weight: 800;
+    color: #5860a2;
+  }
+
+  .global-stats-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+
+  .stats-block {
+    background: rgba(244, 246, 255, 0.9);
+    border-radius: 20px;
+    padding: 0.85rem 1rem;
+    box-shadow: inset 0 0 0 1px rgba(165, 180, 255, 0.16);
+  }
+
+  .stats-block h4 {
+    margin: 0 0 0.6rem;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #4e5796;
+  }
+
+  .stats-block ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .stats-block li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.86rem;
+    color: #4b3f74;
+  }
+
+  .stats-label {
+    font-weight: 600;
+    max-width: 70%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .stats-value {
+    font-weight: 700;
+    color: #6a78ff;
+  }
+
+  .stats-empty {
+    font-size: 0.8rem;
+    color: rgba(75, 63, 116, 0.55);
+  }
+
+  .stats-loading {
+    color: rgba(75, 63, 116, 0.7);
+  }
+
+  .stats-error {
+    color: #d66a6a;
   }
 
   .hero-header {
@@ -992,6 +1160,11 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     .admin-news-panel {
       width: 100%;
       order: 2;
+    }
+
+    .global-stats-panel {
+      width: 100%;
+      order: 3;
     }
 
     .mode-cards-wrapper {
