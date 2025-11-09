@@ -702,6 +702,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     backdrop-filter: blur(20px) saturation(130%);
     box-shadow: 0 24px 60px rgba(255, 158, 205, 0.28);
     margin-bottom: 2.5rem;
+    z-index: 200;
   }
 
   .hero-main {
@@ -864,7 +865,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     border-radius: 20px;
     box-shadow: 0 26px 60px rgba(98, 127, 255, 0.22);
     padding: 1rem;
-    z-index: 60;
+    z-index: 600;
     backdrop-filter: blur(20px);
   }
 
