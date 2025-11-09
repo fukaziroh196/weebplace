@@ -124,6 +124,19 @@ export const news = {
       method: 'POST',
       body: JSON.stringify({ text }),
     });
+  },
+
+  async update(id, text) {
+    return await apiRequest(`/news/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ text }),
+    });
+  },
+
+  async remove(id) {
+    return await apiRequest(`/news/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    });
   }
 };
 

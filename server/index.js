@@ -435,6 +435,92 @@ app.post('/api/news', authenticateToken, requireAdmin, (req, res) => {
   );
 });
 
+app.patch('/api/news/:id', authenticateToken, requireAdmin, (req, res) => {
+  const id = (req.params?.id || '').trim();
+  const text = (req.body?.text || '').trim();
+
+  if (!id) {
+    return res.status(400).json({ error: 'ID новости обязателен' });
+  }
+
+  if (!text) {
+    return res.status(400).json({ error: 'Текст новости не может быть пустым' });
+  }
+
+  if (text.length > 280) {
+    return res.status(400).json({ error: 'Новость слишком длинная (максимум 280 символов)' });
+  }
+
+  db.run(
+    'UPDATE project_news SET text = ?, created_at = ? WHERE id = ?',
+    [text, Date.now(), id],
+    function(err) {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+
+      if (this.changes === 0) {
+        return res.status(404).json({ error: 'Новость не найдена' });
+      }
+
+      db.get(
+        `SELECT n.id, n.text, n.created_at, n.user_id, u.username 
+         FROM project_news n 
+         LEFT JOIN users u ON u.id = n.user_id 
+         WHERE n.id = ?`,
+        [id],
+        (selectErr, row) => {
+          if (selectErr || !row) {
+            return res.status(200).json({
+              id,
+              text,
+              createdAt: Date.now(),
+              author: {
+                id: req.user.id,
+                username: req.user.username || 'Администратор'
+              }
+            });
+          }
+
+          res.json({
+            id: row.id,
+            text: row.text,
+            createdAt: row.created_at,
+            author: {
+              id: row.user_id,
+              username: row.username || 'Администратор'
+            }
+          });
+        }
+      );
+    }
+  );
+});
+
+app.delete('/api/news/:id', authenticateToken, requireAdmin, (req, res) => {
+  const id = (req.params?.id || '').trim();
+
+  if (!id) {
+    return res.status(400).json({ error: 'ID новости обязателен' });
+  }
+
+  db.run(
+    'DELETE FROM project_news WHERE id = ?',
+    [id],
+    function(err) {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+
+      if (this.changes === 0) {
+        return res.status(404).json({ error: 'Новость не найдена' });
+      }
+
+      res.json({ success: true });
+    }
+  );
+});
+
 // Загрузка картинки для "Угадай аниме" (только админ)
 app.post('/api/anime-guesses', authenticateToken, requireAdmin, upload.single('image'), (req, res) => {
   const { title, animeId, sourceId } = req.body;

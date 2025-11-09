@@ -14,7 +14,7 @@
   import AdminQuizPanel from './AdminQuizPanel.svelte';
   import { availableQuizDates, refreshQuizDates } from '../stores/quizzes';
   import { userStats, loadUserStats, loadGlobalStats, globalStats } from '../stores/stats';
-  import { newsFeed, loadNews, publishNews } from '../stores/news';
+  import { newsFeed, loadNews, publishNews, updateNews, deleteNews } from '../stores/news';
   import { leaderboard, leaderboardPeriod, refreshLeaderboard } from '../stores/leaderboard';
   import ReplayDatesModal from './ReplayDatesModal.svelte';
   import { currentUser } from '../stores/authApi';
@@ -55,6 +55,12 @@ let newsState = { loading: false, items: [], error: '' };
 let newsItems = [];
 let newsLoading = false;
 let newsError = '';
+let newsManageError = '';
+let editingNewsId = null;
+let editDraft = '';
+let editSubmitting = false;
+let editError = '';
+let deletingNewsId = null;
 
 $: newsState = $newsFeed || { loading: false, items: [], error: '' };
 $: newsItems = newsState.items || [];
@@ -101,6 +107,7 @@ async function submitNews() {
   if (!text || newsSubmitting) return;
   newsSubmitting = true;
   newsSubmitError = '';
+  newsManageError = '';
   try {
     await publishNews(text);
     newsDraft = '';
@@ -125,6 +132,66 @@ function handleClickOutside(event) {
   if (profileButtonEl && profileButtonEl.contains(event.target)) return;
   showProfileMenu = false;
   }
+
+function startEditNews(item) {
+  if (!isAdmin) return;
+  editingNewsId = item?.id ?? null;
+  editDraft = item?.text ?? '';
+  editError = '';
+  newsManageError = '';
+}
+
+function cancelEditNews() {
+  editingNewsId = null;
+  editDraft = '';
+  editError = '';
+}
+
+async function submitEditNews() {
+  if (!isAdmin || !editingNewsId || editSubmitting) return;
+  const payload = editDraft.trim();
+  if (!payload) {
+    editError = 'Текст новости не может быть пустым';
+    return;
+  }
+
+  editSubmitting = true;
+  editError = '';
+  newsManageError = '';
+  try {
+    await updateNews(editingNewsId, payload);
+    cancelEditNews();
+  } catch (error) {
+    editError = error?.message || 'Не удалось обновить новость';
+  } finally {
+    editSubmitting = false;
+  }
+}
+
+async function handleDeleteNews(item) {
+  if (!isAdmin || deletingNewsId) return;
+  const id = item?.id;
+  if (!id) return;
+
+  const confirmed =
+    typeof window !== 'undefined' && typeof window.confirm === 'function'
+      ? window.confirm('Удалить объявление?')
+      : true;
+  if (!confirmed) return;
+
+  deletingNewsId = id;
+  newsManageError = '';
+  try {
+    await deleteNews(id);
+    if (editingNewsId === id) {
+      cancelEditNews();
+    }
+  } catch (error) {
+    newsManageError = error?.message || 'Не удалось удалить новость';
+  } finally {
+    deletingNewsId = null;
+  }
+}
   
 onMount(() => {
   refreshQuizDates();
@@ -280,11 +347,71 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                     Не удалось загрузить новости: {newsError}
                   </div>
                 {:else if newsItems.length}
+                  {#if newsManageError}
+                    <div class="admin-news-empty admin-news-error-state">{newsManageError}</div>
+                  {/if}
                   <ul class="admin-news-list">
                     {#each newsItems as item (item.id)}
-                      <li>
-                        <p>{item.text}</p>
-                        <span>{formatNewsTimestamp(item.createdAt)}</span>
+                      <li class:news-editing={editingNewsId === item.id}>
+                        {#if isAdmin && editingNewsId === item.id}
+                          <textarea
+                            class="admin-news-input admin-news-edit-input"
+                            bind:value={editDraft}
+                            maxlength="280"
+                            rows="4"
+                            disabled={editSubmitting}
+                          />
+                          <div class="admin-news-edit-meta">
+                            <span class="admin-news-timestamp">{formatNewsTimestamp(item.createdAt)}</span>
+                            <div class="admin-news-edit-actions">
+                              <button
+                                type="button"
+                                class="admin-news-btn admin-news-save"
+                                on:click={submitEditNews}
+                                disabled={editSubmitting || !editDraft.trim()}
+                                aria-busy={editSubmitting}
+                              >
+                                {editSubmitting ? 'Сохраняем…' : 'Сохранить'}
+                              </button>
+                              <button
+                                type="button"
+                                class="admin-news-btn admin-news-cancel"
+                                on:click={cancelEditNews}
+                                disabled={editSubmitting}
+                              >
+                                Отмена
+                              </button>
+                            </div>
+                          </div>
+                          {#if editError}
+                            <span class="admin-news-error">{editError}</span>
+                          {/if}
+                        {:else}
+                          <p>{item.text}</p>
+                          <div class="admin-news-meta">
+                            <span class="admin-news-timestamp">{formatNewsTimestamp(item.createdAt)}</span>
+                            {#if isAdmin}
+                              <div class="admin-news-controls">
+                                <button
+                                  type="button"
+                                  class="admin-news-btn"
+                                  on:click={() => startEditNews(item)}
+                                >
+                                  Редактировать
+                                </button>
+                                <button
+                                  type="button"
+                                  class="admin-news-btn admin-news-delete"
+                                  on:click={() => handleDeleteNews(item)}
+                                  disabled={deletingNewsId === item.id}
+                                  aria-busy={deletingNewsId === item.id}
+                                >
+                                  {deletingNewsId === item.id ? 'Удаляем…' : 'Удалить'}
+                                </button>
+                              </div>
+                            {/if}
+                          </div>
+                        {/if}
                       </li>
                     {/each}
                   </ul>
@@ -808,6 +935,10 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     gap: 0.45rem;
   }
 
+  .admin-news-list li.news-editing {
+    gap: 0.8rem;
+  }
+
   .admin-news-list li p {
     margin: 0;
     font-size: 0.9rem;
@@ -818,6 +949,77 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     font-size: 0.7rem;
     color: rgba(92, 74, 129, 0.6);
     letter-spacing: 0.05em;
+  }
+
+  .admin-news-meta,
+  .admin-news-edit-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .admin-news-timestamp {
+    font-size: 0.74rem;
+    color: rgba(92, 74, 129, 0.58);
+    letter-spacing: 0.05em;
+  }
+
+  .admin-news-controls,
+  .admin-news-edit-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .admin-news-btn {
+    border: none;
+    border-radius: 999px;
+    padding: 0.35rem 0.95rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: rgba(149, 118, 255, 0.14);
+    color: #6c54b2;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  .admin-news-btn:hover:not(:disabled) {
+    background: rgba(149, 118, 255, 0.22);
+    transform: translateY(-1px);
+  }
+
+  .admin-news-btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  .admin-news-delete {
+    background: rgba(240, 90, 130, 0.16);
+    color: #d8587f;
+  }
+
+  .admin-news-delete:hover:not(:disabled) {
+    background: rgba(240, 90, 130, 0.22);
+  }
+
+  .admin-news-save {
+    background: rgba(118, 205, 170, 0.2);
+    color: #29a07d;
+  }
+
+  .admin-news-save:hover:not(:disabled) {
+    background: rgba(118, 205, 170, 0.26);
+  }
+
+  .admin-news-cancel {
+    background: rgba(149, 118, 255, 0.14);
+  }
+
+  .admin-news-edit-input {
+    min-height: 4.8rem;
   }
 
   .admin-news-empty {

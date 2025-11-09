@@ -66,3 +66,38 @@ export async function publishNews(text) {
   return normalized;
 }
 
+export async function updateNews(id, text) {
+  const payload = (text || '').trim();
+  if (!payload) {
+    throw new Error('Текст новости не может быть пустым');
+  }
+
+  const updated = await newsApi.update(id, payload);
+  const normalized = {
+    ...updated,
+    createdAt: updated?.createdAt ?? updated?.created_at ?? Date.now()
+  };
+
+  newsFeed.update((state) => {
+    const items = (state?.items || []).map((item) =>
+      item.id === normalized.id ? { ...item, ...normalized } : item
+    );
+    return {
+      loading: false,
+      items,
+      error: ''
+    };
+  });
+
+  return normalized;
+}
+
+export async function deleteNews(id) {
+  await newsApi.remove(id);
+  newsFeed.update((state) => ({
+    loading: false,
+    items: (state?.items || []).filter((item) => item.id !== id),
+    error: ''
+  }));
+}
+
