@@ -37,17 +37,10 @@ const adminMenuItem = {
   action: () => activeView.set('adminQuiz')
 };
 
-const authMenuItem = {
-  icon: '🔐',
-  label: 'Войти / Регистрация',
-  action: () => goToProfile()
-};
-
 const baseMenuItems = [
   { icon: '🍿', label: 'Угадай аниме', action: () => activeView.set('guessAnime') },
   { icon: '📅', label: 'Повторы', action: () => openReplay() },
-  { icon: '👑', label: 'Лидерборд', action: () => activeView.set('aniquiz') },
-  authMenuItem
+  { icon: '👑', label: 'Лидерборд', action: () => activeView.set('aniquiz') }
 ];
 
 $: isAdmin = $currentUser?.role === 'admin' || $currentUser?.is_admin === 1 || $currentUser?.isAdmin === true;
