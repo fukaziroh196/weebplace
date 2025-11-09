@@ -1054,14 +1054,14 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .mode-cards {
     display: grid;
-    grid-template-columns: repeat(2, minmax(260px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(2, minmax(300px, 1fr));
+    gap: 2.2rem;
   }
 
   .mode-card {
     border: none;
     border-radius: 28px;
-    padding: 2.1rem 1.8rem;
+    padding: 2.3rem 2rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1251,7 +1251,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     }
 
     .mode-cards {
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.6rem;
     }
 
     .hero-achievements {
