@@ -522,7 +522,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
               <div class="leaderboard-empty">Ошибка: {$leaderboard.error}</div>
             {:else if $leaderboard.data && $leaderboard.data.length > 0}
               <ol class="leaderboard-list">
-                {#each $leaderboard.data.slice(0, 5) as entry, index (entry.id || entry.userId || index)}
+                {#each $leaderboard.data.slice(0, 6) as entry, index (entry.id || entry.userId || index)}
                   <li class:top={index === 0}>
                     <div class="leaderboard-rank">{index + 1}</div>
                     <div class="leaderboard-info">

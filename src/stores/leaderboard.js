@@ -8,7 +8,7 @@ export async function refreshLeaderboard(period = 'all') {
   try {
     leaderboard.update(state => ({ ...state, loading: true, error: '' }));
     console.log('[refreshLeaderboard] Loading for period:', period);
-    const top = await leaderboardApi.list(5, period); // Загружаем только 5 игроков
+    const top = await leaderboardApi.list(6, period); // Загружаем 6 игроков
     if (Array.isArray(top) && top.length) {
       const data = top.map((r) => ({ 
         id: r.userId || r.id || r.username,
