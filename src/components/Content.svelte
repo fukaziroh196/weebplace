@@ -623,7 +623,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    padding: 3rem clamp(1.5rem, 4vw, 4rem) 3.5rem;
+    padding: 3rem clamp(1.5rem, 4vw, 4rem) 1.5rem;
     box-sizing: border-box;
   }
 
@@ -1162,13 +1162,13 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .hero-footer {
-    margin-top: 1.8rem;
+    margin-top: 1.2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1.5rem;
     flex-wrap: wrap;
-    padding: 1.8rem 2rem;
+    padding: 1.4rem 2rem;
     border-radius: 28px;
     background: rgba(255, 255, 255, 0.78);
     box-shadow: 0 28px 60px rgba(161, 143, 255, 0.18);
@@ -1442,7 +1442,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   @media (max-width: 900px) {
     .animeguess-page {
-      padding: 2.4rem clamp(1rem, 5vw, 2.2rem) 2.8rem;
+      padding: 2.4rem clamp(1rem, 5vw, 2.2rem) 1.5rem;
     }
 
     .hero-header {
@@ -1465,7 +1465,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   @media (max-width: 560px) {
     .animeguess-page {
-      padding: 1.8rem 1rem 2.4rem;
+      padding: 1.8rem 1rem 1.2rem;
     }
 
     .hero-logo {
