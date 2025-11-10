@@ -14,11 +14,11 @@
   import AdminQuizPanel from './AdminQuizPanel.svelte';
   import { availableQuizDates, refreshQuizDates } from '../stores/quizzes';
   import { userStats, loadUserStats, loadGlobalStats, globalStats } from '../stores/stats';
-  import { newsFeed, loadNews, publishNews, updateNews, deleteNews } from '../stores/news';
   import { leaderboard, leaderboardPeriod, refreshLeaderboard } from '../stores/leaderboard';
   import ReplayDatesModal from './ReplayDatesModal.svelte';
   import { currentUser } from '../stores/authApi';
   import ProfileMenu from './ProfileMenu.svelte';
+  import { newsFeed, loadNews, publishNews, updateNews, deleteNews } from '../stores/news';
 
   // Quizzes-first app: remove anime viewing and banners; home shows quiz menu.
   
@@ -44,23 +44,21 @@ const leaderboardTabs = [
   { value: 'day', label: 'День' },
   { value: 'week', label: 'Неделя' },
   { value: 'all', label: 'Все' }
-  ];
+];
 let currentLeaderboardPeriod = 'all';
 $: currentLeaderboardPeriod = $leaderboardPeriod;
 
 let newsDraft = '';
 let newsSubmitting = false;
 let newsSubmitError = '';
+let editingNewsId = null;
+let editingNewsText = '';
+let editingSubmitting = false;
+let deletingNewsId = null;
 let newsState = { loading: false, items: [], error: '' };
 let newsItems = [];
 let newsLoading = false;
 let newsError = '';
-let newsManageError = '';
-let editingNewsId = null;
-let editDraft = '';
-let editSubmitting = false;
-let editError = '';
-let deletingNewsId = null;
 
 $: newsState = $newsFeed || { loading: false, items: [], error: '' };
 $: newsItems = newsState.items || [];
@@ -77,8 +75,8 @@ function changeLeaderboardPeriod(value) {
   if (currentLeaderboardPeriod === value) return;
   leaderboardPeriod.set(value);
   refreshLeaderboard(value);
-  }
-  
+}
+
 function formatLeaderboardMetric(entry) {
   if (!entry) return '';
   const value = entry.days ?? entry.guesses ?? entry.score ?? entry.value ?? 0;
@@ -107,21 +105,56 @@ async function submitNews() {
   if (!text || newsSubmitting) return;
   newsSubmitting = true;
   newsSubmitError = '';
-  newsManageError = '';
-    try {
+  try {
     await publishNews(text);
     newsDraft = '';
   } catch (error) {
     newsSubmitError = error?.message || 'Не удалось опубликовать новость';
-    } finally {
+  } finally {
     newsSubmitting = false;
-    }
   }
+}
+
+function startEditNews(item) {
+  editingNewsId = item.id;
+  editingNewsText = item.text;
+}
+
+function cancelEditNews() {
+  editingNewsId = null;
+  editingNewsText = '';
+}
+
+async function submitEditNews() {
+  if (!editingNewsId || !editingNewsText.trim() || editingSubmitting) return;
+  editingSubmitting = true;
+  try {
+    await updateNews(editingNewsId, editingNewsText.trim());
+    editingNewsId = null;
+    editingNewsText = '';
+  } catch (error) {
+    newsSubmitError = error?.message || 'Не удалось обновить новость';
+  } finally {
+    editingSubmitting = false;
+  }
+}
+
+async function handleDeleteNews(item) {
+  if (deletingNewsId || !confirm('Удалить это объявление?')) return;
+  deletingNewsId = item.id;
+  try {
+    await deleteNews(item.id);
+  } catch (error) {
+    newsSubmitError = error?.message || 'Не удалось удалить новость';
+  } finally {
+    deletingNewsId = null;
+  }
+}
 
 function toggleProfileMenu() {
   showProfileMenu = !showProfileMenu;
   }
-
+  
 function closeProfileMenu() {
   showProfileMenu = false;
   }
@@ -132,66 +165,6 @@ function handleClickOutside(event) {
   if (profileButtonEl && profileButtonEl.contains(event.target)) return;
   showProfileMenu = false;
   }
-
-function startEditNews(item) {
-  if (!isAdmin) return;
-  editingNewsId = item?.id ?? null;
-  editDraft = item?.text ?? '';
-  editError = '';
-  newsManageError = '';
-}
-
-function cancelEditNews() {
-  editingNewsId = null;
-  editDraft = '';
-  editError = '';
-}
-
-async function submitEditNews() {
-  if (!isAdmin || !editingNewsId || editSubmitting) return;
-  const payload = editDraft.trim();
-  if (!payload) {
-    editError = 'Текст новости не может быть пустым';
-    return;
-  }
-
-  editSubmitting = true;
-  editError = '';
-  newsManageError = '';
-  try {
-    await updateNews(editingNewsId, payload);
-    cancelEditNews();
-  } catch (error) {
-    editError = error?.message || 'Не удалось обновить новость';
-    } finally {
-    editSubmitting = false;
-    }
-  }
-
-async function handleDeleteNews(item) {
-  if (!isAdmin || deletingNewsId) return;
-  const id = item?.id;
-  if (!id) return;
-
-  const confirmed =
-    typeof window !== 'undefined' && typeof window.confirm === 'function'
-      ? window.confirm('Удалить объявление?')
-      : true;
-  if (!confirmed) return;
-
-  deletingNewsId = id;
-  newsManageError = '';
-  try {
-    await deleteNews(id);
-    if (editingNewsId === id) {
-      cancelEditNews();
-    }
-  } catch (error) {
-    newsManageError = error?.message || 'Не удалось удалить новость';
-  } finally {
-    deletingNewsId = null;
-  }
-}
   
 onMount(() => {
   refreshQuizDates();
@@ -203,11 +176,11 @@ onMount(() => {
   window.addEventListener('click', handleClickOutside);
   window.addEventListener('closeProfileMenu', closeProfileMenu);
 
-    return () => {
+  return () => {
     window.removeEventListener('click', handleClickOutside);
     window.removeEventListener('closeProfileMenu', closeProfileMenu);
-    };
-  });
+  };
+});
   
 const gameCards = [
   {
@@ -243,7 +216,7 @@ const gameCards = [
     action: () => activeView.set('guessBattle')
   }
 ];
-  
+
 $: achievementsToday = $userStats?.data?.achievementsToday ?? 3456;
 $: playersToday = $userStats?.data?.playersToday ?? 3456;
   
@@ -275,7 +248,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
           </button>
         {/each}
         <div class="profile-nav-wrapper">
-            <button
+          <button
             class="profile-nav-button"
             type="button"
             bind:this={profileButtonEl}
@@ -289,16 +262,16 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
               </svg>
             </span>
             <span class="profile-nav-name">{$currentUser?.username || 'Профиль'}</span>
-            </button>
+          </button>
           {#if showProfileMenu}
             <div class="profile-dropdown" bind:this={profileDropdownEl}>
               <ProfileMenu {isAdmin} />
-          </div>
+            </div>
           {/if}
         </div>
       </nav>
     </header>
-    
+
     <div class="page-layout">
       <div class="page-main">
         {#if $activeView === 'home' || $activeView === 'aniquiz'}
@@ -309,7 +282,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                   <div>
                     <span class="admin-news-subtitle">Новости</span>
                     <h3 class="admin-news-title">Объявления проекта</h3>
-    </div>
+                  </div>
                   {#if isAdmin}
                     <span class="admin-news-role">Админ может публиковать</span>
                   {/if}
@@ -326,15 +299,15 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                     />
                     <div class="admin-news-actions">
                       <span class="admin-news-counter">{newsDraft.length}/280</span>
-        <button
+                      <button
                         type="submit"
                         class="admin-news-submit"
                         disabled={!newsDraft.trim() || newsSubmitting}
                         aria-busy={newsSubmitting}
                       >
                         Опубликовать
-        </button>
-    </div>
+                      </button>
+                    </div>
                     {#if newsSubmitError}
                       <span class="admin-news-error">{newsSubmitError}</span>
                     {/if}
@@ -347,79 +320,72 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                     Не удалось загрузить новости: {newsError}
                   </div>
                 {:else if newsItems.length}
-                  {#if newsManageError}
-                    <div class="admin-news-empty admin-news-error-state">{newsManageError}</div>
-                  {/if}
                   <ul class="admin-news-list">
                     {#each newsItems as item (item.id)}
                       <li class:news-editing={editingNewsId === item.id}>
                         {#if isAdmin && editingNewsId === item.id}
                           <textarea
                             class="admin-news-input admin-news-edit-input"
-                            bind:value={editDraft}
+                            bind:value={editingNewsText}
                             maxlength="280"
                             rows="4"
-                            disabled={editSubmitting}
+                            disabled={editingSubmitting}
                           />
                           <div class="admin-news-edit-meta">
                             <span class="admin-news-timestamp">{formatNewsTimestamp(item.createdAt)}</span>
                             <div class="admin-news-edit-actions">
-    <button 
+                              <button
                                 type="button"
                                 class="admin-news-btn admin-news-save"
                                 on:click={submitEditNews}
-                                disabled={editSubmitting || !editDraft.trim()}
-                                aria-busy={editSubmitting}
+                                disabled={!editingNewsText.trim() || editingSubmitting}
                               >
-                                {editSubmitting ? 'Сохраняем…' : 'Сохранить'}
-    </button>
-    <button 
+                                Сохранить
+                              </button>
+                              <button
                                 type="button"
                                 class="admin-news-btn admin-news-cancel"
                                 on:click={cancelEditNews}
-                                disabled={editSubmitting}
+                                disabled={editingSubmitting}
                               >
                                 Отмена
-    </button>
-  </div>
+                              </button>
+                            </div>
                           </div>
-                          {#if editError}
-                            <span class="admin-news-error">{editError}</span>
-                          {/if}
                         {:else}
                           <p>{item.text}</p>
                           <div class="admin-news-meta">
                             <span class="admin-news-timestamp">{formatNewsTimestamp(item.createdAt)}</span>
                             {#if isAdmin}
                               <div class="admin-news-controls">
-        <button
+                                <button
                                   type="button"
                                   class="admin-news-btn"
                                   on:click={() => startEditNews(item)}
+                                  disabled={deletingNewsId === item.id}
                                 >
                                   Редактировать
                                 </button>
-        <button
+                                <button
                                   type="button"
                                   class="admin-news-btn admin-news-delete"
                                   on:click={() => handleDeleteNews(item)}
                                   disabled={deletingNewsId === item.id}
-                                  aria-busy={deletingNewsId === item.id}
                                 >
                                   {deletingNewsId === item.id ? 'Удаляем…' : 'Удалить'}
                                 </button>
-      </div>
-                {/if}
-                      </div>
-                    {/if}
+                              </div>
+                            {/if}
+                          </div>
+                        {/if}
                       </li>
-            {/each}
+                    {/each}
                   </ul>
                 {:else}
                   <div class="admin-news-empty">
                     Пока нет объявлений. {#if isAdmin}Добавьте первое сообщение.{:else}Администратор ещё ничего не опубликовал.{/if}
-      </div>
-    {/if}
+                  </div>
+                {/if}
               </section>
 
               <section class="mode-cards-wrapper">
@@ -428,11 +394,11 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                     <button class="mode-card" style={`background:${card.background};`} on:click={card.action}>
                       <div class="mode-avatar" style={`color:${card.accent}`}>
                         <span>{card.emoji}</span>
-    </div>
+                      </div>
                       <span class="mode-label">{card.title}</span>
                       <span class="mode-description">{card.description}</span>
                     </button>
-      {/each}
+                  {/each}
                 </section>
               </section>
 
@@ -441,7 +407,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                   <div>
                     <span class="global-stats-subtitle">Интересные факты</span>
                     <h3 class="global-stats-title">Статистика игр</h3>
-    </div>
+                  </div>
                 </header>
                 <div class="global-stats-content">
                   {#if globalLoading}
@@ -462,24 +428,24 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                           {/each}
                         </ol>
                       {:else}
-                        <div class="stats-empty">Данных пока нет</div>
+                        <div class="stats-empty">Нет данных</div>
                       {/if}
-          </div>
+                    </div>
                     <div class="stats-block">
                       <h4>Скоростные игроки</h4>
                       {#if globalFastPlayers.length}
                         <ol>
-                          {#each globalFastPlayers as item (item.userId || item.username)}
+                          {#each globalFastPlayers as item (item.username)}
                             <li>
-                              <span class="stats-label">{item.username || 'Игрок'}</span>
-                              <span class="stats-value">{item.score ?? item.wins ?? 0}</span>
+                              <span class="stats-label">{item.username}</span>
+                              <span class="stats-value">{item.score ?? item.time ?? 0}</span>
                             </li>
-      {/each}
+                          {/each}
                         </ol>
                       {:else}
-                        <div class="stats-empty">Нет победителей</div>
+                        <div class="stats-empty">Нет данных</div>
                       {/if}
-    </div>
+                    </div>
                     <div class="stats-block">
                       <h4>Популярные режимы</h4>
                       {#if globalRecentModes.length}
@@ -487,75 +453,29 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                           {#each globalRecentModes as item (item.mode)}
                             <li>
                               <span class="stats-label">{item.mode}</span>
-                              <span class="stats-value">{item.plays ?? item.count ?? 0}</span>
+                              <span class="stats-value">{item.count ?? 0}</span>
                             </li>
-      {/each}
+                          {/each}
                         </ol>
                       {:else}
-                        <div class="stats-empty">Статистика не собрана</div>
+                        <div class="stats-empty">Нет данных</div>
                       {/if}
-    </div>
+                    </div>
                   {/if}
-  </div>
+                </div>
               </section>
             </div>
           </main>
-
-          <footer class="hero-footer">
-            <div class="hero-achievements">
-              <span class="hero-achievements-title">Достижения дня</span>
-              <span class="hero-achievements-value">{achievementsToday.toLocaleString()}</span>
-              <span class="hero-achievements-meta">{playersToday.toLocaleString()} пользователей сегодня</span>
-    </div>
-          </footer>
-  {:else if $activeView === 'search'}
-  <!-- Search View -->
-  <div class="mt-2">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-bold text-white">Результаты поиска</h2>
-    </div>
-    {#if $isSearching}
-      <div class="text-white/80">Идёт поиск…</div>
-    {:else if $searchResults.length}
-      <div class="grid grid-cols-5 gap-6">
-        {#each $searchResults as item}
-                  <div class="bg-pink-900/50 rounded-xl backdrop-blur-sm relative w-[204px] h-[240px] overflow-hidden">
-            {#if item.image}
-              <img src={item.image} alt={item.title} class="absolute inset-0 w-full h-full object-cover opacity-90" loading="lazy" />
-            {/if}
-            <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent rounded-b-xl">
-              <h3 class="text-white font-semibold text-sm truncate">{item.title}</h3>
-              <div class="flex items-center gap-2 text-xs">
-                {#if item.score}
-                  <span class="text-pink-300">★ {item.score}</span>
-                {/if}
-                {#if item.year}
-                  <span class="text-white/70">{item.year}</span>
-                {/if}
-              </div>
-            </div>
-          </div>
-        {/each}
-      </div>
-    {:else}
-      <div class="text-white/60">Нет результатов. Измените запрос.</div>
-    {/if}
-  </div>
-  {:else if $activeView === 'details'}
-          <!-- Details removed in quiz-only mode -->
-          <div class="text-white/80 mt-4">Просмотр аниме отключён. Выберите режим в AniQuiz.</div>
-  {:else if $activeView === 'profile'}
-  <ProfileView />
-  {:else if $activeView === 'admin'}
-  <AdminPanel />
-  {:else if $activeView === 'lists'}
-  <ListsView />
-  {:else if $activeView === 'messages'}
-    <MessagesView />
-  {:else if $activeView === 'catalog'}
-  <CatalogView />
-  {:else if $activeView === 'guessAnime'}
-  <GuessAnimeView />
+        {:else if $activeView === 'profile'}
+          <ProfileView />
+        {:else if $activeView === 'lists'}
+          <ListsView />
+        {:else if $activeView === 'messages'}
+          <MessagesView />
+        {:else if $activeView === 'catalog'}
+          <CatalogView />
+        {:else if $activeView === 'guessAnime'}
+          <GuessAnimeView />
         {:else if $activeView === 'guessCharacter'}
           <GuessCharacterView />
         {:else if $activeView === 'guessOpening'}
@@ -564,45 +484,61 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
           <BattlePackSelector />
         {:else if $activeView === 'adminQuiz'}
           <AdminQuizPanel />
-  {/if}
-</div>
+        {:else if $activeView === 'admin'}
+          <AdminPanel />
+        {/if}
 
-      <aside class="leaderboard-panel">
-        <div class="leaderboard-card">
-          <div class="leaderboard-header">
-            <div>
+        {#if $activeView === 'home' || $activeView === 'aniquiz'}
+          <footer class="hero-footer">
+            <div class="hero-achievements">
+              <span class="hero-achievements-title">Достижения дня</span>
+              <span class="hero-achievements-value">{achievementsToday.toLocaleString()}</span>
+              <span class="hero-achievements-meta">{playersToday.toLocaleString()} пользователей сегодня</span>
+            </div>
+          </footer>
+        {/if}
+      </div>
+
+      {#if $activeView === 'home' || $activeView === 'aniquiz'}
+        <aside class="leaderboard-panel">
+          <div class="leaderboard-card">
+            <div class="leaderboard-header">
               <span class="leaderboard-subtitle">Топ игроков</span>
-              <h3 class="leaderboard-title">Лидерборд</h3>
+              <h2 class="leaderboard-title">Лидерборд</h2>
+              <div class="leaderboard-tabs">
+                {#each leaderboardTabs as tab (tab.value)}
+                  <button
+                    class:active={currentLeaderboardPeriod === tab.value}
+                    on:click={() => changeLeaderboardPeriod(tab.value)}
+                  >
+                    {tab.label}
+                  </button>
+                {/each}
+              </div>
             </div>
-            <div class="leaderboard-tabs">
-              {#each leaderboardTabs as tab}
-                <button
-                  class:active={currentLeaderboardPeriod === tab.value}
-                  on:click={() => changeLeaderboardPeriod(tab.value)}
-                >
-                  {tab.label}
-                </button>
-              {/each}
-            </div>
-          </div>
-          <ol class="leaderboard-list">
-            {#if $leaderboard?.length}
-              {#each $leaderboard as entry, idx (entry.userId ?? idx)}
-                <li class:top={idx < 3}>
-                  <div class="leaderboard-rank">{entry.rank ?? idx + 1}</div>
-                  <div class="leaderboard-info">
-                    <span class="leaderboard-name">{entry.name || entry.username || `Игрок ${entry.userId ?? ''}`}</span>
-                    <span class="leaderboard-metric">{formatLeaderboardMetric(entry)}</span>
-                  </div>
-                </li>
-              {/each}
+            {#if $leaderboard.loading}
+              <div class="leaderboard-empty">Загрузка…</div>
+            {:else if $leaderboard.error}
+              <div class="leaderboard-empty">Ошибка: {$leaderboard.error}</div>
+            {:else if $leaderboard.data && $leaderboard.data.length > 0}
+              <ol class="leaderboard-list">
+                {#each $leaderboard.data.slice(0, 5) as entry, index (entry.id || entry.userId || index)}
+                  <li class:top={index === 0}>
+                    <div class="leaderboard-rank">{index + 1}</div>
+                    <div class="leaderboard-info">
+                      <div class="leaderboard-name">{entry.name || entry.username || 'Игрок'}</div>
+                      <div class="leaderboard-metric">{formatLeaderboardMetric(entry)}</div>
+                    </div>
+                  </li>
+                {/each}
+              </ol>
             {:else}
-              <li class="leaderboard-empty">Данных пока нет</li>
+              <div class="leaderboard-empty">Нет данных</div>
             {/if}
-          </ol>
-          <div class="leaderboard-footer">Обновляется ежедневно</div>
-        </div>
-      </aside>
+            <div class="leaderboard-footer">Обновляется ежедневно</div>
+          </div>
+        </aside>
+      {/if}
     </div>
 
     <ReplayDatesModal onClose={closeReplay} bind:open={showReplay} />
@@ -623,27 +559,27 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    padding: 3rem clamp(1.5rem, 4vw, 4rem) 1.5rem;
+    padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 4vw, 4rem) clamp(0.75rem, 2vw, 1.5rem);
     box-sizing: border-box;
   }
 
   .page-layout {
     display: flex;
     align-items: flex-start;
-    gap: 2.8rem;
+    gap: clamp(1rem, 2.5vw, 2.8rem);
   }
 
   .page-main {
     flex: 1;
     min-width: 0;
-    max-width: 1180px;
+    max-width: clamp(600px, 62vw, 1180px);
     display: flex;
     flex-direction: column;
-    gap: 2.5rem;
+    gap: clamp(1.2rem, 2.5vw, 2.5rem);
   }
 
   .leaderboard-panel {
-    width: clamp(320px, 30vw, 420px);
+    width: clamp(260px, 28vw, 420px);
     flex-shrink: 0;
     margin-left: auto;
     padding-right: clamp(0.5rem, 2vw, 1.6rem);
@@ -651,25 +587,25 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .leaderboard-card {
     position: sticky;
-    top: calc(clamp(1rem, 4vh, 2rem) + 1.2rem);
+    top: calc(clamp(0.8rem, 3vh, 2rem) + clamp(0.8rem, 1.5vw, 1.2rem));
     background: rgba(255, 255, 255, 0.82);
-    border-radius: 28px;
-    padding: 1.6rem 1.4rem;
-    box-shadow: 0 24px 60px rgba(151, 168, 255, 0.24);
+    border-radius: clamp(20px, 2.5vw, 28px);
+    padding: clamp(1rem, 2vw, 1.6rem) clamp(0.9rem, 1.8vw, 1.4rem);
+    box-shadow: 0 clamp(16px, 2.5vw, 24px) clamp(40px, 6vw, 60px) rgba(151, 168, 255, 0.24);
     display: flex;
     flex-direction: column;
-    gap: 1.3rem;
+    gap: clamp(0.9rem, 1.8vw, 1.3rem);
     backdrop-filter: blur(18px);
   }
 
   .leaderboard-header {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: clamp(0.6rem, 1.2vw, 1rem);
   }
 
   .leaderboard-subtitle {
-    font-size: 0.78rem;
+    font-size: clamp(0.65rem, 0.9vw, 0.78rem);
     text-transform: uppercase;
     letter-spacing: 0.18em;
     color: rgba(82, 72, 120, 0.55);
@@ -678,24 +614,24 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .leaderboard-title {
     margin: 0;
-    font-size: 1.45rem;
+    font-size: clamp(1.1rem, 2vw, 1.45rem);
     font-weight: 800;
     color: #5a4a82;
   }
 
   .leaderboard-tabs {
     display: inline-flex;
-    padding: 0.25rem;
+    padding: clamp(0.2rem, 0.3vw, 0.25rem);
     border-radius: 999px;
     background: rgba(122, 108, 190, 0.12);
-    gap: 0.25rem;
+    gap: clamp(0.2rem, 0.3vw, 0.25rem);
   }
 
   .leaderboard-tabs button {
     border: none;
     border-radius: 999px;
-    padding: 0.42rem 0.85rem;
-    font-size: 0.75rem;
+    padding: clamp(0.35rem, 0.7vw, 0.42rem) clamp(0.7rem, 1.1vw, 0.85rem);
+    font-size: clamp(0.65rem, 0.85vw, 0.75rem);
     font-weight: 700;
     letter-spacing: 0.06em;
     cursor: pointer;
@@ -707,7 +643,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .leaderboard-tabs button.active {
     background: linear-gradient(135deg, #a9c0ff 0%, #7f9eff 100%);
     color: #fff;
-    box-shadow: 0 12px 26px rgba(125, 152, 255, 0.35);
+    box-shadow: 0 clamp(8px, 1.5vw, 12px) clamp(18px, 3vw, 26px) rgba(125, 152, 255, 0.35);
   }
 
   .leaderboard-tabs button:not(.active):hover {
@@ -720,15 +656,15 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.85rem;
+    gap: clamp(0.6rem, 1.1vw, 0.85rem);
   }
 
   .leaderboard-list li {
     display: flex;
     align-items: center;
-    gap: 0.9rem;
-    padding: 0.7rem 0.85rem;
-    border-radius: 18px;
+    gap: clamp(0.7rem, 1.2vw, 0.9rem);
+    padding: clamp(0.55rem, 1vw, 0.7rem) clamp(0.7rem, 1.1vw, 0.85rem);
+    border-radius: clamp(14px, 2vw, 18px);
     background: rgba(248, 249, 255, 0.75);
     box-shadow: inset 0 0 0 1px rgba(149, 168, 255, 0.12);
   }
@@ -739,16 +675,17 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .leaderboard-rank {
-    width: 40px;
-    height: 40px;
-    border-radius: 14px;
+    width: clamp(32px, 4.5vw, 40px);
+    height: clamp(32px, 4.5vw, 40px);
+    border-radius: clamp(11px, 1.6vw, 14px);
     background: rgba(136, 161, 255, 0.16);
     color: #6a7aff;
     font-weight: 800;
-    font-size: 1rem;
+    font-size: clamp(0.85rem, 1.2vw, 1rem);
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
   }
 
   .leaderboard-list li.top .leaderboard-rank {
@@ -759,21 +696,22 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .leaderboard-info {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: clamp(0.2rem, 0.3vw, 0.25rem);
     min-width: 0;
+    flex: 1;
   }
 
   .leaderboard-name {
     font-weight: 700;
     color: #4e3f6f;
-    font-size: 0.92rem;
+    font-size: clamp(0.8rem, 1.1vw, 0.92rem);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
   .leaderboard-metric {
-    font-size: 0.78rem;
+    font-size: clamp(0.7rem, 0.95vw, 0.78rem);
     color: rgba(78, 63, 111, 0.6);
     letter-spacing: 0.03em;
   }
@@ -782,10 +720,12 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     justify-content: center;
     font-weight: 600;
     color: rgba(78, 63, 111, 0.56);
+    font-size: clamp(0.75rem, 1vw, 0.85rem);
+    padding: clamp(1.5rem, 3vw, 2rem) clamp(1rem, 2vw, 1.5rem);
   }
 
   .leaderboard-footer {
-    font-size: 0.72rem;
+    font-size: clamp(0.65rem, 0.85vw, 0.72rem);
     text-transform: uppercase;
     letter-spacing: 0.18em;
     color: rgba(78, 63, 111, 0.42);
@@ -795,26 +735,26 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .dashboard-row {
     display: flex;
     flex-wrap: nowrap;
-    gap: 1.8rem;
+    gap: clamp(1.2rem, 2.2vw, 1.8rem);
     align-items: flex-start;
     width: 100%;
   }
 
   .mode-cards-wrapper {
     flex: 1;
-    min-width: 280px;
+    min-width: clamp(240px, 25vw, 280px);
   }
 
   .admin-news-panel {
-    width: clamp(240px, 24vw, 320px);
+    width: clamp(220px, 24vw, 320px);
     flex-shrink: 0;
     background: rgba(255, 255, 255, 0.86);
-    border-radius: 26px;
-    padding: 1.4rem;
-    box-shadow: 0 24px 58px rgba(255, 179, 214, 0.24);
+    border-radius: clamp(20px, 2.8vw, 26px);
+    padding: clamp(1rem, 1.8vw, 1.4rem);
+    box-shadow: 0 clamp(18px, 2.8vw, 24px) clamp(42px, 6.5vw, 58px) rgba(255, 179, 214, 0.24);
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: clamp(0.8rem, 1.2vw, 1rem);
     backdrop-filter: blur(18px);
   }
 
@@ -822,10 +762,12 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: clamp(0.5rem, 1vw, 0.8rem);
+    flex-wrap: wrap;
   }
 
   .admin-news-subtitle {
-    font-size: 0.72rem;
+    font-size: clamp(0.65rem, 0.85vw, 0.72rem);
     text-transform: uppercase;
     letter-spacing: 0.2em;
     color: rgba(122, 88, 151, 0.6);
@@ -833,61 +775,64 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .admin-news-title {
-    margin: 0.25rem 0 0;
-    font-size: 1.3rem;
+    margin: clamp(0.2rem, 0.3vw, 0.25rem) 0 0;
+    font-size: clamp(1.1rem, 1.8vw, 1.3rem);
     font-weight: 800;
     color: #7a4ba7;
   }
 
   .admin-news-role {
-    font-size: 0.7rem;
+    font-size: clamp(0.65rem, 0.85vw, 0.7rem);
     font-weight: 700;
     letter-spacing: 0.08em;
     color: rgba(122, 88, 151, 0.55);
-    padding: 0.35rem 0.75rem;
+    padding: clamp(0.3rem, 0.5vw, 0.35rem) clamp(0.6rem, 1vw, 0.75rem);
     border-radius: 999px;
     background: rgba(239, 229, 255, 0.6);
     box-shadow: inset 0 0 0 1px rgba(130, 90, 190, 0.18);
+    white-space: nowrap;
   }
 
   .admin-news-form {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: clamp(0.6rem, 1vw, 0.75rem);
   }
 
   .admin-news-input {
     width: 100%;
     border: none;
-    border-radius: 18px;
-    padding: 0.85rem 1rem;
+    border-radius: clamp(14px, 2vw, 18px);
+    padding: clamp(0.7rem, 1.1vw, 0.85rem) clamp(0.8rem, 1.2vw, 1rem);
     background: rgba(248, 242, 255, 0.9);
     box-shadow: inset 0 0 0 1px rgba(173, 149, 255, 0.18);
-    font-size: 0.9rem;
+    font-size: clamp(0.8rem, 1.1vw, 0.9rem);
     color: #5b4a7a;
     resize: none;
+    font-family: inherit;
   }
 
   .admin-news-input:focus-visible {
-    outline: 2px solid rgba(149, 118, 255, 0.45);
-    outline-offset: 3px;
+    outline: clamp(1.5px, 0.25vw, 2px) solid rgba(149, 118, 255, 0.45);
+    outline-offset: clamp(2px, 0.4vw, 3px);
   }
 
   .admin-news-actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: clamp(0.5rem, 1vw, 0.8rem);
   }
 
   .admin-news-counter {
-    font-size: 0.78rem;
+    font-size: clamp(0.7rem, 0.95vw, 0.78rem);
     color: rgba(90, 67, 108, 0.6);
   }
 
   .admin-news-error {
     display: block;
-    margin-top: 0.35rem;
-    font-size: 0.78rem;
+    margin-top: clamp(0.3rem, 0.5vw, 0.35rem);
+    font-size: clamp(0.7rem, 0.95vw, 0.78rem);
     font-weight: 600;
     color: #d8587f;
   }
@@ -895,14 +840,15 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .admin-news-submit {
     border: none;
     border-radius: 999px;
-    padding: 0.6rem 1.4rem;
-    font-size: 0.82rem;
+    padding: clamp(0.5rem, 0.85vw, 0.6rem) clamp(1.1rem, 1.8vw, 1.4rem);
+    font-size: clamp(0.75rem, 1vw, 0.82rem);
     font-weight: 700;
     background: linear-gradient(135deg, #ff8ccc 0%, #ff6fb3 100%);
     color: #fff;
-    box-shadow: 0 16px 32px rgba(255, 111, 179, 0.32);
+    box-shadow: 0 clamp(12px, 2vw, 16px) clamp(24px, 3.5vw, 32px) rgba(255, 111, 179, 0.32);
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    white-space: nowrap;
   }
 
   .admin-news-submit:disabled {
@@ -913,7 +859,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .admin-news-submit:not(:disabled):hover {
     transform: translateY(-2px);
-    box-shadow: 0 22px 42px rgba(255, 111, 179, 0.38);
+    box-shadow: 0 clamp(16px, 2.8vw, 22px) clamp(32px, 4.5vw, 42px) rgba(255, 111, 179, 0.38);
   }
 
   .admin-news-list {
@@ -922,31 +868,32 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.9rem;
+    gap: clamp(0.7rem, 1.1vw, 0.9rem);
   }
 
   .admin-news-list li {
     background: rgba(250, 247, 255, 0.92);
-    border-radius: 18px;
-    padding: 0.85rem 1rem;
+    border-radius: clamp(14px, 2vw, 18px);
+    padding: clamp(0.7rem, 1.1vw, 0.85rem) clamp(0.8rem, 1.2vw, 1rem);
     box-shadow: inset 0 0 0 1px rgba(173, 149, 255, 0.14);
     display: flex;
     flex-direction: column;
-    gap: 0.45rem;
+    gap: clamp(0.35rem, 0.6vw, 0.45rem);
   }
 
   .admin-news-list li.news-editing {
-    gap: 0.8rem;
+    gap: clamp(0.6rem, 1vw, 0.8rem);
   }
 
   .admin-news-list li p {
     margin: 0;
-    font-size: 0.9rem;
+    font-size: clamp(0.8rem, 1.1vw, 0.9rem);
     color: #5c4a81;
+    line-height: 1.5;
   }
 
   .admin-news-list li span {
-    font-size: 0.7rem;
+    font-size: clamp(0.65rem, 0.85vw, 0.7rem);
     color: rgba(92, 74, 129, 0.6);
     letter-spacing: 0.05em;
   }
@@ -956,11 +903,12 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 0.8rem;
+    gap: clamp(0.6rem, 1vw, 0.8rem);
+    flex-wrap: wrap;
   }
 
   .admin-news-timestamp {
-    font-size: 0.74rem;
+    font-size: clamp(0.65rem, 0.9vw, 0.74rem);
     color: rgba(92, 74, 129, 0.58);
     letter-spacing: 0.05em;
   }
@@ -969,14 +917,15 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .admin-news-edit-actions {
     display: flex;
     align-items: center;
-    gap: 0.45rem;
+    gap: clamp(0.35rem, 0.6vw, 0.45rem);
+    flex-wrap: wrap;
   }
 
   .admin-news-btn {
     border: none;
     border-radius: 999px;
-    padding: 0.35rem 0.95rem;
-    font-size: 0.72rem;
+    padding: clamp(0.3rem, 0.5vw, 0.35rem) clamp(0.75rem, 1.2vw, 0.95rem);
+    font-size: clamp(0.65rem, 0.85vw, 0.72rem);
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -984,6 +933,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     color: #6c54b2;
     cursor: pointer;
     transition: background 0.2s ease, transform 0.2s ease;
+    white-space: nowrap;
   }
 
   .admin-news-btn:hover:not(:disabled) {
@@ -1019,14 +969,14 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .admin-news-edit-input {
-    min-height: 4.8rem;
+    min-height: clamp(3.8rem, 6vw, 4.8rem);
   }
 
   .admin-news-empty {
     background: rgba(250, 247, 255, 0.85);
-    border-radius: 18px;
-    padding: 1rem;
-    font-size: 0.85rem;
+    border-radius: clamp(14px, 2vw, 18px);
+    padding: clamp(0.8rem, 1.2vw, 1rem);
+    font-size: clamp(0.75rem, 1vw, 0.85rem);
     text-align: center;
     color: rgba(92, 74, 129, 0.6);
     box-shadow: inset 0 0 0 1px rgba(173, 149, 255, 0.12);
@@ -1038,17 +988,17 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .global-stats-panel {
-    width: clamp(240px, 25vw, 320px);
+    width: clamp(220px, 25vw, 320px);
     flex-shrink: 0;
     margin-left: auto;
-    transform: translateX(clamp(1.5rem, 6vw, 8rem));
+    transform: translateX(clamp(1rem, 6vw, 8rem));
     background: rgba(255, 255, 255, 0.86);
-    border-radius: 26px;
-    padding: 1.4rem;
-    box-shadow: 0 24px 58px rgba(174, 199, 255, 0.23);
+    border-radius: clamp(20px, 2.8vw, 26px);
+    padding: clamp(1rem, 1.8vw, 1.4rem);
+    box-shadow: 0 clamp(18px, 2.8vw, 24px) clamp(42px, 6.5vw, 58px) rgba(174, 199, 255, 0.23);
     display: flex;
     flex-direction: column;
-    gap: 1.2rem;
+    gap: clamp(0.9rem, 1.5vw, 1.2rem);
     backdrop-filter: blur(18px);
   }
 
@@ -1059,7 +1009,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .global-stats-subtitle {
-    font-size: 0.72rem;
+    font-size: clamp(0.65rem, 0.85vw, 0.72rem);
     text-transform: uppercase;
     letter-spacing: 0.2em;
     color: rgba(80, 88, 151, 0.55);
@@ -1067,8 +1017,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .global-stats-title {
-    margin: 0.25rem 0 0;
-    font-size: 1.28rem;
+    margin: clamp(0.2rem, 0.3vw, 0.25rem) 0 0;
+    font-size: clamp(1.1rem, 1.8vw, 1.28rem);
     font-weight: 800;
     color: #5860a2;
   }
@@ -1076,19 +1026,19 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .global-stats-content {
     display: flex;
     flex-direction: column;
-    gap: 0.9rem;
+    gap: clamp(0.9rem, 1.4vw, 1.1rem);
   }
 
   .stats-block {
     background: rgba(244, 246, 255, 0.9);
-    border-radius: 20px;
-    padding: 0.7rem 0.9rem;
+    border-radius: clamp(16px, 2.2vw, 20px);
+    padding: clamp(0.7rem, 1.1vw, 0.85rem) clamp(0.8rem, 1.2vw, 1rem);
     box-shadow: inset 0 0 0 1px rgba(165, 180, 255, 0.16);
   }
 
   .stats-block h4 {
-    margin: 0 0 0.6rem;
-    font-size: 0.95rem;
+    margin: 0 0 clamp(0.45rem, 0.8vw, 0.6rem);
+    font-size: clamp(0.85rem, 1.2vw, 0.95rem);
     font-weight: 800;
     color: #4e5796;
   }
@@ -1099,14 +1049,14 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
+    gap: clamp(0.35rem, 0.6vw, 0.45rem);
   }
 
   .stats-block li {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.82rem;
+    font-size: clamp(0.75rem, 1.1vw, 0.86rem);
     color: #4b3f74;
   }
 
@@ -1124,8 +1074,10 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .stats-empty {
-    font-size: 0.8rem;
+    font-size: clamp(0.7rem, 1vw, 0.8rem);
     color: rgba(75, 63, 116, 0.55);
+    text-align: center;
+    padding: clamp(0.8rem, 1.2vw, 1rem) 0;
   }
 
   .stats-loading {
@@ -1138,18 +1090,19 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .hero-header {
     position: sticky;
-    top: clamp(1rem, 4vh, 2rem);
+    top: clamp(0.8rem, 3vh, 2rem);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: min(3vw, 2.5rem);
-    padding: 1.2rem 2rem;
-    border-radius: 28px;
+    gap: clamp(1rem, 2.5vw, 2.5rem);
+    padding: clamp(0.9rem, 1.5vw, 1.2rem) clamp(1.4rem, 2.5vw, 2rem);
+    border-radius: clamp(22px, 3vw, 28px);
     background: rgba(255, 255, 255, 0.78);
     backdrop-filter: blur(20px) saturation(130%);
-    box-shadow: 0 24px 60px rgba(255, 158, 205, 0.28);
-    margin-bottom: 2.5rem;
+    box-shadow: 0 clamp(18px, 2.8vw, 24px) clamp(45px, 7vw, 60px) rgba(255, 158, 205, 0.28);
+    margin-bottom: clamp(1.8rem, 3vw, 2.5rem);
     z-index: 200;
+    flex-wrap: wrap;
   }
 
   .hero-main {
@@ -1158,59 +1111,66 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    gap: 2.6rem;
+    gap: clamp(1.8rem, 3vw, 2.6rem);
   }
 
   .hero-footer {
-    margin-top: 1.2rem;
+    margin-top: clamp(0.9rem, 1.5vw, 1.2rem);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1.5rem;
+    gap: clamp(1rem, 1.8vw, 1.5rem);
     flex-wrap: wrap;
-    padding: 1.4rem 2rem;
-    border-radius: 28px;
+    padding: clamp(1rem, 1.8vw, 1.4rem) clamp(1.4rem, 2.5vw, 2rem);
+    border-radius: clamp(22px, 3vw, 28px);
     background: rgba(255, 255, 255, 0.78);
-    box-shadow: 0 28px 60px rgba(161, 143, 255, 0.18);
+    box-shadow: 0 clamp(20px, 3.5vw, 28px) clamp(45px, 7vw, 60px) rgba(161, 143, 255, 0.18);
   }
 
   .hero-logo {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: clamp(0.7rem, 1.2vw, 1rem);
   }
 
   .home-button {
-    width: 58px;
-    height: 58px;
-    border-radius: 20px;
+    width: clamp(48px, 6vw, 58px);
+    height: clamp(48px, 6vw, 58px);
+    border-radius: clamp(16px, 2.2vw, 20px);
     border: none;
     cursor: pointer;
-    font-size: 1.75rem;
+    font-size: clamp(1.4rem, 2.2vw, 1.75rem);
     display: flex;
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, #ffd6ec 0%, #ffb9df 100%);
-    box-shadow: 0 18px 35px rgba(255, 158, 205, 0.35);
+    box-shadow: 0 clamp(14px, 2.5vw, 18px) clamp(28px, 4.5vw, 35px) rgba(255, 158, 205, 0.35);
     color: #ff6aa3;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .home-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 clamp(16px, 2.8vw, 20px) clamp(32px, 5vw, 40px) rgba(255, 158, 205, 0.4);
   }
 
   .home-button:focus-visible {
-    outline: 2px solid rgba(255, 118, 186, 0.5);
-    outline-offset: 4px;
+    outline: clamp(1.5px, 0.25vw, 2px) solid rgba(255, 118, 186, 0.5);
+    outline-offset: clamp(3px, 0.5vw, 4px);
   }
 
   .hero-title {
-    font-size: 2.25rem;
+    font-size: clamp(1.6rem, 2.8vw, 2.25rem);
     font-weight: 800;
     color: #ff74ad;
     letter-spacing: 0.02em;
+    white-space: nowrap;
   }
 
   .hero-nav {
     display: flex;
     align-items: center;
-    gap: 1.3rem;
+    gap: clamp(0.9rem, 1.6vw, 1.3rem);
     flex-wrap: wrap;
   }
 
@@ -1220,11 +1180,11 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.35rem;
+    gap: clamp(0.25rem, 0.45vw, 0.35rem);
     cursor: pointer;
     color: #8d7aa1;
     font-weight: 600;
-    font-size: 0.82rem;
+    font-size: clamp(0.7rem, 1vw, 0.82rem);
     letter-spacing: 0.04em;
     transition: transform 0.2s ease, color 0.2s ease;
   }
@@ -1235,15 +1195,15 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .hero-nav-item:focus-visible {
-    outline: 2px solid rgba(255, 118, 186, 0.4);
-    outline-offset: 4px;
+    outline: clamp(1.5px, 0.25vw, 2px) solid rgba(255, 118, 186, 0.4);
+    outline-offset: clamp(3px, 0.5vw, 4px);
   }
 
   .hero-nav-icon {
-    font-size: 1.2rem;
+    font-size: clamp(1rem, 1.5vw, 1.2rem);
     background: rgba(255, 201, 229, 0.45);
     color: #ff78b4;
-    padding: 0.38rem 0.62rem;
+    padding: clamp(0.3rem, 0.5vw, 0.38rem) clamp(0.5rem, 0.8vw, 0.62rem);
     border-radius: 999px;
   }
 
@@ -1254,150 +1214,154 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .profile-nav-button {
     border: none;
     border-radius: 999px;
-    padding: 0.65rem 1.4rem;
+    padding: clamp(0.5rem, 0.9vw, 0.65rem) clamp(1.1rem, 1.8vw, 1.4rem);
     display: flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: clamp(0.5rem, 0.9vw, 0.65rem);
     background: linear-gradient(135deg, #ffffff 0%, #f2f7ff 100%);
     color: #6a6780;
     font-weight: 700;
-    font-size: 0.9rem;
-    box-shadow: 0 18px 32px rgba(123, 176, 255, 0.22);
+    font-size: clamp(0.8rem, 1.1vw, 0.9rem);
+    box-shadow: 0 clamp(14px, 2.5vw, 18px) clamp(24px, 4vw, 32px) rgba(123, 176, 255, 0.22);
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
   }
 
   .profile-nav-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 24px 44px rgba(123, 176, 255, 0.28);
+    box-shadow: 0 clamp(18px, 3vw, 24px) clamp(32px, 5.5vw, 44px) rgba(123, 176, 255, 0.28);
     color: #4463ff;
   }
 
   .profile-nav-button:focus-visible {
-    outline: 2px solid rgba(123, 176, 255, 0.45);
-    outline-offset: 4px;
+    outline: clamp(1.5px, 0.25vw, 2px) solid rgba(123, 176, 255, 0.45);
+    outline-offset: clamp(3px, 0.5vw, 4px);
   }
 
   .profile-nav-avatar {
-    width: 34px;
-    height: 34px;
+    width: clamp(28px, 3.8vw, 34px);
+    height: clamp(28px, 3.8vw, 34px);
     border-radius: 50%;
     background: rgba(172, 205, 255, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #6b85ff;
-    box-shadow: inset 0 0 0 1px rgba(123, 176, 255, 0.24);
+    flex-shrink: 0;
   }
 
   .profile-nav-avatar svg {
-    width: 18px;
-    height: 18px;
+    width: clamp(16px, 2.2vw, 20px);
+    height: clamp(16px, 2.2vw, 20px);
     fill: currentColor;
   }
 
   .profile-nav-name {
     white-space: nowrap;
-    max-width: 160px;
+    max-width: clamp(100px, 12vw, 160px);
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .profile-dropdown {
     position: absolute;
-    top: calc(100% + 0.8rem);
+    top: calc(100% + clamp(0.6rem, 1vw, 0.8rem));
     right: 0;
-    min-width: 260px;
+    min-width: clamp(220px, 28vw, 260px);
     background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    box-shadow: 0 26px 60px rgba(98, 127, 255, 0.22);
-    padding: 1rem;
+    border-radius: clamp(16px, 2.2vw, 20px);
+    box-shadow: 0 clamp(20px, 3vw, 26px) clamp(45px, 7vw, 60px) rgba(98, 127, 255, 0.22);
+    padding: clamp(0.8rem, 1.2vw, 1rem);
     z-index: 600;
     backdrop-filter: blur(20px);
   }
 
   .mode-cards {
     display: grid;
-    grid-template-columns: repeat(2, minmax(280px, 1fr));
-    gap: 1.6rem;
+    grid-template-columns: repeat(2, minmax(clamp(240px, 25vw, 280px), 1fr));
+    gap: clamp(1.4rem, 2.2vw, 2rem);
   }
 
   .mode-card {
     border: none;
-    border-radius: 28px;
-    padding: 1.7rem 1.6rem;
+    border-radius: clamp(22px, 3vw, 28px);
+    padding: clamp(1.6rem, 2.5vw, 2.15rem) clamp(1.4rem, 2.2vw, 1.9rem);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.9rem;
+    gap: clamp(0.8rem, 1.2vw, 1rem);
     text-align: center;
     cursor: pointer;
-    box-shadow: 0 18px 36px rgba(186, 173, 255, 0.16);
+    box-shadow: 0 clamp(14px, 2.5vw, 18px) clamp(28px, 4.5vw, 36px) rgba(186, 173, 255, 0.16);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
   .mode-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 24px 44px rgba(173, 152, 255, 0.22);
+    box-shadow: 0 clamp(18px, 3vw, 24px) clamp(35px, 5.5vw, 44px) rgba(173, 152, 255, 0.22);
   }
 
   .mode-card:focus-visible {
-    outline: 2px solid rgba(255, 160, 210, 0.4);
-    outline-offset: 5px;
+    outline: clamp(1.5px, 0.25vw, 2px) solid rgba(255, 160, 210, 0.4);
+    outline-offset: clamp(4px, 0.6vw, 5px);
   }
 
   .mode-avatar {
-    width: 88px;
-    height: 88px;
-    border-radius: 24px;
+    width: clamp(78px, 10.5vw, 98px);
+    height: clamp(78px, 10.5vw, 98px);
+    border-radius: clamp(18px, 2.5vw, 24px);
     background: rgba(255, 255, 255, 0.82);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 clamp(9px, 1.5vw, 12px) clamp(22px, 3.5vw, 28px) rgba(0, 0, 0, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.9rem;
+    font-size: clamp(1.6rem, 2.6vw, 2.1rem);
   }
 
   .mode-label {
-    font-size: 0.98rem;
+    font-size: clamp(0.85rem, 1.2vw, 0.98rem);
     font-weight: 800;
     color: #635075;
     letter-spacing: 0.05em;
   }
 
   .mode-description {
-    font-size: 0.82rem;
+    font-size: clamp(0.7rem, 1vw, 0.82rem);
     color: rgba(87, 70, 99, 0.62);
-    max-width: 220px;
+    max-width: clamp(180px, 22vw, 220px);
+    line-height: 1.4;
   }
 
   .hero-achievements {
     background: rgba(255, 244, 251, 0.92);
-    border-radius: 22px;
-    padding: 1rem 1.8rem;
+    border-radius: clamp(18px, 2.5vw, 22px);
+    padding: clamp(0.8rem, 1.3vw, 1rem) clamp(1.4rem, 2.2vw, 1.8rem);
     display: flex;
     align-items: center;
-    gap: 1.3rem;
-    box-shadow: 0 16px 32px rgba(255, 188, 215, 0.22);
+    gap: clamp(1rem, 1.6vw, 1.3rem);
+    box-shadow: 0 clamp(12px, 2vw, 16px) clamp(24px, 4vw, 32px) rgba(255, 188, 215, 0.22);
+    flex-wrap: wrap;
   }
 
   .hero-achievements-title {
-    font-size: 0.8rem;
+    font-size: clamp(0.7rem, 1vw, 0.8rem);
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: rgba(90, 72, 108, 0.6);
+    white-space: nowrap;
   }
 
   .hero-achievements-value {
-    font-size: 1.85rem;
+    font-size: clamp(1.4rem, 2.4vw, 1.85rem);
     font-weight: 800;
     color: #ff6ea2;
+    white-space: nowrap;
   }
 
   .hero-achievements-meta {
-    font-size: 0.86rem;
+    font-size: clamp(0.75rem, 1.1vw, 0.86rem);
     color: rgba(90, 72, 108, 0.58);
+    white-space: nowrap;
   }
 
   @media (max-width: 1200px) {
@@ -1437,35 +1401,45 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
     .mode-cards-wrapper {
       width: 100%;
+      order: 1;
+    }
+
+    .mode-cards {
+      grid-template-columns: repeat(2, minmax(clamp(200px, 35vw, 280px), 1fr));
     }
   }
 
   @media (max-width: 900px) {
     .animeguess-page {
-      padding: 2.4rem clamp(1rem, 5vw, 2.2rem) 1.5rem;
+      padding: clamp(1.2rem, 3vw, 2.4rem) clamp(0.8rem, 4vw, 2.2rem) clamp(0.6rem, 2vw, 1.5rem);
     }
 
     .hero-header {
       flex-direction: column;
       align-items: flex-start;
-      padding: 1rem 1.4rem;
-      gap: 1.2rem;
+      padding: clamp(0.8rem, 1.3vw, 1rem) clamp(1rem, 1.8vw, 1.4rem);
+      gap: clamp(0.9rem, 1.5vw, 1.2rem);
     }
 
     .hero-footer {
       flex-direction: column;
       align-items: stretch;
-      padding: 1.4rem;
+      padding: clamp(1rem, 1.8vw, 1.4rem);
     }
 
     .hero-achievements {
       justify-content: space-between;
     }
+
+    .mode-cards {
+      grid-template-columns: 1fr;
+      gap: clamp(1.2rem, 2vw, 1.6rem);
+    }
   }
 
   @media (max-width: 560px) {
     .animeguess-page {
-      padding: 1.8rem 1rem 1.2rem;
+      padding: clamp(1rem, 2.5vw, 1.8rem) clamp(0.8rem, 2vw, 1rem) clamp(0.6rem, 1.5vw, 1.2rem);
     }
 
     .hero-logo {
@@ -1486,10 +1460,10 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
     .hero-nav-item {
       flex-direction: row;
-      gap: 0.4rem;
+      gap: clamp(0.3rem, 0.5vw, 0.4rem);
       background: rgba(255, 218, 234, 0.42);
-      padding: 0.35rem 0.8rem;
-      border-radius: 16px;
+      padding: clamp(0.3rem, 0.5vw, 0.35rem) clamp(0.6rem, 1vw, 0.8rem);
+      border-radius: clamp(12px, 2vw, 16px);
     }
 
     .profile-nav-wrapper {
@@ -1515,8 +1489,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     }
 
     .mode-cards {
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 1.6rem;
+      grid-template-columns: 1fr;
+      gap: clamp(1rem, 2vw, 1.6rem);
     }
 
     .hero-achievements {
