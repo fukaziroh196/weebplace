@@ -610,11 +610,9 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
 <style>
   :global(html, body, #app) {
-    height: 100vh;
-    max-height: 100vh;
-    overflow: hidden;
+    height: 100%;
+    min-height: 100vh;
     margin: 0;
-    padding: 0;
     background: linear-gradient(180deg, #fff5f7 0%, #ffeef8 100%);
     color: #735f7e;
     font-family: "Inter", "SF Pro Display", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -622,10 +620,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .animeguess-page {
     width: 100%;
-    height: 100vh;
-    max-height: 100vh;
-    overflow-y: auto;
-    overflow-x: hidden;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     padding: 3rem clamp(1.5rem, 4vw, 4rem) 3.5rem;
