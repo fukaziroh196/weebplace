@@ -572,10 +572,11 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .page-main {
     flex: 1;
     min-width: 0;
-    max-width: clamp(600px, 62vw, 1180px);
+    max-width: clamp(600px, 65vw, 1250px);
     display: flex;
     flex-direction: column;
     gap: clamp(0.5rem, 1.2vw, 1rem);
+    overflow: visible;
   }
 
   .leaderboard-panel {
@@ -990,7 +991,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .global-stats-panel {
     width: clamp(220px, 25vw, 320px);
     flex-shrink: 0;
-    margin-left: clamp(3.5rem, 6vw, 8rem);
+    flex-grow: 0;
+    margin-left: clamp(4rem, 8vw, 12rem);
     background: rgba(255, 255, 255, 0.86);
     border-radius: clamp(20px, 2.8vw, 26px);
     padding: clamp(1rem, 1.8vw, 1.4rem);
@@ -1111,11 +1113,13 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     justify-content: flex-start;
     align-items: flex-start;
     gap: clamp(0.7rem, 1.2vw, 1rem);
+    overflow: visible;
+    width: 100%;
   }
 
   .hero-footer {
     margin-top: clamp(0.5rem, 1vw, 0.7rem);
-    margin-right: clamp(-1rem, -2vw, -1.5rem);
+    margin-right: clamp(-2rem, -2.5vw, -2.8rem);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1125,8 +1129,9 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     border-radius: clamp(22px, 3vw, 28px);
     background: rgba(255, 255, 255, 0.78);
     box-shadow: 0 clamp(20px, 3.5vw, 28px) clamp(45px, 7vw, 60px) rgba(161, 143, 255, 0.18);
-    width: calc(100% + clamp(1rem, 2vw, 1.5rem));
+    width: calc(100% + clamp(2rem, 2.5vw, 2.8rem));
     box-sizing: border-box;
+    position: relative;
   }
 
   .hero-logo {
@@ -1398,6 +1403,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       width: 100%;
       order: 3;
       margin-left: 0;
+      margin-right: 0;
     }
 
     .mode-cards-wrapper {
