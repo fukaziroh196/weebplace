@@ -590,7 +590,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     top: calc(clamp(0.2rem, 0.8vh, 0.5rem) + clamp(0.3rem, 0.6vw, 0.5rem));
     background: rgba(255, 255, 255, 0.82);
     border-radius: clamp(20px, 2.5vw, 28px);
-    padding: clamp(1rem, 2vw, 1.6rem) clamp(0.9rem, 1.8vw, 1.4rem);
+    padding: clamp(1rem, 2vw, 1.6rem) clamp(0.9rem, 1.8vw, 1.4rem) clamp(1.4rem, 2.5vw, 2rem) clamp(0.9rem, 1.8vw, 1.4rem);
     box-shadow: 0 clamp(16px, 2.5vw, 24px) clamp(40px, 6vw, 60px) rgba(151, 168, 255, 0.24);
     display: flex;
     flex-direction: column;
