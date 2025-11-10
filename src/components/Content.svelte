@@ -44,7 +44,7 @@ const leaderboardTabs = [
   { value: 'day', label: 'День' },
   { value: 'week', label: 'Неделя' },
   { value: 'all', label: 'Все' }
-];
+  ];
 let currentLeaderboardPeriod = 'all';
 $: currentLeaderboardPeriod = $leaderboardPeriod;
 
@@ -77,8 +77,8 @@ function changeLeaderboardPeriod(value) {
   if (currentLeaderboardPeriod === value) return;
   leaderboardPeriod.set(value);
   refreshLeaderboard(value);
-}
-
+  }
+  
 function formatLeaderboardMetric(entry) {
   if (!entry) return '';
   const value = entry.days ?? entry.guesses ?? entry.score ?? entry.value ?? 0;
@@ -108,15 +108,15 @@ async function submitNews() {
   newsSubmitting = true;
   newsSubmitError = '';
   newsManageError = '';
-  try {
+    try {
     await publishNews(text);
     newsDraft = '';
   } catch (error) {
     newsSubmitError = error?.message || 'Не удалось опубликовать новость';
-  } finally {
+    } finally {
     newsSubmitting = false;
+    }
   }
-}
 
 function toggleProfileMenu() {
   showProfileMenu = !showProfileMenu;
@@ -163,10 +163,10 @@ async function submitEditNews() {
     cancelEditNews();
   } catch (error) {
     editError = error?.message || 'Не удалось обновить новость';
-  } finally {
+    } finally {
     editSubmitting = false;
+    }
   }
-}
 
 async function handleDeleteNews(item) {
   if (!isAdmin || deletingNewsId) return;
@@ -203,11 +203,11 @@ onMount(() => {
   window.addEventListener('click', handleClickOutside);
   window.addEventListener('closeProfileMenu', closeProfileMenu);
 
-  return () => {
+    return () => {
     window.removeEventListener('click', handleClickOutside);
     window.removeEventListener('closeProfileMenu', closeProfileMenu);
-  };
-});
+    };
+  });
   
 const gameCards = [
   {
@@ -243,7 +243,7 @@ const gameCards = [
     action: () => activeView.set('guessBattle')
   }
 ];
-
+  
 $: achievementsToday = $userStats?.data?.achievementsToday ?? 3456;
 $: playersToday = $userStats?.data?.playersToday ?? 3456;
   
@@ -275,7 +275,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
           </button>
         {/each}
         <div class="profile-nav-wrapper">
-          <button
+            <button
             class="profile-nav-button"
             type="button"
             bind:this={profileButtonEl}
@@ -289,16 +289,16 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
               </svg>
             </span>
             <span class="profile-nav-name">{$currentUser?.username || 'Профиль'}</span>
-          </button>
+            </button>
           {#if showProfileMenu}
             <div class="profile-dropdown" bind:this={profileDropdownEl}>
               <ProfileMenu {isAdmin} />
-            </div>
+          </div>
           {/if}
         </div>
       </nav>
     </header>
-
+    
     <div class="page-layout">
       <div class="page-main">
         {#if $activeView === 'home' || $activeView === 'aniquiz'}
@@ -309,7 +309,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                   <div>
                     <span class="admin-news-subtitle">Новости</span>
                     <h3 class="admin-news-title">Объявления проекта</h3>
-                  </div>
+    </div>
                   {#if isAdmin}
                     <span class="admin-news-role">Админ может публиковать</span>
                   {/if}
@@ -326,15 +326,15 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                     />
                     <div class="admin-news-actions">
                       <span class="admin-news-counter">{newsDraft.length}/280</span>
-                      <button
+        <button
                         type="submit"
                         class="admin-news-submit"
                         disabled={!newsDraft.trim() || newsSubmitting}
                         aria-busy={newsSubmitting}
                       >
                         Опубликовать
-                      </button>
-                    </div>
+        </button>
+    </div>
                     {#if newsSubmitError}
                       <span class="admin-news-error">{newsSubmitError}</span>
                     {/if}
@@ -364,7 +364,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                           <div class="admin-news-edit-meta">
                             <span class="admin-news-timestamp">{formatNewsTimestamp(item.createdAt)}</span>
                             <div class="admin-news-edit-actions">
-                              <button
+    <button 
                                 type="button"
                                 class="admin-news-btn admin-news-save"
                                 on:click={submitEditNews}
@@ -372,16 +372,16 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                                 aria-busy={editSubmitting}
                               >
                                 {editSubmitting ? 'Сохраняем…' : 'Сохранить'}
-                              </button>
-                              <button
+    </button>
+    <button 
                                 type="button"
                                 class="admin-news-btn admin-news-cancel"
                                 on:click={cancelEditNews}
                                 disabled={editSubmitting}
                               >
                                 Отмена
-                              </button>
-                            </div>
+    </button>
+  </div>
                           </div>
                           {#if editError}
                             <span class="admin-news-error">{editError}</span>
@@ -392,14 +392,14 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                             <span class="admin-news-timestamp">{formatNewsTimestamp(item.createdAt)}</span>
                             {#if isAdmin}
                               <div class="admin-news-controls">
-                                <button
+        <button
                                   type="button"
                                   class="admin-news-btn"
                                   on:click={() => startEditNews(item)}
                                 >
                                   Редактировать
                                 </button>
-                                <button
+        <button
                                   type="button"
                                   class="admin-news-btn admin-news-delete"
                                   on:click={() => handleDeleteNews(item)}
@@ -408,18 +408,18 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                                 >
                                   {deletingNewsId === item.id ? 'Удаляем…' : 'Удалить'}
                                 </button>
-                              </div>
-                            {/if}
-                          </div>
-                        {/if}
+      </div>
+                {/if}
+                      </div>
+                    {/if}
                       </li>
-                    {/each}
+            {/each}
                   </ul>
                 {:else}
                   <div class="admin-news-empty">
                     Пока нет объявлений. {#if isAdmin}Добавьте первое сообщение.{:else}Администратор ещё ничего не опубликовал.{/if}
-                  </div>
-                {/if}
+      </div>
+    {/if}
               </section>
 
               <section class="mode-cards-wrapper">
@@ -428,11 +428,11 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                     <button class="mode-card" style={`background:${card.background};`} on:click={card.action}>
                       <div class="mode-avatar" style={`color:${card.accent}`}>
                         <span>{card.emoji}</span>
-                      </div>
+    </div>
                       <span class="mode-label">{card.title}</span>
                       <span class="mode-description">{card.description}</span>
                     </button>
-                  {/each}
+      {/each}
                 </section>
               </section>
 
@@ -441,7 +441,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                   <div>
                     <span class="global-stats-subtitle">Интересные факты</span>
                     <h3 class="global-stats-title">Статистика игр</h3>
-                  </div>
+    </div>
                 </header>
                 <div class="global-stats-content">
                   {#if globalLoading}
@@ -464,7 +464,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                       {:else}
                         <div class="stats-empty">Данных пока нет</div>
                       {/if}
-                    </div>
+          </div>
                     <div class="stats-block">
                       <h4>Скоростные игроки</h4>
                       {#if globalFastPlayers.length}
@@ -474,12 +474,12 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                               <span class="stats-label">{item.username || 'Игрок'}</span>
                               <span class="stats-value">{item.score ?? item.wins ?? 0}</span>
                             </li>
-                          {/each}
+      {/each}
                         </ol>
                       {:else}
                         <div class="stats-empty">Нет победителей</div>
                       {/if}
-                    </div>
+    </div>
                     <div class="stats-block">
                       <h4>Популярные режимы</h4>
                       {#if globalRecentModes.length}
@@ -489,14 +489,14 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                               <span class="stats-label">{item.mode}</span>
                               <span class="stats-value">{item.plays ?? item.count ?? 0}</span>
                             </li>
-                          {/each}
+      {/each}
                         </ol>
                       {:else}
                         <div class="stats-empty">Статистика не собрана</div>
                       {/if}
-                    </div>
+    </div>
                   {/if}
-                </div>
+  </div>
               </section>
             </div>
           </main>
@@ -506,56 +506,56 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
               <span class="hero-achievements-title">Достижения дня</span>
               <span class="hero-achievements-value">{achievementsToday.toLocaleString()}</span>
               <span class="hero-achievements-meta">{playersToday.toLocaleString()} пользователей сегодня</span>
-            </div>
+    </div>
           </footer>
-        {:else if $activeView === 'search'}
-          <!-- Search View -->
-          <div class="mt-2">
-            <div class="flex justify-between items-center mb-4">
-              <h2 class="text-xl font-bold text-white">Результаты поиска</h2>
-            </div>
-            {#if $isSearching}
-              <div class="text-white/80">Идёт поиск…</div>
-            {:else if $searchResults.length}
-              <div class="grid grid-cols-5 gap-6">
-                {#each $searchResults as item}
+  {:else if $activeView === 'search'}
+  <!-- Search View -->
+  <div class="mt-2">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold text-white">Результаты поиска</h2>
+    </div>
+    {#if $isSearching}
+      <div class="text-white/80">Идёт поиск…</div>
+    {:else if $searchResults.length}
+      <div class="grid grid-cols-5 gap-6">
+        {#each $searchResults as item}
                   <div class="bg-pink-900/50 rounded-xl backdrop-blur-sm relative w-[204px] h-[240px] overflow-hidden">
-                    {#if item.image}
-                      <img src={item.image} alt={item.title} class="absolute inset-0 w-full h-full object-cover opacity-90" loading="lazy" />
-                    {/if}
-                    <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent rounded-b-xl">
-                      <h3 class="text-white font-semibold text-sm truncate">{item.title}</h3>
-                      <div class="flex items-center gap-2 text-xs">
-                        {#if item.score}
-                          <span class="text-pink-300">★ {item.score}</span>
-                        {/if}
-                        {#if item.year}
-                          <span class="text-white/70">{item.year}</span>
-                        {/if}
-                      </div>
-                    </div>
-                  </div>
-                {/each}
-              </div>
-            {:else}
-              <div class="text-white/60">Нет результатов. Измените запрос.</div>
+            {#if item.image}
+              <img src={item.image} alt={item.title} class="absolute inset-0 w-full h-full object-cover opacity-90" loading="lazy" />
             {/if}
+            <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent rounded-b-xl">
+              <h3 class="text-white font-semibold text-sm truncate">{item.title}</h3>
+              <div class="flex items-center gap-2 text-xs">
+                {#if item.score}
+                  <span class="text-pink-300">★ {item.score}</span>
+                {/if}
+                {#if item.year}
+                  <span class="text-white/70">{item.year}</span>
+                {/if}
+              </div>
+            </div>
           </div>
-        {:else if $activeView === 'details'}
+        {/each}
+      </div>
+    {:else}
+      <div class="text-white/60">Нет результатов. Измените запрос.</div>
+    {/if}
+  </div>
+  {:else if $activeView === 'details'}
           <!-- Details removed in quiz-only mode -->
           <div class="text-white/80 mt-4">Просмотр аниме отключён. Выберите режим в AniQuiz.</div>
-        {:else if $activeView === 'profile'}
-          <ProfileView />
-        {:else if $activeView === 'admin'}
-          <AdminPanel />
-        {:else if $activeView === 'lists'}
-          <ListsView />
-        {:else if $activeView === 'messages'}
-          <MessagesView />
-        {:else if $activeView === 'catalog'}
-          <CatalogView />
-        {:else if $activeView === 'guessAnime'}
-          <GuessAnimeView />
+  {:else if $activeView === 'profile'}
+  <ProfileView />
+  {:else if $activeView === 'admin'}
+  <AdminPanel />
+  {:else if $activeView === 'lists'}
+  <ListsView />
+  {:else if $activeView === 'messages'}
+    <MessagesView />
+  {:else if $activeView === 'catalog'}
+  <CatalogView />
+  {:else if $activeView === 'guessAnime'}
+  <GuessAnimeView />
         {:else if $activeView === 'guessCharacter'}
           <GuessCharacterView />
         {:else if $activeView === 'guessOpening'}
@@ -564,8 +564,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
           <BattlePackSelector />
         {:else if $activeView === 'adminQuiz'}
           <AdminQuizPanel />
-        {/if}
-      </div>
+  {/if}
+</div>
 
       <aside class="leaderboard-panel">
         <div class="leaderboard-card">
@@ -1076,13 +1076,13 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .global-stats-content {
     display: flex;
     flex-direction: column;
-    gap: 1.1rem;
+    gap: 0.9rem;
   }
 
   .stats-block {
     background: rgba(244, 246, 255, 0.9);
     border-radius: 20px;
-    padding: 0.85rem 1rem;
+    padding: 0.7rem 0.9rem;
     box-shadow: inset 0 0 0 1px rgba(165, 180, 255, 0.16);
   }
 
@@ -1099,14 +1099,14 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.45rem;
+    gap: 0.35rem;
   }
 
   .stats-block li {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.86rem;
+    font-size: 0.82rem;
     color: #4b3f74;
   }
 
@@ -1319,17 +1319,17 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .mode-cards {
     display: grid;
     grid-template-columns: repeat(2, minmax(280px, 1fr));
-    gap: 2rem;
+    gap: 1.6rem;
   }
 
   .mode-card {
     border: none;
     border-radius: 28px;
-    padding: 2.15rem 1.9rem;
+    padding: 1.7rem 1.6rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    gap: 0.9rem;
     text-align: center;
     cursor: pointer;
     box-shadow: 0 18px 36px rgba(186, 173, 255, 0.16);
@@ -1347,15 +1347,15 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .mode-avatar {
-    width: 98px;
-    height: 98px;
+    width: 88px;
+    height: 88px;
     border-radius: 24px;
     background: rgba(255, 255, 255, 0.82);
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.1rem;
+    font-size: 1.9rem;
   }
 
   .mode-label {
