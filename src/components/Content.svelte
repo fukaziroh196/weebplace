@@ -572,7 +572,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .page-main {
     flex: 1;
     min-width: 0;
-    max-width: clamp(600px, 62vw, 1180px);
+    max-width: clamp(700px, 70vw, 1350px);
     display: flex;
     flex-direction: column;
     gap: clamp(0.5rem, 1.2vw, 1rem);
@@ -1116,15 +1116,18 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .hero-footer {
     margin-top: clamp(0.5rem, 1vw, 0.7rem);
+    margin-right: clamp(-1.5rem, -3vw, -3rem);
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: clamp(1rem, 1.8vw, 1.5rem);
     flex-wrap: wrap;
-    padding: clamp(1rem, 1.8vw, 1.4rem) clamp(1.4rem, 2.5vw, 2rem);
+    padding: clamp(1rem, 1.8vw, 1.4rem) clamp(2rem, 5vw, 4rem) clamp(1rem, 1.8vw, 1.4rem) clamp(1.4rem, 2.5vw, 2rem);
     border-radius: clamp(22px, 3vw, 28px);
     background: rgba(255, 255, 255, 0.78);
     box-shadow: 0 clamp(20px, 3.5vw, 28px) clamp(45px, 7vw, 60px) rgba(161, 143, 255, 0.18);
+    width: calc(100% + clamp(1.5rem, 3vw, 3rem));
+    max-width: none;
   }
 
   .hero-logo {
@@ -1426,6 +1429,9 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       flex-direction: column;
       align-items: stretch;
       padding: clamp(1rem, 1.8vw, 1.4rem);
+      margin-right: 0;
+      width: 100%;
+      max-width: 100%;
     }
 
     .hero-achievements {
