@@ -565,7 +565,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .page-layout {
     display: flex;
-    align-items: stretch;
+    align-items: flex-start;
     gap: clamp(1rem, 2.5vw, 2.8rem);
     flex: 1;
     min-height: 0;
@@ -579,7 +579,6 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     flex-direction: column;
     gap: clamp(0.5rem, 1.2vw, 1rem);
     overflow: visible;
-    min-height: 100%;
   }
 
   .leaderboard-panel {
@@ -740,10 +739,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     display: flex;
     flex-wrap: nowrap;
     gap: clamp(0.6rem, 1.2vw, 1rem);
-    align-items: stretch;
+    align-items: flex-start;
     width: 100%;
-    flex: 1;
-    min-height: 0;
   }
 
   .mode-cards-wrapper {
@@ -1115,16 +1112,15 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: flex-start;
     gap: clamp(0.7rem, 1.2vw, 1rem);
     overflow: visible;
     width: 100%;
-    min-height: 100%;
   }
 
   .hero-footer {
-    margin-top: auto;
+    margin-top: clamp(0.5rem, 1vw, 0.7rem);
     margin-right: clamp(-2rem, -2.5vw, -2.8rem);
     display: flex;
     align-items: center;
@@ -1138,8 +1134,6 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     width: calc(100% + clamp(2rem, 2.5vw, 2.8rem));
     box-sizing: border-box;
     position: relative;
-    flex-shrink: 0;
-    align-self: flex-end;
   }
 
   .hero-logo {
