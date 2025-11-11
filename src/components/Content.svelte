@@ -744,7 +744,6 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .mode-cards-wrapper {
     flex: 1;
     min-width: clamp(240px, 25vw, 280px);
-    margin-left: clamp(1.5rem, 3vw, 4rem);
   }
 
   .admin-news-panel {
@@ -1287,6 +1286,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     display: grid;
     grid-template-columns: repeat(2, minmax(clamp(240px, 25vw, 280px), 1fr));
     gap: clamp(0.7rem, 1.2vw, 1rem);
+    padding-left: clamp(1.5rem, 3vw, 4rem);
   }
 
   .mode-card {
@@ -1410,11 +1410,11 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     .mode-cards-wrapper {
       width: 100%;
       order: 1;
-      margin-left: 0;
     }
 
     .mode-cards {
       grid-template-columns: repeat(2, minmax(clamp(200px, 35vw, 280px), 1fr));
+      padding-left: 0;
     }
   }
 
@@ -1446,6 +1446,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     .mode-cards {
       grid-template-columns: 1fr;
       gap: clamp(0.6rem, 1.2vw, 1rem);
+      padding-left: 0;
     }
   }
 
@@ -1505,6 +1506,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     .mode-cards {
       grid-template-columns: 1fr;
       gap: clamp(0.5rem, 1vw, 0.9rem);
+      padding-left: 0;
     }
 
     .hero-achievements {
