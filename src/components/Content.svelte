@@ -552,6 +552,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     background: linear-gradient(180deg, #fff5f7 0%, #ffeef8 100%);
     color: #735f7e;
     font-family: "Inter", "SF Pro Display", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: clamp(14px, 1vw, 18px);
   }
 
   .animeguess-page {
@@ -1420,22 +1421,26 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   /* Large screens (above Full HD) */
   @media (min-width: 1920px) {
+    :global(html) {
+      font-size: clamp(16px, 1.2vw, 20px);
+    }
+
     .animeguess-page {
       padding: clamp(0.3rem, 0.8vw, 0.6rem) clamp(2rem, 5vw, 6rem) clamp(0.75rem, 2vw, 1.5rem);
     }
 
     .page-layout {
-      max-width: min(95vw, 2400px);
+      max-width: 95vw;
       margin: 0 auto;
       gap: clamp(1.5rem, 3vw, 3rem);
     }
 
     .page-main {
-      max-width: min(70vw, 1600px);
+      max-width: 70vw;
     }
 
     .leaderboard-panel {
-      width: min(30vw, 480px);
+      width: 30vw;
     }
 
     .dashboard-row {
@@ -1456,82 +1461,90 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
     .global-stats-panel {
       margin-left: clamp(10rem, 20vw, 18rem);
-      width: min(28vw, 380px);
+      width: 28vw;
     }
 
     .admin-news-panel {
-      width: min(26vw, 360px);
+      width: 26vw;
     }
 
     .mode-cards-wrapper {
-      min-width: min(30vw, 320px);
+      min-width: 30vw;
     }
 
     .mode-cards {
-      grid-template-columns: repeat(2, minmax(280px, 1fr));
+      grid-template-columns: repeat(2, minmax(clamp(280px, 14vw, 360px), 1fr));
       padding-left: clamp(1rem, 2vw, 2.5rem);
     }
   }
 
   /* Very large screens (2K and above) */
   @media (min-width: 2560px) {
+    :global(html) {
+      font-size: clamp(18px, 1.4vw, 22px);
+    }
+
     .animeguess-page {
       padding: clamp(0.3rem, 0.8vw, 0.6rem) clamp(3rem, 6vw, 8rem) clamp(0.75rem, 2vw, 1.5rem);
     }
 
     .page-layout {
-      max-width: min(92vw, 2800px);
+      max-width: 92vw;
       gap: clamp(2rem, 4vw, 4rem);
     }
 
     .page-main {
-      max-width: min(68vw, 1800px);
+      max-width: 68vw;
     }
 
     .leaderboard-panel {
-      width: min(32vw, 520px);
+      width: 32vw;
     }
 
     .global-stats-panel {
       margin-left: clamp(12rem, 22vw, 20rem);
-      width: min(30vw, 420px);
+      width: 30vw;
     }
 
     .admin-news-panel {
-      width: min(28vw, 400px);
+      width: 28vw;
     }
 
     .mode-cards-wrapper {
-      min-width: min(32vw, 360px);
+      min-width: 32vw;
     }
 
     .mode-cards {
-      grid-template-columns: repeat(2, minmax(320px, 1fr));
+      grid-template-columns: repeat(2, minmax(clamp(320px, 16vw, 400px), 1fr));
       padding-left: clamp(1.5rem, 3vw, 3rem);
     }
   }
 
   /* Ultra-wide screens (4K and above) */
   @media (min-width: 3840px) {
+    :global(html) {
+      font-size: clamp(20px, 1.6vw, 24px);
+    }
+
     .page-layout {
-      max-width: min(90vw, 3200px);
+      max-width: 90vw;
     }
 
     .page-main {
-      max-width: min(65vw, 2000px);
+      max-width: 65vw;
     }
 
     .leaderboard-panel {
-      width: min(35vw, 600px);
+      width: 35vw;
     }
 
     .global-stats-panel {
       margin-left: clamp(14rem, 24vw, 24rem);
-      width: min(32vw, 480px);
+      width: 32vw;
     }
 
     .admin-news-panel {
-      width: min(30vw, 460px);
+      width: 30vw;
     }
   }
 
