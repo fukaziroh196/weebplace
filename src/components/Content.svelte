@@ -545,14 +545,18 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   </div>
 
 <style>
-  :global(html, body, #app) {
+  /* Базовое масштабирование: 16px на 1920px, пропорционально до 4K */
+  :global(html) {
+    font-size: clamp(14px, 0.833vw, 32px); /* 0.833vw = 16px на 1920px, 21.3px на 2560px, 32px на 3840px */
+  }
+
+  :global(body, #app) {
     height: 100%;
     min-height: 100vh;
     margin: 0;
     background: linear-gradient(180deg, #fff5f7 0%, #ffeef8 100%);
     color: #735f7e;
     font-family: "Inter", "SF Pro Display", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    font-size: clamp(14px, 1vw, 18px);
   }
 
   .animeguess-page {
@@ -560,56 +564,59 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    padding: clamp(0.3rem, 0.8vw, 0.6rem) clamp(1rem, 4vw, 4rem) clamp(0.75rem, 2vw, 1.5rem);
+    padding: 0.5rem clamp(1rem, 4vw, 6rem) 1rem;
     box-sizing: border-box;
   }
 
   .page-layout {
     display: flex;
     align-items: flex-start;
-    gap: clamp(1rem, 2.5vw, 2.8rem);
+    gap: clamp(1rem, 2.5vw, 3rem);
     flex: 1;
     min-height: 0;
+    max-width: min(95vw, 2600px);
+    margin: 0 auto;
+    width: 100%;
   }
 
   .page-main {
     flex: 1;
     min-width: 0;
-    max-width: clamp(600px, 65vw, 1250px);
+    max-width: min(65vw, 1700px);
     display: flex;
     flex-direction: column;
-    gap: clamp(0.5rem, 1.2vw, 1rem);
+    gap: 0.75rem;
     overflow: visible;
   }
 
   .leaderboard-panel {
-    width: clamp(260px, 28vw, 420px);
+    width: min(28vw, 500px);
     flex-shrink: 0;
     margin-left: auto;
-    padding-right: clamp(0.5rem, 2vw, 1.6rem);
+    padding-right: clamp(0.5rem, 2vw, 2rem);
   }
 
   .leaderboard-card {
     position: sticky;
-    top: calc(clamp(0.2rem, 0.8vh, 0.5rem) + clamp(0.3rem, 0.6vw, 0.5rem));
+    top: 1rem;
     background: rgba(255, 255, 255, 0.82);
-    border-radius: clamp(20px, 2.5vw, 28px);
-    padding: clamp(1rem, 2vw, 1.6rem) clamp(0.9rem, 1.8vw, 1.4rem) clamp(1.4rem, 2.5vw, 2rem) clamp(0.9rem, 1.8vw, 1.4rem);
-    box-shadow: 0 clamp(16px, 2.5vw, 24px) clamp(40px, 6vw, 60px) rgba(151, 168, 255, 0.24);
+    border-radius: 1.75rem;
+    padding: 1.5rem 1.4rem 2rem;
+    box-shadow: 0 1.5rem 3.75rem rgba(151, 168, 255, 0.24);
     display: flex;
     flex-direction: column;
-    gap: clamp(0.9rem, 1.8vw, 1.3rem);
+    gap: 1.2rem;
     backdrop-filter: blur(18px);
   }
 
   .leaderboard-header {
     display: flex;
     flex-direction: column;
-    gap: clamp(0.6rem, 1.2vw, 1rem);
+    gap: 0.875rem;
   }
 
   .leaderboard-subtitle {
-    font-size: clamp(0.65rem, 0.9vw, 0.78rem);
+    font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.18em;
     color: rgba(82, 72, 120, 0.55);
@@ -618,24 +625,24 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .leaderboard-title {
     margin: 0;
-    font-size: clamp(1.1rem, 2vw, 1.45rem);
+    font-size: 1.35rem;
     font-weight: 800;
     color: #5a4a82;
   }
 
   .leaderboard-tabs {
     display: inline-flex;
-    padding: clamp(0.2rem, 0.3vw, 0.25rem);
+    padding: 0.2rem;
     border-radius: 999px;
     background: rgba(122, 108, 190, 0.12);
-    gap: clamp(0.2rem, 0.3vw, 0.25rem);
+    gap: 0.2rem;
   }
 
   .leaderboard-tabs button {
     border: none;
     border-radius: 999px;
-    padding: clamp(0.35rem, 0.7vw, 0.42rem) clamp(0.7rem, 1.1vw, 0.85rem);
-    font-size: clamp(0.65rem, 0.85vw, 0.75rem);
+    padding: 0.4rem 0.8rem;
+    font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 0.06em;
     cursor: pointer;
@@ -647,7 +654,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .leaderboard-tabs button.active {
     background: linear-gradient(135deg, #a9c0ff 0%, #7f9eff 100%);
     color: #fff;
-    box-shadow: 0 clamp(8px, 1.5vw, 12px) clamp(18px, 3vw, 26px) rgba(125, 152, 255, 0.35);
+    box-shadow: 0 0.75rem 1.625rem rgba(125, 152, 255, 0.35);
   }
 
   .leaderboard-tabs button:not(.active):hover {
@@ -660,15 +667,15 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: clamp(0.6rem, 1.1vw, 0.85rem);
+    gap: 0.75rem;
   }
 
   .leaderboard-list li {
     display: flex;
     align-items: center;
-    gap: clamp(0.7rem, 1.2vw, 0.9rem);
-    padding: clamp(0.55rem, 1vw, 0.7rem) clamp(0.7rem, 1.1vw, 0.85rem);
-    border-radius: clamp(14px, 2vw, 18px);
+    gap: 0.875rem;
+    padding: 0.65rem 0.8rem;
+    border-radius: 1.125rem;
     background: rgba(248, 249, 255, 0.75);
     box-shadow: inset 0 0 0 1px rgba(149, 168, 255, 0.12);
   }
@@ -679,13 +686,13 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .leaderboard-rank {
-    width: clamp(32px, 4.5vw, 40px);
-    height: clamp(32px, 4.5vw, 40px);
-    border-radius: clamp(11px, 1.6vw, 14px);
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.875rem;
     background: rgba(136, 161, 255, 0.16);
     color: #6a7aff;
     font-weight: 800;
-    font-size: clamp(0.85rem, 1.2vw, 1rem);
+    font-size: 0.9375rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -700,7 +707,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .leaderboard-info {
     display: flex;
     flex-direction: column;
-    gap: clamp(0.2rem, 0.3vw, 0.25rem);
+    gap: 0.2rem;
     min-width: 0;
     flex: 1;
   }
@@ -708,14 +715,14 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .leaderboard-name {
     font-weight: 700;
     color: #4e3f6f;
-    font-size: clamp(0.8rem, 1.1vw, 0.92rem);
+    font-size: 0.875rem;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
   .leaderboard-metric {
-    font-size: clamp(0.7rem, 0.95vw, 0.78rem);
+    font-size: 0.75rem;
     color: rgba(78, 63, 111, 0.6);
     letter-spacing: 0.03em;
   }
@@ -724,41 +731,42 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     justify-content: center;
     font-weight: 600;
     color: rgba(78, 63, 111, 0.56);
-    font-size: clamp(0.75rem, 1vw, 0.85rem);
-    padding: clamp(1.5rem, 3vw, 2rem) clamp(1rem, 2vw, 1.5rem);
+    font-size: 0.8rem;
+    padding: 1.75rem 1.25rem;
   }
 
   .leaderboard-footer {
-    font-size: clamp(0.65rem, 0.85vw, 0.72rem);
+    font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.18em;
     color: rgba(78, 63, 111, 0.42);
     font-weight: 700;
+    padding-bottom: 0.5rem;
   }
 
   .dashboard-row {
     display: flex;
     flex-wrap: nowrap;
-    gap: clamp(0.6rem, 1.2vw, 1rem);
+    gap: 0.875rem;
     align-items: flex-start;
     width: 100%;
   }
 
   .mode-cards-wrapper {
     flex: 1;
-    min-width: clamp(240px, 25vw, 280px);
+    min-width: 17.5rem;
   }
 
   .admin-news-panel {
-    width: clamp(220px, 24vw, 320px);
+    width: min(24vw, 320px);
     flex-shrink: 0;
     background: rgba(255, 255, 255, 0.86);
-    border-radius: clamp(20px, 2.8vw, 26px);
-    padding: clamp(1rem, 1.8vw, 1.4rem);
-    box-shadow: 0 clamp(18px, 2.8vw, 24px) clamp(42px, 6.5vw, 58px) rgba(255, 179, 214, 0.24);
+    border-radius: 1.625rem;
+    padding: 1.25rem;
+    box-shadow: 0 1.5rem 3.625rem rgba(255, 179, 214, 0.24);
     display: flex;
     flex-direction: column;
-    gap: clamp(0.8rem, 1.2vw, 1rem);
+    gap: 0.875rem;
     backdrop-filter: blur(18px);
   }
 
@@ -766,12 +774,12 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: clamp(0.5rem, 1vw, 0.8rem);
+    gap: 0.625rem;
     flex-wrap: wrap;
   }
 
   .admin-news-subtitle {
-    font-size: clamp(0.65rem, 0.85vw, 0.72rem);
+    font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.2em;
     color: rgba(122, 88, 151, 0.6);
@@ -779,18 +787,18 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .admin-news-title {
-    margin: clamp(0.2rem, 0.3vw, 0.25rem) 0 0;
-    font-size: clamp(1.1rem, 1.8vw, 1.3rem);
+    margin: 0.2rem 0 0;
+    font-size: 1.2rem;
     font-weight: 800;
     color: #7a4ba7;
   }
 
   .admin-news-role {
-    font-size: clamp(0.65rem, 0.85vw, 0.7rem);
+    font-size: 0.6875rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     color: rgba(122, 88, 151, 0.55);
-    padding: clamp(0.3rem, 0.5vw, 0.35rem) clamp(0.6rem, 1vw, 0.75rem);
+    padding: 0.3rem 0.7rem;
     border-radius: 999px;
     background: rgba(239, 229, 255, 0.6);
     box-shadow: inset 0 0 0 1px rgba(130, 90, 190, 0.18);
@@ -800,43 +808,43 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .admin-news-form {
     display: flex;
     flex-direction: column;
-    gap: clamp(0.6rem, 1vw, 0.75rem);
+    gap: 0.7rem;
   }
 
   .admin-news-input {
     width: 100%;
     border: none;
-    border-radius: clamp(14px, 2vw, 18px);
-    padding: clamp(0.7rem, 1.1vw, 0.85rem) clamp(0.8rem, 1.2vw, 1rem);
+    border-radius: 1.125rem;
+    padding: 0.8rem 1rem;
     background: rgba(248, 242, 255, 0.9);
     box-shadow: inset 0 0 0 1px rgba(173, 149, 255, 0.18);
-    font-size: clamp(0.8rem, 1.1vw, 0.9rem);
+    font-size: 0.875rem;
     color: #5b4a7a;
     resize: none;
     font-family: inherit;
   }
 
   .admin-news-input:focus-visible {
-    outline: clamp(1.5px, 0.25vw, 2px) solid rgba(149, 118, 255, 0.45);
-    outline-offset: clamp(2px, 0.4vw, 3px);
+    outline: 2px solid rgba(149, 118, 255, 0.45);
+    outline-offset: 2px;
   }
 
   .admin-news-actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: clamp(0.5rem, 1vw, 0.8rem);
+    gap: 0.625rem;
   }
 
   .admin-news-counter {
-    font-size: clamp(0.7rem, 0.95vw, 0.78rem);
+    font-size: 0.75rem;
     color: rgba(90, 67, 108, 0.6);
   }
 
   .admin-news-error {
     display: block;
-    margin-top: clamp(0.3rem, 0.5vw, 0.35rem);
-    font-size: clamp(0.7rem, 0.95vw, 0.78rem);
+    margin-top: 0.3rem;
+    font-size: 0.75rem;
     font-weight: 600;
     color: #d8587f;
   }
@@ -844,12 +852,12 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .admin-news-submit {
     border: none;
     border-radius: 999px;
-    padding: clamp(0.5rem, 0.85vw, 0.6rem) clamp(1.1rem, 1.8vw, 1.4rem);
-    font-size: clamp(0.75rem, 1vw, 0.82rem);
+    padding: 0.55rem 1.3rem;
+    font-size: 0.8rem;
     font-weight: 700;
     background: linear-gradient(135deg, #ff8ccc 0%, #ff6fb3 100%);
     color: #fff;
-    box-shadow: 0 clamp(12px, 2vw, 16px) clamp(24px, 3.5vw, 32px) rgba(255, 111, 179, 0.32);
+    box-shadow: 0 1rem 2rem rgba(255, 111, 179, 0.32);
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
     white-space: nowrap;
@@ -863,7 +871,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .admin-news-submit:not(:disabled):hover {
     transform: translateY(-2px);
-    box-shadow: 0 clamp(16px, 2.8vw, 22px) clamp(32px, 4.5vw, 42px) rgba(255, 111, 179, 0.38);
+    box-shadow: 0 1.375rem 2.625rem rgba(255, 111, 179, 0.38);
   }
 
   .admin-news-list {
@@ -872,32 +880,32 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: clamp(0.7rem, 1.1vw, 0.9rem);
+    gap: 0.8rem;
   }
 
   .admin-news-list li {
     background: rgba(250, 247, 255, 0.92);
-    border-radius: clamp(14px, 2vw, 18px);
-    padding: clamp(0.7rem, 1.1vw, 0.85rem) clamp(0.8rem, 1.2vw, 1rem);
+    border-radius: 1.125rem;
+    padding: 0.8rem 1rem;
     box-shadow: inset 0 0 0 1px rgba(173, 149, 255, 0.14);
     display: flex;
     flex-direction: column;
-    gap: clamp(0.35rem, 0.6vw, 0.45rem);
+    gap: 0.4rem;
   }
 
   .admin-news-list li.news-editing {
-    gap: clamp(0.6rem, 1vw, 0.8rem);
+    gap: 0.7rem;
   }
 
   .admin-news-list li p {
     margin: 0;
-    font-size: clamp(0.8rem, 1.1vw, 0.9rem);
+    font-size: 0.875rem;
     color: #5c4a81;
     line-height: 1.5;
   }
 
   .admin-news-list li span {
-    font-size: clamp(0.65rem, 0.85vw, 0.7rem);
+    font-size: 0.6875rem;
     color: rgba(92, 74, 129, 0.6);
     letter-spacing: 0.05em;
   }
@@ -907,12 +915,12 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: clamp(0.6rem, 1vw, 0.8rem);
+    gap: 0.7rem;
     flex-wrap: wrap;
   }
 
   .admin-news-timestamp {
-    font-size: clamp(0.65rem, 0.9vw, 0.74rem);
+    font-size: 0.7rem;
     color: rgba(92, 74, 129, 0.58);
     letter-spacing: 0.05em;
   }
@@ -921,15 +929,15 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .admin-news-edit-actions {
     display: flex;
     align-items: center;
-    gap: clamp(0.35rem, 0.6vw, 0.45rem);
+    gap: 0.4rem;
     flex-wrap: wrap;
   }
 
   .admin-news-btn {
     border: none;
     border-radius: 999px;
-    padding: clamp(0.3rem, 0.5vw, 0.35rem) clamp(0.75rem, 1.2vw, 0.95rem);
-    font-size: clamp(0.65rem, 0.85vw, 0.72rem);
+    padding: 0.3rem 0.9rem;
+    font-size: 0.6875rem;
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -973,14 +981,14 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .admin-news-edit-input {
-    min-height: clamp(3.8rem, 6vw, 4.8rem);
+    min-height: 4.5rem;
   }
 
   .admin-news-empty {
     background: rgba(250, 247, 255, 0.85);
-    border-radius: clamp(14px, 2vw, 18px);
-    padding: clamp(0.8rem, 1.2vw, 1rem);
-    font-size: clamp(0.75rem, 1vw, 0.85rem);
+    border-radius: 1.125rem;
+    padding: 1rem;
+    font-size: 0.8rem;
     text-align: center;
     color: rgba(92, 74, 129, 0.6);
     box-shadow: inset 0 0 0 1px rgba(173, 149, 255, 0.12);
@@ -992,17 +1000,17 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .global-stats-panel {
-    width: clamp(220px, 25vw, 320px);
+    width: min(25vw, 320px);
     flex-shrink: 0;
     flex-grow: 0;
     margin-left: clamp(8.75rem, 17.5vw, 31rem);
     background: rgba(255, 255, 255, 0.86);
-    border-radius: clamp(20px, 2.8vw, 26px);
-    padding: clamp(1rem, 1.8vw, 1.4rem);
-    box-shadow: 0 clamp(18px, 2.8vw, 24px) clamp(42px, 6.5vw, 58px) rgba(174, 199, 255, 0.23);
+    border-radius: 1.625rem;
+    padding: 1.25rem;
+    box-shadow: 0 1.5rem 3.625rem rgba(174, 199, 255, 0.23);
     display: flex;
     flex-direction: column;
-    gap: clamp(0.9rem, 1.5vw, 1.2rem);
+    gap: 1.1rem;
     backdrop-filter: blur(18px);
   }
 
@@ -1013,7 +1021,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .global-stats-subtitle {
-    font-size: clamp(0.65rem, 0.85vw, 0.72rem);
+    font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.2em;
     color: rgba(80, 88, 151, 0.55);
@@ -1021,8 +1029,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .global-stats-title {
-    margin: clamp(0.2rem, 0.3vw, 0.25rem) 0 0;
-    font-size: clamp(1.1rem, 1.8vw, 1.28rem);
+    margin: 0.2rem 0 0;
+    font-size: 1.2rem;
     font-weight: 800;
     color: #5860a2;
   }
@@ -1030,19 +1038,19 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .global-stats-content {
     display: flex;
     flex-direction: column;
-    gap: clamp(0.9rem, 1.4vw, 1.1rem);
+    gap: 1rem;
   }
 
   .stats-block {
     background: rgba(244, 246, 255, 0.9);
-    border-radius: clamp(16px, 2.2vw, 20px);
-    padding: clamp(0.7rem, 1.1vw, 0.85rem) clamp(0.8rem, 1.2vw, 1rem);
+    border-radius: 1.25rem;
+    padding: 0.8rem 1rem;
     box-shadow: inset 0 0 0 1px rgba(165, 180, 255, 0.16);
   }
 
   .stats-block h4 {
-    margin: 0 0 clamp(0.45rem, 0.8vw, 0.6rem);
-    font-size: clamp(0.85rem, 1.2vw, 0.95rem);
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
     font-weight: 800;
     color: #4e5796;
   }
@@ -1053,14 +1061,14 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: clamp(0.35rem, 0.6vw, 0.45rem);
+    gap: 0.4rem;
   }
 
   .stats-block li {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: clamp(0.75rem, 1.1vw, 0.86rem);
+    font-size: 0.8125rem;
     color: #4b3f74;
   }
 
@@ -1078,10 +1086,10 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .stats-empty {
-    font-size: clamp(0.7rem, 1vw, 0.8rem);
+    font-size: 0.75rem;
     color: rgba(75, 63, 116, 0.55);
     text-align: center;
-    padding: clamp(0.8rem, 1.2vw, 1rem) 0;
+    padding: 1rem 0;
   }
 
   .stats-loading {
@@ -1094,17 +1102,17 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .hero-header {
     position: sticky;
-    top: clamp(0.2rem, 0.8vh, 0.5rem);
+    top: 0.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: clamp(1rem, 2.5vw, 2.5rem);
-    padding: clamp(0.5rem, 1vw, 0.8rem) clamp(1.4rem, 2.5vw, 2rem);
-    border-radius: clamp(22px, 3vw, 28px);
+    gap: 2rem;
+    padding: 0.75rem 1.875rem;
+    border-radius: 1.75rem;
     background: rgba(255, 255, 255, 0.78);
     backdrop-filter: blur(20px) saturation(130%);
-    box-shadow: 0 clamp(18px, 2.8vw, 24px) clamp(45px, 7vw, 60px) rgba(255, 158, 205, 0.28);
-    margin-bottom: clamp(0.6rem, 1.2vw, 1rem);
+    box-shadow: 0 1.5rem 3.75rem rgba(255, 158, 205, 0.28);
+    margin-bottom: 0.875rem;
     z-index: 200;
     flex-wrap: wrap;
   }
@@ -1115,23 +1123,23 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    gap: clamp(0.7rem, 1.2vw, 1rem);
+    gap: 0.875rem;
     overflow: visible;
     width: 100%;
   }
 
   .hero-footer {
-    margin-top: clamp(0.5rem, 1vw, 0.7rem);
+    margin-top: 0.6rem;
     margin-right: clamp(-2rem, -2.5vw, -2.8rem);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: clamp(1rem, 1.8vw, 1.5rem);
+    gap: 1.375rem;
     flex-wrap: wrap;
-    padding: clamp(1rem, 1.8vw, 1.4rem) clamp(1.4rem, 2.5vw, 2rem);
-    border-radius: clamp(22px, 3vw, 28px);
+    padding: 1.25rem 1.875rem;
+    border-radius: 1.75rem;
     background: rgba(255, 255, 255, 0.78);
-    box-shadow: 0 clamp(20px, 3.5vw, 28px) clamp(45px, 7vw, 60px) rgba(161, 143, 255, 0.18);
+    box-shadow: 0 1.75rem 3.75rem rgba(161, 143, 255, 0.18);
     width: calc(100% + clamp(2rem, 2.5vw, 2.8rem));
     box-sizing: border-box;
     position: relative;
@@ -1140,37 +1148,37 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .hero-logo {
     display: flex;
     align-items: center;
-    gap: clamp(0.7rem, 1.2vw, 1rem);
+    gap: 0.875rem;
   }
 
   .home-button {
-    width: clamp(48px, 6vw, 58px);
-    height: clamp(48px, 6vw, 58px);
-    border-radius: clamp(16px, 2.2vw, 20px);
+    width: 3.625rem;
+    height: 3.625rem;
+    border-radius: 1.25rem;
     border: none;
     cursor: pointer;
-    font-size: clamp(1.4rem, 2.2vw, 1.75rem);
+    font-size: 1.625rem;
     display: flex;
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, #ffd6ec 0%, #ffb9df 100%);
-    box-shadow: 0 clamp(14px, 2.5vw, 18px) clamp(28px, 4.5vw, 35px) rgba(255, 158, 205, 0.35);
+    box-shadow: 0 1.125rem 2.1875rem rgba(255, 158, 205, 0.35);
     color: #ff6aa3;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
   .home-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 clamp(16px, 2.8vw, 20px) clamp(32px, 5vw, 40px) rgba(255, 158, 205, 0.4);
+    box-shadow: 0 1.25rem 2.5rem rgba(255, 158, 205, 0.4);
   }
 
   .home-button:focus-visible {
-    outline: clamp(1.5px, 0.25vw, 2px) solid rgba(255, 118, 186, 0.5);
-    outline-offset: clamp(3px, 0.5vw, 4px);
+    outline: 2px solid rgba(255, 118, 186, 0.5);
+    outline-offset: 3px;
   }
 
   .hero-title {
-    font-size: clamp(1.6rem, 2.8vw, 2.25rem);
+    font-size: 2rem;
     font-weight: 800;
     color: #ff74ad;
     letter-spacing: 0.02em;
@@ -1180,7 +1188,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .hero-nav {
     display: flex;
     align-items: center;
-    gap: clamp(0.9rem, 1.6vw, 1.3rem);
+    gap: 1.125rem;
     flex-wrap: wrap;
   }
 
@@ -1190,11 +1198,11 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: clamp(0.25rem, 0.45vw, 0.35rem);
+    gap: 0.3rem;
     cursor: pointer;
     color: #8d7aa1;
     font-weight: 600;
-    font-size: clamp(0.7rem, 1vw, 0.82rem);
+    font-size: 0.8rem;
     letter-spacing: 0.04em;
     transition: transform 0.2s ease, color 0.2s ease;
   }
@@ -1205,15 +1213,15 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .hero-nav-item:focus-visible {
-    outline: clamp(1.5px, 0.25vw, 2px) solid rgba(255, 118, 186, 0.4);
-    outline-offset: clamp(3px, 0.5vw, 4px);
+    outline: 2px solid rgba(255, 118, 186, 0.4);
+    outline-offset: 3px;
   }
 
   .hero-nav-icon {
-    font-size: clamp(1rem, 1.5vw, 1.2rem);
+    font-size: 1.1rem;
     background: rgba(255, 201, 229, 0.45);
     color: #ff78b4;
-    padding: clamp(0.3rem, 0.5vw, 0.38rem) clamp(0.5rem, 0.8vw, 0.62rem);
+    padding: 0.35rem 0.6rem;
     border-radius: 999px;
   }
 
@@ -1224,33 +1232,33 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .profile-nav-button {
     border: none;
     border-radius: 999px;
-    padding: clamp(0.5rem, 0.9vw, 0.65rem) clamp(1.1rem, 1.8vw, 1.4rem);
+    padding: 0.6rem 1.3rem;
     display: flex;
     align-items: center;
-    gap: clamp(0.5rem, 0.9vw, 0.65rem);
+    gap: 0.6rem;
     background: linear-gradient(135deg, #ffffff 0%, #f2f7ff 100%);
     color: #6a6780;
     font-weight: 700;
-    font-size: clamp(0.8rem, 1.1vw, 0.9rem);
-    box-shadow: 0 clamp(14px, 2.5vw, 18px) clamp(24px, 4vw, 32px) rgba(123, 176, 255, 0.22);
+    font-size: 0.875rem;
+    box-shadow: 0 1.125rem 2rem rgba(123, 176, 255, 0.22);
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
   }
 
   .profile-nav-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 clamp(18px, 3vw, 24px) clamp(32px, 5.5vw, 44px) rgba(123, 176, 255, 0.28);
+    box-shadow: 0 1.5rem 2.75rem rgba(123, 176, 255, 0.28);
     color: #4463ff;
   }
 
   .profile-nav-button:focus-visible {
-    outline: clamp(1.5px, 0.25vw, 2px) solid rgba(123, 176, 255, 0.45);
-    outline-offset: clamp(3px, 0.5vw, 4px);
+    outline: 2px solid rgba(123, 176, 255, 0.45);
+    outline-offset: 3px;
   }
 
   .profile-nav-avatar {
-    width: clamp(28px, 3.8vw, 34px);
-    height: clamp(28px, 3.8vw, 34px);
+    width: 2.125rem;
+    height: 2.125rem;
     border-radius: 50%;
     background: rgba(172, 205, 255, 0.2);
     display: flex;
@@ -1260,101 +1268,101 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .profile-nav-avatar svg {
-    width: clamp(16px, 2.2vw, 20px);
-    height: clamp(16px, 2.2vw, 20px);
+    width: 1.25rem;
+    height: 1.25rem;
     fill: currentColor;
   }
 
   .profile-nav-name {
     white-space: nowrap;
-    max-width: clamp(100px, 12vw, 160px);
+    max-width: 10rem;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .profile-dropdown {
     position: absolute;
-    top: calc(100% + clamp(0.6rem, 1vw, 0.8rem));
+    top: calc(100% + 0.7rem);
     right: 0;
-    min-width: clamp(220px, 28vw, 260px);
+    min-width: 16.25rem;
     background: rgba(255, 255, 255, 0.95);
-    border-radius: clamp(16px, 2.2vw, 20px);
-    box-shadow: 0 clamp(20px, 3vw, 26px) clamp(45px, 7vw, 60px) rgba(98, 127, 255, 0.22);
-    padding: clamp(0.8rem, 1.2vw, 1rem);
+    border-radius: 1.25rem;
+    box-shadow: 0 1.625rem 3.75rem rgba(98, 127, 255, 0.22);
+    padding: 1rem;
     z-index: 600;
     backdrop-filter: blur(20px);
   }
 
   .mode-cards {
     display: grid;
-    grid-template-columns: repeat(2, minmax(clamp(240px, 25vw, 280px), 1fr));
-    gap: clamp(0.7rem, 1.2vw, 1rem);
+    grid-template-columns: repeat(2, minmax(15rem, 1fr));
+    gap: 0.875rem;
     padding-left: clamp(0.5rem, 1.2vw, 2rem);
   }
 
   .mode-card {
     border: none;
-    border-radius: clamp(22px, 3vw, 28px);
-    padding: clamp(1.4rem, 2.2vw, 1.9rem) clamp(1.2rem, 2vw, 1.7rem);
+    border-radius: 1.75rem;
+    padding: 1.75rem 1.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: clamp(0.7rem, 1.1vw, 0.9rem);
+    gap: 0.8rem;
     text-align: center;
     cursor: pointer;
-    box-shadow: 0 clamp(14px, 2.5vw, 18px) clamp(28px, 4.5vw, 36px) rgba(186, 173, 255, 0.16);
+    box-shadow: 0 1.125rem 2.25rem rgba(186, 173, 255, 0.16);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
   .mode-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 clamp(18px, 3vw, 24px) clamp(35px, 5.5vw, 44px) rgba(173, 152, 255, 0.22);
+    box-shadow: 0 1.5rem 2.75rem rgba(173, 152, 255, 0.22);
   }
 
   .mode-card:focus-visible {
-    outline: clamp(1.5px, 0.25vw, 2px) solid rgba(255, 160, 210, 0.4);
-    outline-offset: clamp(4px, 0.6vw, 5px);
+    outline: 2px solid rgba(255, 160, 210, 0.4);
+    outline-offset: 4px;
   }
 
   .mode-avatar {
-    width: clamp(78px, 10.5vw, 98px);
-    height: clamp(78px, 10.5vw, 98px);
-    border-radius: clamp(18px, 2.5vw, 24px);
+    width: 6.125rem;
+    height: 6.125rem;
+    border-radius: 1.5rem;
     background: rgba(255, 255, 255, 0.82);
-    box-shadow: 0 clamp(9px, 1.5vw, 12px) clamp(22px, 3.5vw, 28px) rgba(0, 0, 0, 0.08);
+    box-shadow: 0 0.75rem 1.75rem rgba(0, 0, 0, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+    font-size: 2rem;
   }
 
   .mode-label {
-    font-size: clamp(0.85rem, 1.2vw, 0.98rem);
+    font-size: 0.9375rem;
     font-weight: 800;
     color: #635075;
     letter-spacing: 0.05em;
   }
 
   .mode-description {
-    font-size: clamp(0.7rem, 1vw, 0.82rem);
+    font-size: 0.8rem;
     color: rgba(87, 70, 99, 0.62);
-    max-width: clamp(180px, 22vw, 220px);
+    max-width: 13.75rem;
     line-height: 1.4;
   }
 
   .hero-achievements {
     background: rgba(255, 244, 251, 0.92);
-    border-radius: clamp(18px, 2.5vw, 22px);
-    padding: clamp(0.8rem, 1.3vw, 1rem) clamp(1.4rem, 2.2vw, 1.8rem);
+    border-radius: 1.375rem;
+    padding: 1rem 1.625rem;
     display: flex;
     align-items: center;
-    gap: clamp(1rem, 1.6vw, 1.3rem);
-    box-shadow: 0 clamp(12px, 2vw, 16px) clamp(24px, 4vw, 32px) rgba(255, 188, 215, 0.22);
+    gap: 1.25rem;
+    box-shadow: 0 1rem 2rem rgba(255, 188, 215, 0.22);
     flex-wrap: wrap;
   }
 
   .hero-achievements-title {
-    font-size: clamp(0.7rem, 1vw, 0.8rem);
+    font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -1363,14 +1371,14 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .hero-achievements-value {
-    font-size: clamp(1.4rem, 2.4vw, 1.85rem);
+    font-size: 1.75rem;
     font-weight: 800;
     color: #ff6ea2;
     white-space: nowrap;
   }
 
   .hero-achievements-meta {
-    font-size: clamp(0.75rem, 1.1vw, 0.86rem);
+    font-size: 0.8125rem;
     color: rgba(90, 72, 108, 0.58);
     white-space: nowrap;
   }
@@ -1378,20 +1386,20 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .hero-replays-button {
     border: none;
     background: rgba(255, 244, 251, 0.92);
-    border-radius: clamp(18px, 2.5vw, 22px);
-    padding: clamp(0.8rem, 1.3vw, 1rem) clamp(1.4rem, 2.2vw, 1.8rem);
+    border-radius: 1.375rem;
+    padding: 1rem 1.625rem;
     display: flex;
     align-items: center;
-    gap: clamp(0.6rem, 1vw, 0.8rem);
+    gap: 0.75rem;
     cursor: pointer;
-    box-shadow: 0 clamp(12px, 2vw, 16px) clamp(24px, 4vw, 32px) rgba(255, 188, 215, 0.22);
+    box-shadow: 0 1rem 2rem rgba(255, 188, 215, 0.22);
     transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
     font-family: inherit;
   }
 
   .hero-replays-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 clamp(14px, 2.2vw, 18px) clamp(28px, 4.2vw, 36px) rgba(255, 188, 215, 0.28);
+    box-shadow: 0 1.125rem 2.25rem rgba(255, 188, 215, 0.28);
     background: rgba(255, 248, 253, 0.95);
   }
 
@@ -1400,16 +1408,16 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .hero-replays-button:focus-visible {
-    outline: clamp(1.5px, 0.25vw, 2px) solid rgba(255, 118, 186, 0.4);
-    outline-offset: clamp(3px, 0.5vw, 4px);
+    outline: 2px solid rgba(255, 118, 186, 0.4);
+    outline-offset: 3px;
   }
 
   .hero-replays-icon {
-    font-size: clamp(1.2rem, 1.8vw, 1.4rem);
+    font-size: 1.375rem;
   }
 
   .hero-replays-label {
-    font-size: clamp(0.85rem, 1.2vw, 0.95rem);
+    font-size: 0.9375rem;
     font-weight: 600;
     color: #8d7aa1;
     white-space: nowrap;
@@ -1419,142 +1427,43 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     color: #ff6ea2;
   }
 
-  /* Large screens (above Full HD) */
-  @media (min-width: 1920px) {
-    :global(html) {
-      font-size: clamp(16px, 1vw, 18px);
-    }
+  /* ============================================
+     Адаптивность для планшетов и мобильных
+     ============================================ */
 
-    .animeguess-page {
-      padding: clamp(0.3rem, 0.8vw, 0.6rem) clamp(2rem, 5vw, 6rem) clamp(0.75rem, 2vw, 1.5rem);
-    }
-
+  /* Планшеты (до 1024px) */
+  @media (max-width: 1024px) {
     .page-layout {
-      max-width: min(95vw, 2400px);
-      margin: 0 auto;
-      gap: clamp(1.5rem, 3vw, 3rem);
+      max-width: 100%;
+      gap: 1.5rem;
     }
 
     .page-main {
-      max-width: min(70vw, 1600px);
+      max-width: 100%;
     }
 
     .leaderboard-panel {
-      width: min(30vw, 480px);
-    }
-
-    .dashboard-row {
-      gap: clamp(1rem, 2vw, 1.5rem);
-    }
-
-    .hero-header {
-      padding: clamp(0.6rem, 1.2vw, 1rem) clamp(1.6rem, 3vw, 2.5rem);
-      gap: clamp(1.5rem, 3vw, 2.5rem);
-    }
-
-    .hero-footer {
-      padding: clamp(1.2rem, 2vw, 1.6rem) clamp(1.6rem, 3vw, 2.5rem);
-      gap: clamp(1.2rem, 2vw, 2rem);
-      margin-right: clamp(-2.5rem, -3vw, -2rem);
-      width: calc(100% + clamp(2.5rem, 3vw, 2rem));
+      width: min(32vw, 420px);
     }
 
     .global-stats-panel {
-      margin-left: clamp(10rem, 20vw, 18rem);
-      width: min(28vw, 380px);
-    }
-
-    .admin-news-panel {
-      width: min(26vw, 360px);
-    }
-
-    .mode-cards-wrapper {
-      min-width: min(30vw, 320px);
+      margin-left: clamp(4rem, 12vw, 16rem);
     }
 
     .mode-cards {
-      grid-template-columns: repeat(2, minmax(280px, 1fr));
-      padding-left: clamp(1rem, 2vw, 2.5rem);
+      padding-left: clamp(0.5rem, 1vw, 1.5rem);
     }
   }
 
-  /* Very large screens (2K and above) */
-  @media (min-width: 2560px) {
-    :global(html) {
-      font-size: clamp(18px, 1.2vw, 20px);
-    }
-
-    .animeguess-page {
-      padding: clamp(0.3rem, 0.8vw, 0.6rem) clamp(3rem, 6vw, 8rem) clamp(0.75rem, 2vw, 1.5rem);
-    }
-
-    .page-layout {
-      max-width: min(92vw, 2800px);
-      gap: clamp(2rem, 4vw, 4rem);
-    }
-
-    .page-main {
-      max-width: min(68vw, 1800px);
-    }
-
-    .leaderboard-panel {
-      width: min(32vw, 520px);
-    }
-
-    .global-stats-panel {
-      margin-left: clamp(12rem, 22vw, 20rem);
-      width: min(30vw, 420px);
-    }
-
-    .admin-news-panel {
-      width: min(28vw, 400px);
-    }
-
-    .mode-cards-wrapper {
-      min-width: min(32vw, 360px);
-    }
-
-    .mode-cards {
-      grid-template-columns: repeat(2, minmax(320px, 1fr));
-      padding-left: clamp(1.5rem, 3vw, 3rem);
-    }
-  }
-
-  /* Ultra-wide screens (4K and above) */
-  @media (min-width: 3840px) {
-    :global(html) {
-      font-size: clamp(20px, 1.4vw, 22px);
-    }
-
-    .page-layout {
-      max-width: min(90vw, 3200px);
-    }
-
-    .page-main {
-      max-width: min(65vw, 2000px);
-    }
-
-    .leaderboard-panel {
-      width: min(35vw, 600px);
-    }
-
-    .global-stats-panel {
-      margin-left: clamp(14rem, 24vw, 24rem);
-      width: min(32vw, 480px);
-    }
-
-    .admin-news-panel {
-      width: min(30vw, 460px);
-    }
-  }
-
+  /* Планшеты в портретной ориентации и маленькие ноутбуки (до 1200px) */
   @media (max-width: 1200px) {
     .page-layout {
       flex-direction: column;
+      gap: 1.25rem;
     }
 
     .page-main {
-      max-width: none;
+      max-width: 100%;
     }
 
     .leaderboard-panel {
@@ -1569,6 +1478,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
     .dashboard-row {
       flex-direction: column;
+      gap: 1rem;
     }
 
     .admin-news-panel {
@@ -1589,46 +1499,71 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     }
 
     .mode-cards {
-      grid-template-columns: repeat(2, minmax(clamp(200px, 35vw, 280px), 1fr));
+      grid-template-columns: repeat(2, minmax(12rem, 1fr));
       padding-left: 0;
     }
   }
 
+  /* Планшеты (до 900px) */
   @media (max-width: 900px) {
+    :global(html) {
+      font-size: clamp(14px, 2vw, 16px);
+    }
+
     .animeguess-page {
-      padding: clamp(0.3rem, 0.8vw, 0.5rem) clamp(0.8rem, 4vw, 2.2rem) clamp(0.6rem, 2vw, 1.5rem);
+      padding: 0.5rem 1.5rem 1rem;
     }
 
     .hero-header {
       flex-direction: column;
       align-items: flex-start;
-      padding: clamp(0.4rem, 0.9vw, 0.7rem) clamp(1rem, 1.8vw, 1.4rem);
-      gap: clamp(0.5rem, 1vw, 0.8rem);
-      margin-bottom: clamp(0.5rem, 1vw, 0.8rem);
+      padding: 0.7rem 1.25rem;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
     }
 
     .hero-footer {
       flex-direction: column;
       align-items: stretch;
-      padding: clamp(1rem, 1.8vw, 1.4rem);
+      padding: 1.25rem;
       margin-right: 0;
       width: 100%;
+      gap: 1rem;
     }
 
     .hero-achievements {
       justify-content: space-between;
+      width: 100%;
     }
 
     .mode-cards {
       grid-template-columns: 1fr;
-      gap: clamp(0.6rem, 1.2vw, 1rem);
+      gap: 0.875rem;
       padding-left: 0;
+    }
+
+    .mode-card {
+      padding: 1.5rem 1.25rem;
+    }
+
+    .admin-news-panel,
+    .global-stats-panel {
+      padding: 1rem;
     }
   }
 
-  @media (max-width: 560px) {
+  /* Мобильные устройства (до 768px) */
+  @media (max-width: 768px) {
+    :global(html) {
+      font-size: 14px;
+    }
+
     .animeguess-page {
-      padding: clamp(0.2rem, 0.6vw, 0.5rem) clamp(0.8rem, 2vw, 1rem) clamp(0.6rem, 1.5vw, 1.2rem);
+      padding: 0.4rem 1rem 0.875rem;
+    }
+
+    .page-layout {
+      gap: 1rem;
     }
 
     .hero-logo {
@@ -1639,22 +1574,34 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     .hero-header {
       align-items: center;
       text-align: center;
-      padding: clamp(0.4rem, 0.8vw, 0.6rem) clamp(0.8rem, 1.5vw, 1.2rem);
-      margin-bottom: clamp(0.4rem, 0.8vw, 0.6rem);
+      padding: 0.6rem 1rem;
+      margin-bottom: 0.6rem;
+      gap: 0.75rem;
+    }
+
+    .hero-title {
+      font-size: 1.5rem;
+    }
+
+    .home-button {
+      width: 3rem;
+      height: 3rem;
+      font-size: 1.375rem;
     }
 
     .hero-nav {
       width: 100%;
       justify-content: center;
       flex-wrap: wrap;
+      gap: 0.75rem;
     }
 
     .hero-nav-item {
       flex-direction: row;
-      gap: clamp(0.3rem, 0.5vw, 0.4rem);
+      gap: 0.4rem;
       background: rgba(255, 218, 234, 0.42);
-      padding: clamp(0.3rem, 0.5vw, 0.35rem) clamp(0.6rem, 1vw, 0.8rem);
-      border-radius: clamp(12px, 2vw, 16px);
+      padding: 0.35rem 0.75rem;
+      border-radius: 1rem;
     }
 
     .profile-nav-wrapper {
@@ -1666,12 +1613,14 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     .profile-nav-button {
       width: 100%;
       justify-content: center;
+      max-width: 20rem;
     }
 
     .profile-dropdown {
       left: 50%;
       right: auto;
       transform: translateX(-50%);
+      min-width: 18rem;
     }
 
     .hero-main {
@@ -1681,19 +1630,96 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
     .mode-cards {
       grid-template-columns: 1fr;
-      gap: clamp(0.5rem, 1vw, 0.9rem);
+      gap: 0.75rem;
       padding-left: 0;
+    }
+
+    .mode-card {
+      padding: 1.25rem 1rem;
+    }
+
+    .mode-avatar {
+      width: 5rem;
+      height: 5rem;
+      font-size: 1.75rem;
+    }
+
+    .dashboard-row {
+      gap: 0.75rem;
+    }
+
+    .admin-news-panel,
+    .global-stats-panel,
+    .leaderboard-card {
+      padding: 1rem;
+      border-radius: 1.25rem;
     }
 
     .hero-achievements {
       flex-direction: column;
       align-items: center;
       text-align: center;
+      padding: 1rem;
+      gap: 0.75rem;
+    }
+
+    .hero-achievements-value {
+      font-size: 1.5rem;
     }
 
     .hero-replays-button {
       width: 100%;
       justify-content: center;
+      padding: 1rem;
+    }
+
+    .leaderboard-card {
+      padding: 1rem;
+    }
+
+    .leaderboard-title {
+      font-size: 1.15rem;
+    }
+  }
+
+  /* Маленькие мобильные устройства (до 480px) */
+  @media (max-width: 480px) {
+    :global(html) {
+      font-size: 13px;
+    }
+
+    .animeguess-page {
+      padding: 0.3rem 0.75rem 0.75rem;
+    }
+
+    .hero-header {
+      padding: 0.5rem 0.875rem;
+    }
+
+    .hero-title {
+      font-size: 1.25rem;
+    }
+
+    .home-button {
+      width: 2.75rem;
+      height: 2.75rem;
+      font-size: 1.25rem;
+    }
+
+    .mode-card {
+      padding: 1rem 0.875rem;
+    }
+
+    .mode-avatar {
+      width: 4.5rem;
+      height: 4.5rem;
+      font-size: 1.5rem;
+    }
+
+    .admin-news-panel,
+    .global-stats-panel,
+    .leaderboard-card {
+      padding: 0.875rem;
     }
   }
 </style>
