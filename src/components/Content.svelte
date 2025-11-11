@@ -32,9 +32,7 @@ let profileDropdownEl;
 const goToHome = () => activeView.set('home');
 const goToProfile = () => activeView.set('profile');
 
-const baseMenuItems = [
-  { icon: '👑', label: 'Лидерборд', action: () => activeView.set('aniquiz') }
-];
+const baseMenuItems = [];
 
 $: isAdmin = $currentUser?.role === 'admin' || $currentUser?.is_admin === 1 || $currentUser?.isAdmin === true;
 const menuItems = baseMenuItems;
@@ -1416,6 +1414,93 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .hero-replays-button:hover .hero-replays-label {
     color: #ff6ea2;
+  }
+
+  /* Large screens (above Full HD) */
+  @media (min-width: 1920px) {
+    .animeguess-page {
+      padding: clamp(0.3rem, 0.8vw, 0.6rem) max(4rem, calc((100vw - 1800px) / 2)) clamp(0.75rem, 2vw, 1.5rem);
+    }
+
+    .page-layout {
+      max-width: 1800px;
+      margin: 0 auto;
+      gap: clamp(1rem, 2.5vw, 2rem);
+    }
+
+    .page-main {
+      max-width: min(65vw, 1400px);
+    }
+
+    .leaderboard-panel {
+      width: min(28vw, 400px);
+    }
+
+    .dashboard-row {
+      gap: clamp(0.6rem, 1.2vw, 1rem);
+    }
+
+    .hero-header {
+      padding: clamp(0.5rem, 1vw, 0.8rem) clamp(1.4rem, 2.5vw, 2rem);
+      gap: clamp(1rem, 2.5vw, 2rem);
+    }
+
+    .hero-footer {
+      padding: clamp(1rem, 1.8vw, 1.4rem) clamp(1.4rem, 2.5vw, 2rem);
+      gap: clamp(1rem, 1.8vw, 1.5rem);
+      margin-right: clamp(-2rem, -2.5vw, -2rem);
+      width: calc(100% + clamp(2rem, 2.5vw, 2rem));
+    }
+
+    .global-stats-panel {
+      margin-left: clamp(8.75rem, 17.5vw, 14rem);
+      width: min(25vw, 320px);
+    }
+
+    .admin-news-panel {
+      width: min(24vw, 320px);
+    }
+
+    .mode-cards-wrapper {
+      min-width: 280px;
+    }
+
+    .mode-cards {
+      grid-template-columns: repeat(2, minmax(280px, 1fr));
+      padding-left: clamp(0.5rem, 1.2vw, 2rem);
+    }
+  }
+
+  /* Very large screens (above 2560px) */
+  @media (min-width: 2560px) {
+    .page-layout {
+      max-width: 2000px;
+    }
+
+    .page-main {
+      max-width: 1400px;
+    }
+
+    .leaderboard-panel {
+      width: 420px;
+    }
+
+    .global-stats-panel {
+      margin-left: 14rem;
+      width: 320px;
+    }
+
+    .admin-news-panel {
+      width: 320px;
+    }
+
+    .mode-cards-wrapper {
+      min-width: 280px;
+    }
+
+    .mode-cards {
+      grid-template-columns: repeat(2, minmax(280px, 1fr));
+    }
   }
 
   @media (max-width: 1200px) {
