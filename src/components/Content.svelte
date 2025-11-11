@@ -590,7 +590,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .leaderboard-panel {
-    width: min(28vw, 500px);
+    width: min(22vw, 380px);
     flex-shrink: 0;
     margin-left: auto;
     padding-right: clamp(0.5rem, 2vw, 2rem);
@@ -1443,7 +1443,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     }
 
     .leaderboard-panel {
-      width: min(32vw, 420px);
+      width: min(28vw, 360px);
     }
 
     .global-stats-panel {
