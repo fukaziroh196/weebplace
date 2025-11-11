@@ -1286,7 +1286,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     display: grid;
     grid-template-columns: repeat(2, minmax(clamp(240px, 25vw, 280px), 1fr));
     gap: clamp(0.7rem, 1.2vw, 1rem);
-    padding-left: clamp(1.5rem, 3vw, 4rem);
+    padding-left: clamp(0.8rem, 1.5vw, 2.5rem);
   }
 
   .mode-card {
