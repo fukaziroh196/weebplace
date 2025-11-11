@@ -1419,87 +1419,117 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   /* Large screens (above Full HD) */
   @media (min-width: 1920px) {
     .animeguess-page {
-      padding: clamp(0.3rem, 0.8vw, 0.6rem) max(4rem, calc((100vw - 1800px) / 2)) clamp(0.75rem, 2vw, 1.5rem);
+      padding: clamp(0.3rem, 0.8vw, 0.6rem) clamp(2rem, 5vw, 6rem) clamp(0.75rem, 2vw, 1.5rem);
     }
 
     .page-layout {
-      max-width: 1800px;
+      max-width: min(95vw, 2400px);
       margin: 0 auto;
-      gap: clamp(1rem, 2.5vw, 2rem);
+      gap: clamp(1.5rem, 3vw, 3rem);
     }
 
     .page-main {
-      max-width: min(65vw, 1400px);
+      max-width: min(70vw, 1600px);
     }
 
     .leaderboard-panel {
-      width: min(28vw, 400px);
+      width: min(30vw, 480px);
     }
 
     .dashboard-row {
-      gap: clamp(0.6rem, 1.2vw, 1rem);
+      gap: clamp(1rem, 2vw, 1.5rem);
     }
 
     .hero-header {
-      padding: clamp(0.5rem, 1vw, 0.8rem) clamp(1.4rem, 2.5vw, 2rem);
-      gap: clamp(1rem, 2.5vw, 2rem);
+      padding: clamp(0.6rem, 1.2vw, 1rem) clamp(1.6rem, 3vw, 2.5rem);
+      gap: clamp(1.5rem, 3vw, 2.5rem);
     }
 
     .hero-footer {
-      padding: clamp(1rem, 1.8vw, 1.4rem) clamp(1.4rem, 2.5vw, 2rem);
-      gap: clamp(1rem, 1.8vw, 1.5rem);
-      margin-right: clamp(-2rem, -2.5vw, -2rem);
-      width: calc(100% + clamp(2rem, 2.5vw, 2rem));
+      padding: clamp(1.2rem, 2vw, 1.6rem) clamp(1.6rem, 3vw, 2.5rem);
+      gap: clamp(1.2rem, 2vw, 2rem);
+      margin-right: clamp(-2.5rem, -3vw, -2rem);
+      width: calc(100% + clamp(2.5rem, 3vw, 2rem));
     }
 
     .global-stats-panel {
-      margin-left: clamp(8.75rem, 17.5vw, 14rem);
-      width: min(25vw, 320px);
+      margin-left: clamp(10rem, 20vw, 18rem);
+      width: min(28vw, 380px);
     }
 
     .admin-news-panel {
-      width: min(24vw, 320px);
+      width: min(26vw, 360px);
     }
 
     .mode-cards-wrapper {
-      min-width: 280px;
+      min-width: min(30vw, 320px);
     }
 
     .mode-cards {
       grid-template-columns: repeat(2, minmax(280px, 1fr));
-      padding-left: clamp(0.5rem, 1.2vw, 2rem);
+      padding-left: clamp(1rem, 2vw, 2.5rem);
     }
   }
 
-  /* Very large screens (above 2560px) */
+  /* Very large screens (2K and above) */
   @media (min-width: 2560px) {
+    .animeguess-page {
+      padding: clamp(0.3rem, 0.8vw, 0.6rem) clamp(3rem, 6vw, 8rem) clamp(0.75rem, 2vw, 1.5rem);
+    }
+
     .page-layout {
-      max-width: 2000px;
+      max-width: min(92vw, 2800px);
+      gap: clamp(2rem, 4vw, 4rem);
     }
 
     .page-main {
-      max-width: 1400px;
+      max-width: min(68vw, 1800px);
     }
 
     .leaderboard-panel {
-      width: 420px;
+      width: min(32vw, 520px);
     }
 
     .global-stats-panel {
-      margin-left: 14rem;
-      width: 320px;
+      margin-left: clamp(12rem, 22vw, 20rem);
+      width: min(30vw, 420px);
     }
 
     .admin-news-panel {
-      width: 320px;
+      width: min(28vw, 400px);
     }
 
     .mode-cards-wrapper {
-      min-width: 280px;
+      min-width: min(32vw, 360px);
     }
 
     .mode-cards {
-      grid-template-columns: repeat(2, minmax(280px, 1fr));
+      grid-template-columns: repeat(2, minmax(320px, 1fr));
+      padding-left: clamp(1.5rem, 3vw, 3rem);
+    }
+  }
+
+  /* Ultra-wide screens (4K and above) */
+  @media (min-width: 3840px) {
+    .page-layout {
+      max-width: min(90vw, 3200px);
+    }
+
+    .page-main {
+      max-width: min(65vw, 2000px);
+    }
+
+    .leaderboard-panel {
+      width: min(35vw, 600px);
+    }
+
+    .global-stats-panel {
+      margin-left: clamp(14rem, 24vw, 24rem);
+      width: min(32vw, 480px);
+    }
+
+    .admin-news-panel {
+      width: min(30vw, 460px);
     }
   }
 
