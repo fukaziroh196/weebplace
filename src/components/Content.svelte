@@ -556,22 +556,19 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .animeguess-page {
     width: 100%;
-    height: 100vh;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    padding: clamp(0.3rem, 0.8vw, 0.6rem) clamp(1rem, 4vw, 4rem) 0;
+    padding: clamp(0.3rem, 0.8vw, 0.6rem) clamp(1rem, 4vw, 4rem) clamp(0.75rem, 2vw, 1.5rem);
     box-sizing: border-box;
-    overflow-y: auto;
   }
 
   .page-layout {
     display: flex;
-    align-items: flex-start;
+    align-items: stretch;
     gap: clamp(1rem, 2.5vw, 2.8rem);
     flex: 1;
     min-height: 0;
-    padding-bottom: clamp(0.75rem, 2vw, 1.5rem);
   }
 
   .page-main {
@@ -582,7 +579,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     flex-direction: column;
     gap: clamp(0.5rem, 1.2vw, 1rem);
     overflow: visible;
-    min-height: 0;
+    min-height: 100%;
   }
 
   .leaderboard-panel {
@@ -743,8 +740,10 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     display: flex;
     flex-wrap: nowrap;
     gap: clamp(0.6rem, 1.2vw, 1rem);
-    align-items: flex-start;
+    align-items: stretch;
     width: 100%;
+    flex: 1;
+    min-height: 0;
   }
 
   .mode-cards-wrapper {
@@ -1121,7 +1120,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     gap: clamp(0.7rem, 1.2vw, 1rem);
     overflow: visible;
     width: 100%;
-    min-height: 0;
+    min-height: 100%;
   }
 
   .hero-footer {
@@ -1140,6 +1139,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     box-sizing: border-box;
     position: relative;
     flex-shrink: 0;
+    align-self: flex-end;
   }
 
   .hero-logo {
@@ -1427,14 +1427,13 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   /* Large screens (above Full HD) */
   @media (min-width: 1920px) {
     .animeguess-page {
-      padding: clamp(0.3rem, 0.8vw, 0.6rem) clamp(2rem, 5vw, 6rem) 0;
+      padding: clamp(0.3rem, 0.8vw, 0.6rem) clamp(2rem, 5vw, 6rem) clamp(0.75rem, 2vw, 1.5rem);
     }
 
     .page-layout {
       max-width: min(95vw, 2400px);
       margin: 0 auto;
       gap: clamp(1.5rem, 3vw, 3rem);
-      padding-bottom: clamp(0.75rem, 2vw, 1.5rem);
     }
 
     .page-main {
@@ -1483,13 +1482,12 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   /* Very large screens (2K and above) */
   @media (min-width: 2560px) {
     .animeguess-page {
-      padding: clamp(0.3rem, 0.8vw, 0.6rem) clamp(3rem, 6vw, 8rem) 0;
+      padding: clamp(0.3rem, 0.8vw, 0.6rem) clamp(3rem, 6vw, 8rem) clamp(0.75rem, 2vw, 1.5rem);
     }
 
     .page-layout {
       max-width: min(92vw, 2800px);
       gap: clamp(2rem, 4vw, 4rem);
-      padding-bottom: clamp(0.75rem, 2vw, 1.5rem);
     }
 
     .page-main {
@@ -1546,7 +1544,6 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   @media (max-width: 1200px) {
     .page-layout {
       flex-direction: column;
-      padding-bottom: clamp(0.75rem, 2vw, 1.5rem);
     }
 
     .page-main {
@@ -1592,11 +1589,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   @media (max-width: 900px) {
     .animeguess-page {
-      padding: clamp(0.3rem, 0.8vw, 0.5rem) clamp(0.8rem, 4vw, 2.2rem) 0;
-    }
-
-    .page-layout {
-      padding-bottom: clamp(0.6rem, 2vw, 1.5rem);
+      padding: clamp(0.3rem, 0.8vw, 0.5rem) clamp(0.8rem, 4vw, 2.2rem) clamp(0.6rem, 2vw, 1.5rem);
     }
 
     .hero-header {
@@ -1628,11 +1621,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   @media (max-width: 560px) {
     .animeguess-page {
-      padding: clamp(0.2rem, 0.6vw, 0.5rem) clamp(0.8rem, 2vw, 1rem) 0;
-    }
-
-    .page-layout {
-      padding-bottom: clamp(0.6rem, 1.5vw, 1.2rem);
+      padding: clamp(0.2rem, 0.6vw, 0.5rem) clamp(0.8rem, 2vw, 1rem) clamp(0.6rem, 1.5vw, 1.2rem);
     }
 
     .hero-logo {
