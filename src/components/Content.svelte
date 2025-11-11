@@ -744,6 +744,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .mode-cards-wrapper {
     flex: 1;
     min-width: clamp(240px, 25vw, 280px);
+    margin-left: clamp(1.5rem, 3vw, 4rem);
   }
 
   .admin-news-panel {
@@ -1409,6 +1410,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     .mode-cards-wrapper {
       width: 100%;
       order: 1;
+      margin-left: 0;
     }
 
     .mode-cards {
