@@ -992,7 +992,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     width: clamp(220px, 25vw, 320px);
     flex-shrink: 0;
     flex-grow: 0;
-    margin-left: clamp(8rem, 16vw, 28rem);
+    margin-left: clamp(10rem, 20vw, 35rem);
+    transform: translateX(clamp(2rem, 4vw, 6rem));
     background: rgba(255, 255, 255, 0.86);
     border-radius: clamp(20px, 2.8vw, 26px);
     padding: clamp(1rem, 1.8vw, 1.4rem);
@@ -1404,6 +1405,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       order: 3;
       margin-left: 0;
       margin-right: 0;
+      transform: none;
     }
 
     .mode-cards-wrapper {
