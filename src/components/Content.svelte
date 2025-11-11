@@ -33,8 +33,6 @@ const goToHome = () => activeView.set('home');
 const goToProfile = () => activeView.set('profile');
 
 const baseMenuItems = [
-  { icon: '🍿', label: 'Угадай аниме', action: () => activeView.set('guessAnime') },
-  { icon: '📅', label: 'Повторы', action: () => openReplay() },
   { icon: '👑', label: 'Лидерборд', action: () => activeView.set('aniquiz') }
 ];
 
@@ -495,6 +493,10 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
               <span class="hero-achievements-value">{achievementsToday.toLocaleString()}</span>
               <span class="hero-achievements-meta">{playersToday.toLocaleString()} пользователей сегодня</span>
             </div>
+            <button class="hero-replays-button" on:click={openReplay}>
+              <span class="hero-replays-icon">📅</span>
+              <span class="hero-replays-label">Повторы</span>
+            </button>
           </footer>
         {/if}
       </div>
@@ -1372,6 +1374,50 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     white-space: nowrap;
   }
 
+  .hero-replays-button {
+    border: none;
+    background: rgba(255, 244, 251, 0.92);
+    border-radius: clamp(18px, 2.5vw, 22px);
+    padding: clamp(0.8rem, 1.3vw, 1rem) clamp(1.4rem, 2.2vw, 1.8rem);
+    display: flex;
+    align-items: center;
+    gap: clamp(0.6rem, 1vw, 0.8rem);
+    cursor: pointer;
+    box-shadow: 0 clamp(12px, 2vw, 16px) clamp(24px, 4vw, 32px) rgba(255, 188, 215, 0.22);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    font-family: inherit;
+  }
+
+  .hero-replays-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 clamp(14px, 2.2vw, 18px) clamp(28px, 4.2vw, 36px) rgba(255, 188, 215, 0.28);
+    background: rgba(255, 248, 253, 0.95);
+  }
+
+  .hero-replays-button:active {
+    transform: translateY(0);
+  }
+
+  .hero-replays-button:focus-visible {
+    outline: clamp(1.5px, 0.25vw, 2px) solid rgba(255, 118, 186, 0.4);
+    outline-offset: clamp(3px, 0.5vw, 4px);
+  }
+
+  .hero-replays-icon {
+    font-size: clamp(1.2rem, 1.8vw, 1.4rem);
+  }
+
+  .hero-replays-label {
+    font-size: clamp(0.85rem, 1.2vw, 0.95rem);
+    font-weight: 600;
+    color: #8d7aa1;
+    white-space: nowrap;
+  }
+
+  .hero-replays-button:hover .hero-replays-label {
+    color: #ff6ea2;
+  }
+
   @media (max-width: 1200px) {
     .page-layout {
       flex-direction: column;
@@ -1513,6 +1559,11 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       flex-direction: column;
       align-items: center;
       text-align: center;
+    }
+
+    .hero-replays-button {
+      width: 100%;
+      justify-content: center;
     }
   }
 </style>
