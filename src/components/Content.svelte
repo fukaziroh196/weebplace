@@ -593,7 +593,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     width: min(22vw, 380px);
     flex-shrink: 0;
     margin-left: auto;
-    margin-right: clamp(2rem, 5vw, 6rem);
+    margin-right: clamp(4rem, 8vw, 10rem);
     padding-right: clamp(0.5rem, 2vw, 2rem);
   }
 
