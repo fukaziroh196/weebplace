@@ -577,7 +577,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     max-width: 100%;
     margin: 0;
     width: 100%;
-    padding-right: clamp(1rem, 3vw, 4rem);
+    padding-right: clamp(0.25rem, 1vw, 1.5rem);
   }
 
   .page-main {
