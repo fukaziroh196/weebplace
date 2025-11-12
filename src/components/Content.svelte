@@ -574,9 +574,10 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     gap: clamp(1rem, 2.5vw, 3rem);
     flex: 1;
     min-height: 0;
-    max-width: min(95vw, 2600px);
-    margin: 0 auto;
+    max-width: 100%;
+    margin: 0;
     width: 100%;
+    padding-right: clamp(1rem, 3vw, 4rem);
   }
 
   .page-main {
@@ -593,8 +594,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     width: min(22vw, 380px);
     flex-shrink: 0;
     margin-left: auto;
-    margin-right: clamp(4rem, 8vw, 10rem);
-    padding-right: clamp(0.5rem, 2vw, 2rem);
+    margin-right: 0;
+    padding-right: 0;
   }
 
   .leaderboard-card {
