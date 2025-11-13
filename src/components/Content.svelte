@@ -1430,6 +1430,67 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   /* ============================================
+     Масштабирование для больших экранов (2K, 4K)
+     ============================================ */
+
+  /* Промежуточные разрешения между Full HD и 2K (1920px - 2560px) */
+  @media (min-width: 1920px) and (max-width: 2559px) {
+    .page-main {
+      max-width: min(65vw, calc(1700px + (100vw - 1920px) * 0.35)); /* Плавное увеличение от 1700px до 2266px */
+    }
+
+    .leaderboard-panel {
+      width: min(22vw, calc(380px + (100vw - 1920px) * 0.197)); /* Плавное увеличение от 380px до 506px */
+    }
+
+    .global-stats-panel {
+      width: min(25vw, calc(320px + (100vw - 1920px) * 0.166)); /* Плавное увеличение от 320px до 426px */
+    }
+
+    .admin-news-panel {
+      width: min(24vw, calc(320px + (100vw - 1920px) * 0.166)); /* Плавное увеличение от 320px до 426px */
+    }
+  }
+
+  /* 2K мониторы (2560x1440 и выше) */
+  @media (min-width: 2560px) {
+    .page-main {
+      max-width: min(65vw, 2266px); /* 1700px * 1.333 для пропорционального масштабирования */
+    }
+
+    .leaderboard-panel {
+      width: min(22vw, 506px); /* 380px * 1.333 */
+    }
+
+    .global-stats-panel {
+      width: min(25vw, 426px); /* 320px * 1.333 */
+    }
+
+    .admin-news-panel {
+      width: min(24vw, 426px); /* 320px * 1.333 */
+    }
+  }
+
+  /* 4K мониторы (3840x2160 и выше) */
+  @media (min-width: 3840px) {
+    .page-main {
+      max-width: min(65vw, 3400px); /* 1700px * 2 для пропорционального масштабирования */
+    }
+
+    .leaderboard-panel {
+      width: min(22vw, 760px); /* 380px * 2 */
+    }
+
+    .global-stats-panel {
+      width: min(25vw, 640px); /* 320px * 2 */
+    }
+
+    .admin-news-panel {
+      width: min(24vw, 640px); /* 320px * 2 */
+    }
+  }
+
+  /* ============================================
      Адаптивность для планшетов и мобильных
      ============================================ */
 
