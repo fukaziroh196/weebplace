@@ -1005,7 +1005,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     width: min(25vw, 320px);
     flex-shrink: 0;
     flex-grow: 0;
-    margin-left: clamp(7.5rem, 15vw, 27rem);
+    margin-left: clamp(6rem, 12vw, 22rem);
     background: rgba(255, 255, 255, 0.86);
     border-radius: 1.625rem;
     padding: 1.25rem;
