@@ -1435,58 +1435,70 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   /* Промежуточные разрешения между Full HD и 2K (1920px - 2560px) */
   @media (min-width: 1920px) and (max-width: 2559px) {
+    :global(html) {
+      font-size: clamp(16px, calc(16px + (100vw - 1920px) * 0.00625), 20px); /* Плавное увеличение от 16px до 20px */
+    }
+
     .page-main {
-      max-width: min(65vw, calc(1700px + (100vw - 1920px) * 0.35)); /* Плавное увеличение от 1700px до 2266px */
+      max-width: min(65vw, calc(1700px + (100vw - 1920px) * 0.6)); /* Плавное увеличение от 1700px до 2554px */
     }
 
     .leaderboard-panel {
-      width: min(22vw, calc(380px + (100vw - 1920px) * 0.197)); /* Плавное увеличение от 380px до 506px */
+      width: min(22vw, calc(380px + (100vw - 1920px) * 0.34)); /* Плавное увеличение от 380px до 570px */
     }
 
     .global-stats-panel {
-      width: min(25vw, calc(320px + (100vw - 1920px) * 0.166)); /* Плавное увеличение от 320px до 426px */
+      width: min(25vw, calc(320px + (100vw - 1920px) * 0.28)); /* Плавное увеличение от 320px до 480px */
     }
 
     .admin-news-panel {
-      width: min(24vw, calc(320px + (100vw - 1920px) * 0.166)); /* Плавное увеличение от 320px до 426px */
+      width: min(24vw, calc(320px + (100vw - 1920px) * 0.28)); /* Плавное увеличение от 320px до 480px */
     }
   }
 
   /* 2K мониторы (2560x1440 и выше) */
   @media (min-width: 2560px) {
+    :global(html) {
+      font-size: clamp(20px, 1vw, 24px); /* Увеличенный базовый размер для 2K */
+    }
+
     .page-main {
-      max-width: min(65vw, 2266px); /* 1700px * 1.333 для пропорционального масштабирования */
+      max-width: min(65vw, 2550px); /* 1700px * 1.5 для большего масштабирования */
     }
 
     .leaderboard-panel {
-      width: min(22vw, 506px); /* 380px * 1.333 */
+      width: min(22vw, 570px); /* 380px * 1.5 */
     }
 
     .global-stats-panel {
-      width: min(25vw, 426px); /* 320px * 1.333 */
+      width: min(25vw, 480px); /* 320px * 1.5 */
     }
 
     .admin-news-panel {
-      width: min(24vw, 426px); /* 320px * 1.333 */
+      width: min(24vw, 480px); /* 320px * 1.5 */
     }
   }
 
   /* 4K мониторы (3840x2160 и выше) */
   @media (min-width: 3840px) {
+    :global(html) {
+      font-size: clamp(28px, 1.2vw, 40px); /* Увеличенный базовый размер для 4K */
+    }
+
     .page-main {
-      max-width: min(65vw, 3400px); /* 1700px * 2 для пропорционального масштабирования */
+      max-width: min(65vw, 4250px); /* 1700px * 2.5 для большего масштабирования */
     }
 
     .leaderboard-panel {
-      width: min(22vw, 760px); /* 380px * 2 */
+      width: min(22vw, 950px); /* 380px * 2.5 */
     }
 
     .global-stats-panel {
-      width: min(25vw, 640px); /* 320px * 2 */
+      width: min(25vw, 800px); /* 320px * 2.5 */
     }
 
     .admin-news-panel {
-      width: min(24vw, 640px); /* 320px * 2 */
+      width: min(24vw, 800px); /* 320px * 2.5 */
     }
   }
 
