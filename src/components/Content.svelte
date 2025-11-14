@@ -1513,6 +1513,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     align-items: center;
     gap: 2rem;
     padding: 1.5rem 1.875rem;
+    min-height: 5rem;
     border-radius: 1.75rem;
     background: var(--news-panel-gradient);
     backdrop-filter: blur(20px) saturation(130%);
@@ -1566,39 +1567,43 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.35rem;
+    justify-content: center;
   }
 
   .hero-game-title {
-    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-size: clamp(1.125rem, 2.5vw, 1.5rem);
     font-weight: 900;
     color: var(--accent-primary, #9ecaff);
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
     text-align: center;
+    line-height: 1.2;
   }
 
   .hero-game-round {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
     flex-wrap: wrap;
     justify-content: center;
   }
 
   .hero-round-text {
-    font-size: clamp(0.875rem, 2vw, 1.125rem);
+    font-size: clamp(0.75rem, 1.5vw, 0.9375rem);
     font-weight: 700;
     color: var(--text-primary, #f5f6ff);
+    line-height: 1.2;
   }
 
   .hero-difficulty-badge {
     background: var(--accent-primary, #9ecaff);
     color: var(--text-primary, #f5f6ff);
-    padding: 0.25rem 0.75rem;
+    padding: 0.2rem 0.6rem;
     border-radius: 999px;
-    font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+    font-size: clamp(0.625rem, 1.2vw, 0.75rem);
     font-weight: 700;
     text-transform: uppercase;
+    line-height: 1.2;
   }
 
   .home-button {
