@@ -841,7 +841,7 @@
     display: flex;
     gap: 8px;
     justify-content: center;
-    margin: 8px auto 12px;
+    margin: 2rem auto 12px;
     padding: 0 10px;
   }
   .view-btn {
