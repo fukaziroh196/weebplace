@@ -1491,7 +1491,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     align-items: center;
     justify-content: space-between;
     gap: 2rem;
-    padding: 0.75rem 1.875rem;
+    padding: 1.125rem 1.875rem;
     border-radius: 1.75rem;
     background: var(--news-panel-gradient);
     backdrop-filter: blur(20px) saturation(130%);
