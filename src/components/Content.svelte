@@ -928,10 +928,17 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
+  :global(html, body) {
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
   :global(body, #app) {
     height: 100%;
     min-height: 100vh;
     margin: 0;
+    overflow: hidden;
     background: var(--app-background, linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%));
     background-size: var(--app-background-size, auto);
     background-attachment: var(--app-background-attachment, scroll);
@@ -943,7 +950,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .animeguess-page {
     width: 100%;
-    min-height: 100vh;
+    height: fit-content;
+    min-height: auto;
     display: flex;
     flex-direction: column;
     padding: 0.5rem clamp(1rem, 4vw, 6rem) 1rem;

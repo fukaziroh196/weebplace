@@ -18,18 +18,9 @@
   <div class="main-layout">
     <!-- Content область -->
     <div class="content-container">
-      <div class="content-scroll" bind:this={scrollEl} on:scroll={(e) => {
-        const el = e.currentTarget;
-        try { showTop = (el?.scrollTop || 0) > 600; } catch (_) { showTop = false; }
-      }}>
+      <div class="content-scroll" bind:this={scrollEl}>
         <Content />
       </div>
-      
-      {#if showTop}
-        <button class="scroll-top-btn" on:click={() => scrollEl?.scrollTo({ top: 0, behavior: 'smooth' })} title="Наверх">
-          ↑
-        </button>
-      {/if}
     </div>
   </div>
   
@@ -68,9 +59,12 @@
   
   .content-scroll {
     width: 100%;
-    height: 100%;
-    overflow-y: auto;
+    height: auto;
+    min-height: 100%;
+    overflow-y: hidden;
+    overflow-x: hidden;
     padding: 20px;
+    box-sizing: border-box;
   }
   
   @media (max-width: 768px) {
