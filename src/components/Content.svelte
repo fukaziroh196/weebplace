@@ -1349,7 +1349,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     flex-wrap: wrap;
     padding: 1.25rem 1.875rem;
     border-radius: 1.75rem;
-    background: var(--panel-highlight);
+    background: var(--news-panel-gradient);
     box-shadow: var(--shadow-outer);
     width: calc(100% + clamp(0.8rem, 1vw, 1.2rem));
     box-sizing: border-box;
