@@ -687,6 +687,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     --hero-toggle-icon-color: var(--accent-primary-strong);
     --hero-button-hover-shadow: 0 1.125rem 2.25rem rgba(60, 64, 98, 0.16);
     --hero-replays-hover-bg: rgba(248, 249, 255, 0.96);
+    --panel-highlight: #c0c7fe;
   }
 
   :global(:root[data-theme='dark']) {
@@ -755,6 +756,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     --hero-toggle-icon-color: #f4f7ff;
     --hero-button-hover-shadow: 0 1.125rem 2.25rem rgba(0, 0, 0, 0.45);
     --hero-replays-hover-bg: rgba(44, 46, 54, 1);
+    --panel-highlight: #c0c7fe;
   }
 
   :global(body, #app) {
@@ -808,7 +810,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .leaderboard-card {
     position: sticky;
     top: 1rem;
-    background: var(--panel-gradient-primary);
+    background: var(--panel-highlight);
     border-radius: 1.75rem;
     padding: 1.5rem 1.4rem 2rem;
     box-shadow: var(--shadow-outer);
@@ -1213,7 +1215,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     flex-shrink: 0;
     flex-grow: 0;
     margin-left: clamp(6.5rem, 13vw, 24rem);
-    background: var(--panel-gradient-primary);
+    background: var(--panel-highlight);
     border-radius: 1.625rem;
     padding: 1.25rem;
     box-shadow: var(--shadow-outer);
@@ -1318,7 +1320,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     gap: 2rem;
     padding: 0.75rem 1.875rem;
     border-radius: 1.75rem;
-    background: var(--panel-gradient-primary);
+    background: var(--panel-highlight);
     backdrop-filter: blur(20px) saturation(130%);
     box-shadow: var(--shadow-outer);
     margin-bottom: clamp(1.5rem, 2.5vw, 2.5rem);
@@ -1347,7 +1349,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     flex-wrap: wrap;
     padding: 1.25rem 1.875rem;
     border-radius: 1.75rem;
-    background: var(--panel-gradient-primary);
+    background: var(--panel-highlight);
     box-shadow: var(--shadow-outer);
     width: calc(100% + clamp(0.8rem, 1vw, 1.2rem));
     box-sizing: border-box;
