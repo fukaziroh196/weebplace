@@ -6,6 +6,7 @@
   import { animeGuesses as apiGuesses, getBatchSampleZipUrl, scores } from '../lib/api';
   import { quizDate, availableQuizDates, refreshQuizDates, setQuizDate } from '../stores/quizzes';
   import { refreshLeaderboard, leaderboardPeriod } from '../stores/leaderboard';
+  import { gameState } from '../stores/gameState';
   
   // Данные об угадываемых аниме
   let animeGuesses = [];
@@ -103,6 +104,25 @@
   
   // Текущая картинка для отображения
   $: currentGuess = animeGuesses[currentImageIndex] || null;
+
+  // Обновляем gameState для отображения в верхней панели
+  $: {
+    if (animeGuesses.length > 0) {
+      gameState.set({
+        title: 'УГАДАЙ АНИМЕ',
+        round: currentImageIndex + 1,
+        difficulty: 'Легко',
+        score: totalScore
+      });
+    } else {
+      gameState.set({
+        title: '',
+        round: 0,
+        difficulty: '',
+        score: 0
+      });
+    }
+  }
   
   // Визуальная обратная связь
   let answerFeedback = ''; // 'correct' | 'incorrect' | ''
@@ -507,8 +527,8 @@
         </div>
   {:else}
     <div class="quiz-container">
-        <!-- Заголовок с раундом и очками -->
-        <div class="quiz-header">
+        <!-- Заголовок с раундом и очками - скрыт, отображается в верхней панели -->
+        <div class="quiz-header" style="display: none;">
           <div class="header-left">
             <h1 class="quiz-title">УГАДАЙ АНИМЕ</h1>
             <div class="round-badge">

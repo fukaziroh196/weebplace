@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { searchResults, isSearching } from '../stores/sources';
   import { activeView } from '../stores/ui';
+  import { gameState } from '../stores/gameState';
   import ProfileView from './ProfileView.svelte';
   import AdminPanel from './AdminPanel.svelte';
   import ListsView from './ListsView.svelte';
@@ -332,10 +333,22 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   <div class="animeguess-page">
     <header class="hero-header">
       <div class="hero-logo">
-        <button class="home-button" on:click={goToHome} aria-label="Главная">
-          <span>🏠</span>
-        </button>
-        <div class="hero-title">OTAKUZ.FUN</div>
+        {#if $activeView !== 'guessAnime'}
+          <button class="home-button" on:click={goToHome} aria-label="Главная">
+            <span>🏠</span>
+          </button>
+        {/if}
+        {#if $activeView === 'guessAnime' && $gameState.title}
+          <div class="hero-game-info">
+            <div class="hero-game-title">{$gameState.title}</div>
+            <div class="hero-game-round">
+              <span class="hero-round-text">Раунд {$gameState.round}</span>
+              <span class="hero-difficulty-badge">{$gameState.difficulty}</span>
+            </div>
+          </div>
+        {:else}
+          <div class="hero-title">OTAKUZ.FUN</div>
+        {/if}
       </div>
       <nav class="hero-nav">
         {#each menuItems as item (item.label)}
@@ -1543,6 +1556,47 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     display: flex;
     align-items: center;
     gap: 0.875rem;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .hero-game-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .hero-game-title {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 900;
+    color: var(--accent-primary, #9ecaff);
+    letter-spacing: 2px;
+    text-align: center;
+  }
+
+  .hero-game-round {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .hero-round-text {
+    font-size: clamp(0.875rem, 2vw, 1.125rem);
+    font-weight: 700;
+    color: var(--text-primary, #f5f6ff);
+  }
+
+  .hero-difficulty-badge {
+    background: var(--accent-primary, #9ecaff);
+    color: var(--text-primary, #f5f6ff);
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+    font-weight: 700;
+    text-transform: uppercase;
   }
 
   .home-button {
