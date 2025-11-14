@@ -30,7 +30,7 @@ let profileButtonEl;
 let profileDropdownEl;
 
 const THEME_STORAGE_KEY = 'animeguessTheme';
-let theme = 'light';
+let theme = 'dark';
 let userChoseTheme = false;
 
 function setDocumentTheme(value) {
@@ -198,15 +198,13 @@ onMount(() => {
   if (savedTheme) {
     userChoseTheme = true;
     applyTheme(savedTheme, { persist: false });
-  } else if (prefersDark) {
-    applyTheme(prefersDark.matches ? 'dark' : 'light', { persist: false });
   } else {
-    applyTheme('light', { persist: false });
+    applyTheme('dark', { persist: false });
   }
 
-  const handleSchemeChange = event => {
+  const handleSchemeChange = () => {
     if (!userChoseTheme) {
-      applyTheme(event.matches ? 'dark' : 'light', { persist: false });
+      applyTheme('dark', { persist: false });
     }
   };
 
@@ -631,6 +629,10 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     --surface-muted: rgba(241, 243, 252, 0.9);
     --surface-pill: rgba(236, 238, 248, 0.85);
     --surface-card: rgba(233, 236, 247, 0.8);
+    --input-surface: rgba(239, 241, 252, 0.9);
+    --input-border-color: rgba(156, 165, 214, 0.18);
+    --chip-bg: rgba(228, 231, 248, 0.7);
+    --chip-border-color: rgba(128, 136, 189, 0.16);
     --text-primary: #4a495f;
     --text-secondary: rgba(74, 73, 99, 0.75);
     --text-tertiary: rgba(74, 73, 99, 0.58);
@@ -643,6 +645,9 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     --shadow-outer: 0 1.5rem 3.5rem rgba(60, 64, 98, 0.14);
     --shadow-soft: 0 1rem 2.5rem rgba(60, 64, 98, 0.12);
     --shadow-inset: inset 0 0 0 1px rgba(118, 126, 170, 0.12);
+    --divider-color: rgba(124, 139, 196, 0.12);
+    --divider-color-strong: rgba(124, 139, 196, 0.22);
+    --icon-pill-bg: rgba(215, 221, 240, 0.6);
     --tab-active-gradient: linear-gradient(135deg, #b8c1df 0%, #8d97c9 100%);
     --tab-active-shadow: 0 0.75rem 1.625rem rgba(109, 123, 181, 0.3);
     --rank-top-gradient: linear-gradient(135deg, #d5c49c 0%, #c3a96c 100%);
@@ -678,57 +683,64 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   :global(:root[data-theme='dark']) {
-    --bg-gradient-start: #10121c;
-    --bg-gradient-end: #1b1f2d;
-    --surface-primary: rgba(19, 23, 36, 0.92);
-    --surface-secondary: rgba(22, 26, 40, 0.88);
-    --surface-muted: rgba(26, 30, 45, 0.85);
-    --surface-pill: rgba(32, 36, 52, 0.82);
-    --surface-card: rgba(29, 32, 48, 0.86);
-    --text-primary: #f5f6ff;
-    --text-secondary: rgba(230, 232, 255, 0.82);
-    --text-tertiary: rgba(230, 232, 255, 0.64);
-    --text-quaternary: rgba(230, 232, 255, 0.45);
-    --accent-primary: #9fb4ff;
-    --accent-primary-strong: #d8deff;
-    --accent-secondary: #d9c089;
-    --accent-rose: #d7aac4;
-    --accent-chip: linear-gradient(135deg, #2c3148 0%, #383d57 100%);
-    --shadow-outer: 0 1.5rem 3.5rem rgba(3, 4, 7, 0.65);
-    --shadow-soft: 0 1rem 2.5rem rgba(3, 4, 7, 0.5);
-    --shadow-inset: inset 0 0 0 1px rgba(89, 97, 140, 0.5);
-    --tab-active-gradient: linear-gradient(135deg, #353c5a 0%, #475279 100%);
-    --tab-active-shadow: 0 0.75rem 1.625rem rgba(0, 0, 0, 0.55);
-    --rank-top-gradient: linear-gradient(135deg, #6a5a2f 0%, #a8843a 100%);
-    --rank-top-color: #ffe1a2;
-    --rank-pill-bg: rgba(141, 155, 214, 0.2);
-    --admin-submit-gradient: linear-gradient(135deg, #3c4260 0%, #596387 100%);
-    --admin-submit-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.5);
-    --admin-submit-shadow-hover: 0 1.375rem 2.625rem rgba(0, 0, 0, 0.6);
-    --danger-color: #ff9bb0;
-    --danger-bg: rgba(176, 72, 94, 0.45);
-    --danger-bg-hover: rgba(176, 72, 94, 0.58);
-    --success-color: #7de0b4;
-    --success-bg: rgba(60, 140, 115, 0.45);
-    --success-bg-hover: rgba(60, 140, 115, 0.6);
-    --stats-error-color: #ff7d7d;
-    --home-button-gradient: linear-gradient(135deg, #2a3046 0%, #1f2336 100%);
+    --bg-gradient-start: #1c1d22;
+    --bg-gradient-end: #1c1d22;
+    --surface-primary: rgba(36, 38, 44, 0.95);
+    --surface-secondary: rgba(36, 38, 44, 0.92);
+    --surface-muted: rgba(36, 38, 44, 0.9);
+    --surface-pill: rgba(40, 42, 48, 0.92);
+    --surface-card: rgba(40, 42, 48, 0.9);
+    --input-surface: rgba(28, 29, 34, 0.9);
+    --input-border-color: rgba(255, 255, 255, 0.05);
+    --chip-bg: rgba(255, 255, 255, 0.05);
+    --chip-border-color: rgba(255, 255, 255, 0.08);
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.6);
+    --text-tertiary: rgba(255, 255, 255, 0.35);
+    --text-quaternary: rgba(255, 255, 255, 0.2);
+    --accent-primary: #8fd6ff;
+    --accent-primary-strong: #a8e4ff;
+    --accent-secondary: #ffe9a3;
+    --accent-rose: #ffb7d5;
+    --accent-chip: linear-gradient(135deg, #c8bfff 0%, #b8a9ff 100%);
+    --shadow-outer: 0 1.5rem 3.5rem rgba(0, 0, 0, 0.35);
+    --shadow-soft: 0 1rem 2.5rem rgba(0, 0, 0, 0.35);
+    --shadow-inset: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    --divider-color: rgba(255, 255, 255, 0.05);
+    --divider-color-strong: rgba(255, 255, 255, 0.12);
+    --icon-pill-bg: rgba(255, 255, 255, 0.08);
+    --tab-active-gradient: linear-gradient(135deg, #8fd6ff 0%, #a8e4ff 100%);
+    --tab-active-shadow: 0 0.75rem 1.625rem rgba(0, 0, 0, 0.35);
+    --rank-top-gradient: linear-gradient(135deg, #ffe9a3 0%, #fddc85 100%);
+    --rank-top-color: #2e1f00;
+    --rank-pill-bg: rgba(255, 255, 255, 0.12);
+    --admin-submit-gradient: linear-gradient(135deg, #ffb7d5 0%, #fcaFCb 100%);
+    --admin-submit-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.35);
+    --admin-submit-shadow-hover: 0 1.375rem 2.625rem rgba(0, 0, 0, 0.45);
+    --danger-color: #ffb7d5;
+    --danger-bg: rgba(255, 183, 213, 0.15);
+    --danger-bg-hover: rgba(255, 183, 213, 0.25);
+    --success-color: #8fe3c1;
+    --success-bg: rgba(143, 227, 193, 0.17);
+    --success-bg-hover: rgba(143, 227, 193, 0.25);
+    --stats-error-color: #ffb7d5;
+    --home-button-gradient: linear-gradient(135deg, #2a2c32 0%, #1f2025 100%);
     --home-button-shadow: 0 1.125rem 2.1875rem rgba(0, 0, 0, 0.45);
     --home-button-shadow-hover: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.55);
-    --home-button-color: #f5f6ff;
-    --profile-button-gradient: linear-gradient(135deg, #2b3148 0%, #212539 100%);
+    --home-button-color: #ffffff;
+    --profile-button-gradient: linear-gradient(135deg, #2b2d34 0%, #212227 100%);
     --profile-button-shadow: 0 1.125rem 2rem rgba(0, 0, 0, 0.45);
     --profile-button-hover-shadow: 0 1.5rem 2.75rem rgba(0, 0, 0, 0.55);
-    --profile-avatar-bg: rgba(71, 80, 122, 0.5);
-    --mode-card-shadow: 0 1.125rem 2.25rem rgba(0, 0, 0, 0.5);
-    --mode-card-shadow-hover: 0 1.5rem 2.75rem rgba(0, 0, 0, 0.6);
-    --mode-avatar-bg: rgba(23, 27, 42, 0.85);
-    --hero-toggle-bg: rgba(36, 39, 55, 0.85);
-    --hero-toggle-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.55);
-    --hero-toggle-hover-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.65);
-    --hero-toggle-icon-color: #f5f6ff;
-    --hero-button-hover-shadow: 0 1.125rem 2.25rem rgba(0, 0, 0, 0.55);
-    --hero-replays-hover-bg: rgba(38, 43, 60, 0.95);
+    --profile-avatar-bg: rgba(255, 255, 255, 0.08);
+    --mode-card-shadow: 0 1.125rem 2.25rem rgba(0, 0, 0, 0.45);
+    --mode-card-shadow-hover: 0 1.5rem 2.75rem rgba(0, 0, 0, 0.55);
+    --mode-avatar-bg: rgba(255, 255, 255, 0.08);
+    --hero-toggle-bg: rgba(36, 38, 44, 1);
+    --hero-toggle-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.35);
+    --hero-toggle-hover-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.45);
+    --hero-toggle-icon-color: #ffffff;
+    --hero-button-hover-shadow: 0 1.125rem 2.25rem rgba(0, 0, 0, 0.45);
+    --hero-replays-hover-bg: rgba(44, 46, 54, 1);
   }
 
   :global(body, #app) {
@@ -817,7 +829,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     display: inline-flex;
     padding: 0.2rem;
     border-radius: 999px;
-    background: rgba(124, 139, 196, 0.12);
+    background: var(--divider-color);
     gap: 0.2rem;
   }
 
@@ -865,7 +877,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .leaderboard-list li.top {
     background: var(--accent-chip);
-    box-shadow: inset 0 0 0 1px rgba(151, 155, 196, 0.2);
+    box-shadow: var(--shadow-inset);
   }
 
   .leaderboard-rank {
@@ -983,8 +995,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     color: var(--text-tertiary);
     padding: 0.3rem 0.7rem;
     border-radius: 999px;
-    background: rgba(228, 231, 248, 0.7);
-    box-shadow: inset 0 0 0 1px rgba(128, 136, 189, 0.16);
+    background: var(--chip-bg);
+    box-shadow: inset 0 0 0 1px var(--chip-border-color);
     white-space: nowrap;
   }
 
@@ -999,8 +1011,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     border: none;
     border-radius: 1.125rem;
     padding: 0.8rem 1rem;
-    background: rgba(239, 241, 252, 0.9);
-    box-shadow: inset 0 0 0 1px rgba(156, 165, 214, 0.18);
+    background: var(--input-surface);
+    box-shadow: inset 0 0 0 1px var(--input-border-color);
     font-size: 0.875rem;
     color: var(--text-primary);
     resize: none;
@@ -1070,7 +1082,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     background: var(--surface-secondary);
     border-radius: 1.125rem;
     padding: 0.8rem 1rem;
-    box-shadow: inset 0 0 0 1px rgba(173, 179, 216, 0.12);
+    box-shadow: inset 0 0 0 1px var(--input-border-color);
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
@@ -1124,7 +1136,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    background: rgba(124, 139, 196, 0.15);
+    background: var(--divider-color);
     color: var(--accent-primary-strong);
     cursor: pointer;
     transition: background 0.2s ease, transform 0.2s ease;
@@ -1132,7 +1144,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .admin-news-btn:hover:not(:disabled) {
-    background: rgba(124, 139, 196, 0.22);
+    background: var(--divider-color-strong);
     transform: translateY(-1px);
   }
 
@@ -1160,7 +1172,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .admin-news-cancel {
-    background: rgba(124, 139, 196, 0.15);
+    background: var(--divider-color);
   }
 
   .admin-news-edit-input {
@@ -1174,7 +1186,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     font-size: 0.8rem;
     text-align: center;
     color: var(--text-secondary);
-    box-shadow: inset 0 0 0 1px rgba(173, 179, 216, 0.12);
+    box-shadow: inset 0 0 0 1px var(--input-border-color);
   }
 
   .admin-news-error-state {
@@ -1228,7 +1240,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     background: var(--surface-muted);
     border-radius: 1.25rem;
     padding: 0.8rem 1rem;
-    box-shadow: inset 0 0 0 1px rgba(165, 176, 218, 0.16);
+    box-shadow: inset 0 0 0 1px var(--input-border-color);
   }
 
   .stats-block h4 {
@@ -1402,8 +1414,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .hero-nav-icon {
     font-size: 1.1rem;
-    background: rgba(215, 221, 240, 0.6);
-    color: var(--accent-primary-strong);
+    background: var(--icon-pill-bg);
+    color: var(--hero-toggle-icon-color);
     padding: 0.35rem 0.6rem;
     border-radius: 999px;
   }
@@ -1897,7 +1909,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     .hero-nav-item {
       flex-direction: row;
       gap: 0.4rem;
-      background: rgba(255, 218, 234, 0.42);
+      background: var(--divider-color);
       padding: 0.35rem 0.75rem;
       border-radius: 1rem;
     }
