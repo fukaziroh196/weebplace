@@ -1762,7 +1762,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   :global(:root[data-theme='glass']) .profile-dropdown {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.3);
   }
 
   .mode-cards {
