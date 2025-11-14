@@ -830,75 +830,99 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   :global(:root[data-theme='glass']) {
     --bg-gradient-start: rgba(8, 12, 20, 0.88);
     --bg-gradient-end: rgba(18, 6, 22, 0.9);
-    --surface-primary: rgba(255, 255, 255, 0.16);
-    --surface-secondary: rgba(255, 255, 255, 0.12);
-    --surface-muted: rgba(255, 255, 255, 0.1);
-    --surface-pill: rgba(255, 255, 255, 0.18);
-    --surface-card: rgba(255, 255, 255, 0.14);
-    --input-surface: rgba(255, 255, 255, 0.2);
-    --input-border-color: rgba(255, 255, 255, 0.28);
-    --chip-bg: rgba(255, 255, 255, 0.22);
-    --chip-border-color: rgba(255, 255, 255, 0.32);
-    --panel-gradient-primary: rgba(255, 255, 255, 0.2);
-    --news-panel-gradient: rgba(255, 255, 255, 0.24);
-    --card-gradient-blue: rgba(255, 255, 255, 0.18);
-    --card-gradient-pink: rgba(255, 255, 255, 0.18);
-    --card-gradient-purple: rgba(255, 255, 255, 0.18);
-    --card-gradient-yellow: rgba(255, 255, 255, 0.18);
+    --surface-primary: rgba(255, 255, 255, 0.1);
+    --surface-secondary: rgba(255, 255, 255, 0.08);
+    --surface-muted: rgba(255, 255, 255, 0.06);
+    --surface-pill: rgba(255, 255, 255, 0.12);
+    --surface-card: rgba(255, 255, 255, 0.1);
+    --input-surface: rgba(255, 255, 255, 0.15);
+    --input-border-color: rgba(255, 255, 255, 0.35);
+    --chip-bg: rgba(255, 255, 255, 0.18);
+    --chip-border-color: rgba(255, 255, 255, 0.4);
+    --panel-gradient-primary: rgba(255, 255, 255, 0.12);
+    --news-panel-gradient: rgba(255, 255, 255, 0.15);
+    --card-gradient-blue: rgba(255, 255, 255, 0.12);
+    --card-gradient-pink: rgba(255, 255, 255, 0.12);
+    --card-gradient-purple: rgba(255, 255, 255, 0.12);
+    --card-gradient-yellow: rgba(255, 255, 255, 0.12);
     --text-primary: #f5f6ff;
-    --text-secondary: rgba(245, 246, 255, 0.75);
-    --text-tertiary: rgba(245, 246, 255, 0.52);
-    --text-quaternary: rgba(245, 246, 255, 0.32);
+    --text-secondary: rgba(245, 246, 255, 0.85);
+    --text-tertiary: rgba(245, 246, 255, 0.65);
+    --text-quaternary: rgba(245, 246, 255, 0.45);
     --focus-outline-color: rgba(255, 255, 255, 0.6);
     --accent-primary: #9ecaff;
     --accent-primary-strong: #b3d6ff;
     --accent-secondary: #ffe194;
     --accent-rose: #ffb7d5;
-    --accent-chip: rgba(255, 255, 255, 0.25);
-    --shadow-outer: 0 1.5rem 4rem rgba(0, 0, 0, 0.45);
-    --shadow-soft: 0 1rem 2.5rem rgba(0, 0, 0, 0.35);
-    --shadow-inset: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
-    --divider-color: rgba(255, 255, 255, 0.22);
-    --divider-color-strong: rgba(255, 255, 255, 0.32);
-    --icon-pill-bg: rgba(255, 255, 255, 0.35);
-    --tab-active-gradient: rgba(255, 255, 255, 0.25);
-    --tab-active-shadow: 0 0.75rem 1.625rem rgba(0, 0, 0, 0.45);
-    --rank-top-gradient: rgba(255, 255, 255, 0.25);
+    --accent-chip: rgba(255, 255, 255, 0.2);
+    --shadow-outer: 0 1.5rem 4rem rgba(0, 0, 0, 0.35);
+    --shadow-soft: 0 1rem 2.5rem rgba(0, 0, 0, 0.25);
+    --shadow-inset: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+    --divider-color: rgba(255, 255, 255, 0.25);
+    --divider-color-strong: rgba(255, 255, 255, 0.4);
+    --icon-pill-bg: rgba(255, 255, 255, 0.2);
+    --tab-active-gradient: rgba(255, 255, 255, 0.18);
+    --tab-active-shadow: 0 0.75rem 1.625rem rgba(0, 0, 0, 0.35);
+    --rank-top-gradient: rgba(255, 255, 255, 0.18);
     --rank-top-color: #ffe8a5;
-    --rank-pill-bg: rgba(255, 255, 255, 0.3);
-    --admin-submit-gradient: rgba(255, 255, 255, 0.24);
-    --admin-submit-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.5);
-    --admin-submit-shadow-hover: 0 1.375rem 2.625rem rgba(0, 0, 0, 0.55);
+    --rank-pill-bg: rgba(255, 255, 255, 0.22);
+    --admin-submit-gradient: rgba(255, 255, 255, 0.15);
+    --admin-submit-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.4);
+    --admin-submit-shadow-hover: 0 1.375rem 2.625rem rgba(0, 0, 0, 0.5);
     --danger-color: #ffb7d5;
-    --danger-bg: rgba(255, 183, 213, 0.32);
-    --danger-bg-hover: rgba(255, 183, 213, 0.42);
+    --danger-bg: rgba(255, 183, 213, 0.25);
+    --danger-bg-hover: rgba(255, 183, 213, 0.35);
     --success-color: #92f5d4;
-    --success-bg: rgba(146, 245, 212, 0.28);
-    --success-bg-hover: rgba(146, 245, 212, 0.35);
+    --success-bg: rgba(146, 245, 212, 0.22);
+    --success-bg-hover: rgba(146, 245, 212, 0.3);
     --stats-error-color: #ffb7d5;
-    --home-button-gradient: rgba(255, 255, 255, 0.28);
-    --home-button-shadow: 0 1.125rem 2.1875rem rgba(0, 0, 0, 0.45);
-    --home-button-shadow-hover: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.55);
+    --home-button-gradient: rgba(255, 255, 255, 0.18);
+    --home-button-shadow: 0 1.125rem 2.1875rem rgba(0, 0, 0, 0.35);
+    --home-button-shadow-hover: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.45);
     --home-button-color: #f5f6ff;
-    --profile-button-gradient: rgba(255, 255, 255, 0.2);
-    --profile-button-shadow: 0 1.125rem 2rem rgba(0, 0, 0, 0.4);
-    --profile-button-hover-shadow: 0 1.5rem 2.75rem rgba(0, 0, 0, 0.5);
-    --profile-avatar-bg: rgba(255, 255, 255, 0.3);
-    --mode-card-shadow: 0 1.125rem 2.25rem rgba(0, 0, 0, 0.45);
-    --mode-card-shadow-hover: 0 1.5rem 2.75rem rgba(0, 0, 0, 0.55);
-    --mode-avatar-bg: rgba(255, 255, 255, 0.22);
-    --hero-toggle-bg: rgba(255, 255, 255, 0.26);
-    --hero-toggle-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.45);
-    --hero-toggle-hover-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.55);
+    --profile-button-gradient: rgba(255, 255, 255, 0.15);
+    --profile-button-shadow: 0 1.125rem 2rem rgba(0, 0, 0, 0.3);
+    --profile-button-hover-shadow: 0 1.5rem 2.75rem rgba(0, 0, 0, 0.4);
+    --profile-avatar-bg: rgba(255, 255, 255, 0.22);
+    --mode-card-shadow: 0 1.125rem 2.25rem rgba(0, 0, 0, 0.35);
+    --mode-card-shadow-hover: 0 1.5rem 2.75rem rgba(0, 0, 0, 0.45);
+    --mode-avatar-bg: rgba(255, 255, 255, 0.18);
+    --hero-toggle-bg: rgba(255, 255, 255, 0.18);
+    --hero-toggle-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.35);
+    --hero-toggle-hover-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.45);
     --hero-toggle-icon-color: #f5f6ff;
-    --hero-button-hover-shadow: 0 1.125rem 2.25rem rgba(0, 0, 0, 0.5);
-    --hero-replays-hover-bg: rgba(255, 255, 255, 0.28);
-    --panel-highlight: rgba(255, 255, 255, 0.3);
+    --hero-button-hover-shadow: 0 1.125rem 2.25rem rgba(0, 0, 0, 0.4);
+    --hero-replays-hover-bg: rgba(255, 255, 255, 0.22);
+    --panel-highlight: rgba(255, 255, 255, 0.22);
     --app-background: linear-gradient(180deg, rgba(4, 7, 15, 0.7), rgba(21, 6, 28, 0.85)), url('/backgrounds/backsak.jpg');
     --app-background-size: cover;
     --app-background-attachment: fixed;
     --app-background-repeat: no-repeat;
     --app-background-position: center;
+  }
+
+  /* Glass theme specific styles with backdrop-filter */
+  :global(:root[data-theme='glass']) .theme-toggle,
+  :global(:root[data-theme='glass']) .profile-nav-button,
+  :global(:root[data-theme='glass']) .home-button,
+  :global(:root[data-theme='glass']) .mode-card,
+  :global(:root[data-theme='glass']) .theme-dropdown,
+  :global(:root[data-theme='glass']) .theme-option,
+  :global(:root[data-theme='glass']) .hero-nav-icon {
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+  }
+
+  :global(:root[data-theme='glass']) .profile-dropdown,
+  :global(:root[data-theme='glass']) .leaderboard-card,
+  :global(:root[data-theme='glass']) .global-stats-panel,
+  :global(:root[data-theme='glass']) .admin-news-panel,
+  :global(:root[data-theme='glass']) .hero-header,
+  :global(:root[data-theme='glass']) .hero-footer {
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   :global(body, #app) {
