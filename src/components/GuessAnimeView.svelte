@@ -808,7 +808,7 @@
     position: relative;
     width: 100%;
     max-width: 900px;
-    margin: 3rem auto 3rem;
+    margin: 3rem auto 1.5rem;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
@@ -841,7 +841,7 @@
     display: flex;
     gap: 8px;
     justify-content: center;
-    margin: 3rem auto 12px;
+    margin: 0 auto 12px;
     padding: 0 10px;
   }
   .view-btn {
