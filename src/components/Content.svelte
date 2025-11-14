@@ -182,32 +182,32 @@ const gameCards = [
   {
     title: 'Угадай аниме',
     description: 'Узнай тайтл по короткой подсказке',
-    accent: '#ff93c1',
-    background: 'linear-gradient(180deg, #dcebff 0%, #eff5ff 100%)',
+    accent: '#d883b1',
+    background: 'linear-gradient(180deg, #d0e0f0 0%, #e5eff5 100%)',
     emoji: '🎧',
     action: () => activeView.set('guessAnime')
   },
   {
     title: 'Угадай персонажа',
     description: 'Отгадай героя по внешности',
-    accent: '#ffa17a',
-    background: 'linear-gradient(180deg, #fff2ea 0%, #ffe7da 100%)',
+    accent: '#d8916a',
+    background: 'linear-gradient(180deg, #f5e8e0 0%, #ede5da 100%)',
     emoji: '🗡️',
     action: () => activeView.set('guessCharacter')
   },
   {
     title: 'Угадай опенинг',
     description: 'Соревнуйся в скорости угадывания',
-    accent: '#ff96d6',
-    background: 'linear-gradient(180deg, #ffe6f4 0%, #ffd8ee 100%)',
+    accent: '#d886c6',
+    background: 'linear-gradient(180deg, #f0e0ec 0%, #e8d0e0 100%)',
     emoji: '🎵',
     action: () => activeView.set('guessOpening')
   },
   {
     title: 'Аниме баттлы',
     description: 'Соревнуйся за любимый тайтл в дуэлях',
-    accent: '#9b8bff',
-    background: 'linear-gradient(180deg, #eae6ff 0%, #dcd1ff 100%)',
+    accent: '#8b7be8',
+    background: 'linear-gradient(180deg, #e0dce8 0%, #d0c8e0 100%)',
     emoji: '⚔️',
     action: () => activeView.set('guessBattle')
   }
@@ -654,9 +654,9 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .leaderboard-tabs button.active {
-    background: linear-gradient(135deg, #a9c0ff 0%, #7f9eff 100%);
+    background: linear-gradient(135deg, #a0b5e8 0%, #7388d8 100%);
     color: #fff;
-    box-shadow: 0 0.75rem 1.625rem rgba(125, 152, 255, 0.35);
+    box-shadow: 0 0.75rem 1.625rem rgba(115, 136, 216, 0.25);
   }
 
   .leaderboard-tabs button:not(.active):hover {
@@ -683,8 +683,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .leaderboard-list li.top {
-    background: linear-gradient(135deg, rgba(255, 235, 246, 0.85) 0%, rgba(229, 240, 255, 0.88) 100%);
-    box-shadow: inset 0 0 0 1px rgba(255, 199, 236, 0.25);
+    background: linear-gradient(135deg, rgba(240, 225, 236, 0.8) 0%, rgba(225, 235, 248, 0.85) 100%);
+    box-shadow: inset 0 0 0 1px rgba(220, 179, 216, 0.2);
   }
 
   .leaderboard-rank {
@@ -702,7 +702,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .leaderboard-list li.top .leaderboard-rank {
-    background: linear-gradient(135deg, #ffdba5 0%, #ffc875 100%);
+    background: linear-gradient(135deg, #e8d095 0%, #d8b865 100%);
     color: #825b0d;
   }
 
@@ -765,7 +765,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     background: rgba(255, 255, 255, 0.86);
     border-radius: 1.625rem;
     padding: 1.25rem;
-    box-shadow: 0 1.5rem 3.625rem rgba(255, 179, 214, 0.24);
+    box-shadow: 0 1.5rem 3.625rem rgba(220, 159, 194, 0.18);
     display: flex;
     flex-direction: column;
     gap: 0.875rem;
@@ -857,9 +857,9 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     padding: 0.55rem 1.3rem;
     font-size: 0.8rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #ff8ccc 0%, #ff6fb3 100%);
+    background: linear-gradient(135deg, #e08bb8 0%, #cc5f9a 100%);
     color: #fff;
-    box-shadow: 0 1rem 2rem rgba(255, 111, 179, 0.32);
+    box-shadow: 0 1rem 2rem rgba(204, 95, 154, 0.22);
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
     white-space: nowrap;
@@ -873,7 +873,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .admin-news-submit:not(:disabled):hover {
     transform: translateY(-2px);
-    box-shadow: 0 1.375rem 2.625rem rgba(255, 111, 179, 0.38);
+    box-shadow: 0 1.375rem 2.625rem rgba(204, 95, 154, 0.28);
   }
 
   .admin-news-list {
@@ -1113,7 +1113,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     border-radius: 1.75rem;
     background: rgba(255, 255, 255, 0.78);
     backdrop-filter: blur(20px) saturation(130%);
-    box-shadow: 0 1.5rem 3.75rem rgba(255, 158, 205, 0.28);
+    box-shadow: 0 1.5rem 3.75rem rgba(216, 158, 185, 0.2);
     margin-bottom: clamp(1.5rem, 2.5vw, 2.5rem);
     z-index: 200;
     flex-wrap: wrap;
@@ -1163,26 +1163,26 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #ffd6ec 0%, #ffb9df 100%);
-    box-shadow: 0 1.125rem 2.1875rem rgba(255, 158, 205, 0.35);
-    color: #ff6aa3;
+    background: linear-gradient(135deg, #f0d4e0 0%, #e5b5d1 100%);
+    box-shadow: 0 1.125rem 2.1875rem rgba(216, 138, 175, 0.25);
+    color: #d85a8e;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
   .home-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 1.25rem 2.5rem rgba(255, 158, 205, 0.4);
+    box-shadow: 0 1.25rem 2.5rem rgba(216, 138, 175, 0.3);
   }
 
   .home-button:focus-visible {
-    outline: 2px solid rgba(255, 118, 186, 0.5);
+    outline: 2px solid rgba(216, 118, 166, 0.4);
     outline-offset: 3px;
   }
 
   .hero-title {
     font-size: 2rem;
     font-weight: 800;
-    color: #ff74ad;
+    color: #d9649a;
     letter-spacing: 0.02em;
     white-space: nowrap;
   }
@@ -1210,7 +1210,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .hero-nav-item:hover {
-    color: #ff6ea2;
+    color: #d86293;
     transform: translateY(-2px);
   }
 
@@ -1221,8 +1221,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .hero-nav-icon {
     font-size: 1.1rem;
-    background: rgba(255, 201, 229, 0.45);
-    color: #ff78b4;
+    background: rgba(230, 191, 219, 0.4);
+    color: #d870a4;
     padding: 0.35rem 0.6rem;
     border-radius: 999px;
   }
@@ -1353,13 +1353,13 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .hero-achievements {
-    background: rgba(255, 244, 251, 0.92);
+    background: rgba(245, 235, 242, 0.88);
     border-radius: 1.375rem;
     padding: 1rem 1.625rem;
     display: flex;
     align-items: center;
     gap: 1.25rem;
-    box-shadow: 0 1rem 2rem rgba(255, 188, 215, 0.22);
+    box-shadow: 0 1rem 2rem rgba(220, 168, 195, 0.16);
     flex-wrap: wrap;
   }
 
@@ -1375,7 +1375,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .hero-achievements-value {
     font-size: 1.75rem;
     font-weight: 800;
-    color: #ff6ea2;
+    color: #d86293;
     white-space: nowrap;
   }
 
@@ -1387,21 +1387,21 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .hero-replays-button {
     border: none;
-    background: rgba(255, 244, 251, 0.92);
+    background: rgba(245, 235, 242, 0.88);
     border-radius: 1.375rem;
     padding: 1rem 1.625rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
     cursor: pointer;
-    box-shadow: 0 1rem 2rem rgba(255, 188, 215, 0.22);
+    box-shadow: 0 1rem 2rem rgba(220, 168, 195, 0.16);
     transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
     font-family: inherit;
   }
 
   .hero-replays-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 1.125rem 2.25rem rgba(255, 188, 215, 0.28);
+    box-shadow: 0 1.125rem 2.25rem rgba(220, 168, 195, 0.2);
     background: rgba(255, 248, 253, 0.95);
   }
 
@@ -1426,7 +1426,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .hero-replays-button:hover .hero-replays-label {
-    color: #ff6ea2;
+    color: #d86293;
   }
 
   /* ============================================
