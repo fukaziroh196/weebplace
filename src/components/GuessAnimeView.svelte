@@ -750,7 +750,7 @@
   .quiz-title {
     font-size: clamp(1.5rem, 5vw, 2.5rem);
     font-weight: 900;
-    color: var(--accent);
+    color: var(--accent-primary, #9ecaff);
     letter-spacing: 2px;
     margin: 0;
     text-align: center;
@@ -771,7 +771,7 @@
   }
   
   .difficulty-badge {
-    background: var(--accent);
+    background: var(--accent-primary, #9ecaff);
     color: white;
     padding: 4px 12px;
     border-radius: 20px;
@@ -792,7 +792,7 @@
   .score-value {
     font-size: clamp(1.8rem, 4vw, 2.8rem);
     font-weight: 900;
-    color: var(--accent);
+    color: var(--accent-primary, #9ecaff);
     line-height: 1;
     text-shadow: none;
   }
@@ -857,7 +857,7 @@
   }
   .view-btn:hover:not(:disabled) { background: rgba(255,255,255,0.12); }
   .view-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-  .view-btn.active { background: var(--accent); border-color: var(--accent2); }
+  .view-btn.active { background: var(--accent-primary, #9ecaff); border-color: var(--accent-primary-strong, #b3d6ff); }
   
   .first-letter-display {
     width: 100%;
@@ -873,7 +873,7 @@
   .first-letter-text {
     font-size: clamp(1.2rem, 3vw, 1.8rem);
     font-weight: 600;
-    color: var(--accent);
+    color: var(--accent-primary, #9ecaff);
     letter-spacing: 0.05em;
     font-family: monospace;
   }
@@ -901,20 +901,20 @@
   
   .clue-btn.locked {
     background: var(--panelStrong);
-    border-color: var(--accent);
+    border-color: var(--accent-primary, #9ecaff);
     color: var(--text);
   }
   
   .clue-btn.locked:hover:not(:disabled) {
     background: var(--extra);
-    border-color: var(--accent2);
+    border-color: var(--accent-primary-strong, #b3d6ff);
     color: #FFFFFF;
     transform: translateY(-2px);
   }
   
   .clue-btn.unlocked {
     background: var(--extra);
-    border-color: var(--accent2);
+    border-color: var(--accent-primary-strong, #b3d6ff);
     color: #FFFFFF;
   }
   
@@ -956,7 +956,7 @@
   
   .answer-input:focus {
     outline: none;
-    border-color: var(--accent);
+    border-color: var(--accent-primary, #9ecaff);
     background: rgba(255, 255, 255, 0.08);
   }
   
@@ -965,8 +965,8 @@
   }
   
   .answer-input.answer-correct {
-    border-color: #4CAF50 !important;
-    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+    border-color: var(--accent-primary, #9ecaff) !important;
+    box-shadow: 0 0 10px rgba(158, 202, 255, 0.5);
   }
   
   .answer-input.answer-incorrect {
@@ -983,7 +983,7 @@
   
   .guess-btn {
     padding: 14px 30px;
-    background: var(--accent);
+    background: var(--accent-primary, #9ecaff);
     color: white;
     font-weight: 900;
     font-size: clamp(0.875rem, 2.5vw, 1rem);
@@ -996,7 +996,7 @@
   }
   
   .guess-btn:hover {
-    background: var(--accent2);
+    background: var(--accent-primary-strong, #b3d6ff);
     transform: translateY(-2px);
     box-shadow: none;
   }
@@ -1103,12 +1103,12 @@
   }
   
   .progress-dot.completed {
-    background: var(--accent);
+    background: var(--accent-primary, #9ecaff);
     box-shadow: none;
   }
   
   .progress-dot.active {
-    background: var(--accent);
+    background: var(--accent-primary, #9ecaff);
     box-shadow: none;
     transform: scale(1.3);
   }
@@ -1174,7 +1174,7 @@
   }
   
   .final-score-box {
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    background: linear-gradient(135deg, var(--accent-primary, #9ecaff) 0%, var(--accent-primary-strong, #b3d6ff) 100%);
     border-radius: 12px;
     padding: 20px;
     text-align: center;
@@ -1215,7 +1215,7 @@
   }
   
   .round-label {
-    color: var(--accent);
+    color: var(--accent-primary, #9ecaff);
     font-weight: 700;
     font-size: clamp(0.85rem, 1.8vw, 0.95rem);
   }
@@ -1260,7 +1260,7 @@
   .close-results-btn {
     width: 100%;
     padding: 14px;
-    background: var(--accent);
+    background: var(--accent-primary, #9ecaff);
     color: white;
     font-weight: 900;
     font-size: 1rem;
@@ -1273,7 +1273,7 @@
   }
   
   .close-results-btn:hover {
-    background: var(--accent2);
+    background: var(--accent-primary-strong, #b3d6ff);
     transform: translateY(-2px);
     box-shadow: none;
   }
