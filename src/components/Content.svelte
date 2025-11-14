@@ -26,12 +26,23 @@
   
 let showReplay = false;
 let showProfileMenu = false;
+let showThemeMenu = false;
 let profileButtonEl;
 let profileDropdownEl;
+let themeButtonEl;
+let themeDropdownEl;
 
 const THEME_STORAGE_KEY = 'animeguessTheme';
 let theme = 'dark';
 let userChoseTheme = false;
+const themeOptions = [
+  { id: 'light', label: 'Светлая' },
+  { id: 'dark', label: 'Тёмная' }
+];
+const themeLabels = {
+  light: 'Светлая',
+  dark: 'Тёмная'
+};
 
 function setDocumentTheme(value) {
   if (typeof document !== 'undefined') {
@@ -50,6 +61,15 @@ function applyTheme(value, { persist = true } = {}) {
 
 function toggleTheme() {
   applyTheme(theme === 'dark' ? 'light' : 'dark');
+}
+
+function selectTheme(nextTheme) {
+  if (theme === nextTheme) {
+    showThemeMenu = false;
+    return;
+  }
+  applyTheme(nextTheme);
+  showThemeMenu = false;
 }
 
 const goToHome = () => activeView.set('home');
@@ -177,12 +197,31 @@ function toggleProfileMenu() {
 function closeProfileMenu() {
   showProfileMenu = false;
   }
+
+function toggleThemeMenu() {
+  showThemeMenu = !showThemeMenu;
+}
+
+function closeThemeMenu() {
+  showThemeMenu = false;
+}
   
 function handleClickOutside(event) {
-  if (!showProfileMenu) return;
-  if (profileDropdownEl && profileDropdownEl.contains(event.target)) return;
-  if (profileButtonEl && profileButtonEl.contains(event.target)) return;
-  showProfileMenu = false;
+  const target = event.target;
+  if (showProfileMenu) {
+    const insideProfileDropdown = profileDropdownEl && profileDropdownEl.contains(target);
+    const onProfileButton = profileButtonEl && profileButtonEl.contains(target);
+    if (!insideProfileDropdown && !onProfileButton) {
+      showProfileMenu = false;
+    }
+  }
+  if (showThemeMenu) {
+    const insideThemeDropdown = themeDropdownEl && themeDropdownEl.contains(target);
+    const onThemeButton = themeButtonEl && themeButtonEl.contains(target);
+    if (!insideThemeDropdown && !onThemeButton) {
+      showThemeMenu = false;
+    }
+  }
   }
   
 onMount(() => {
@@ -301,15 +340,32 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
             <span class="hero-nav-label">{item.label}</span>
           </button>
         {/each}
-        <button
-          class="theme-toggle"
-          type="button"
-          aria-pressed={theme === 'dark'}
-          on:click={toggleTheme}
-        >
-          <span class="theme-toggle-icon">{theme === 'dark' ? '🌙' : '☀️'}</span>
-          <span class="theme-toggle-label">{theme === 'dark' ? 'Тёмная' : 'Светлая'}</span>
-        </button>
+        <div class="theme-selector">
+          <button
+            class="theme-toggle"
+            type="button"
+            bind:this={themeButtonEl}
+            aria-expanded={showThemeMenu}
+            on:click={toggleThemeMenu}
+          >
+            <span class="theme-toggle-icon">🎨</span>
+            <span class="theme-toggle-label">{themeLabels[theme] ?? 'Выбрать тему'}</span>
+          </button>
+          {#if showThemeMenu}
+            <div class="theme-dropdown" bind:this={themeDropdownEl}>
+              {#each themeOptions as option}
+                <button
+                  type="button"
+                  class="theme-option"
+                  class:active={theme === option.id}
+                  on:click={() => selectTheme(option.id)}
+                >
+                  {option.label}
+                </button>
+              {/each}
+            </div>
+          {/if}
+        </div>
         <div class="profile-nav-wrapper">
           <button
             class="profile-nav-button"
@@ -1469,6 +1525,46 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .theme-toggle-label {
     white-space: nowrap;
+  }
+
+  .theme-selector {
+    position: relative;
+  }
+
+  .theme-dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.6rem);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    background: var(--surface-primary);
+    border-radius: 1.125rem;
+    box-shadow: var(--shadow-outer);
+    padding: 0.5rem;
+    min-width: 10rem;
+    z-index: 400;
+  }
+
+  .theme-option {
+    border: none;
+    border-radius: 0.75rem;
+    padding: 0.45rem 0.75rem;
+    background: transparent;
+    color: var(--text-primary);
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .theme-option:hover {
+    background: var(--divider-color);
+  }
+
+  .theme-option.active {
+    background: var(--hero-toggle-bg);
+    color: var(--accent-primary);
   }
 
   .profile-nav-wrapper {
