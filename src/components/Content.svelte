@@ -335,7 +335,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
         <button class="home-button" on:click={goToHome} aria-label="Главная">
           <span>🏠</span>
         </button>
-        <div class="hero-title">AnimeGuess!</div>
+        <div class="hero-title">OTAKUZ.FUN</div>
       </div>
       <nav class="hero-nav">
         {#each menuItems as item (item.label)}
