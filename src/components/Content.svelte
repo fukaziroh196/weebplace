@@ -1761,6 +1761,10 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     backdrop-filter: blur(20px);
   }
 
+  :global(:root[data-theme='glass']) .profile-dropdown {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
   .mode-cards {
     display: grid;
     grid-template-columns: repeat(2, minmax(15rem, 1fr));
