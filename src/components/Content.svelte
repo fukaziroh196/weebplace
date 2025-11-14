@@ -29,6 +29,29 @@ let showProfileMenu = false;
 let profileButtonEl;
 let profileDropdownEl;
 
+const THEME_STORAGE_KEY = 'animeguessTheme';
+let theme = 'light';
+let userChoseTheme = false;
+
+function setDocumentTheme(value) {
+  if (typeof document !== 'undefined') {
+    document.documentElement.dataset.theme = value;
+  }
+}
+
+function applyTheme(value, { persist = true } = {}) {
+  theme = value;
+  setDocumentTheme(value);
+  if (persist && typeof localStorage !== 'undefined') {
+    localStorage.setItem(THEME_STORAGE_KEY, value);
+    userChoseTheme = true;
+  }
+}
+
+function toggleTheme() {
+  applyTheme(theme === 'dark' ? 'light' : 'dark');
+}
+
 const goToHome = () => activeView.set('home');
 const goToProfile = () => activeView.set('profile');
 
@@ -169,12 +192,41 @@ onMount(() => {
   loadGlobalStats();
   loadNews();
 
+  const prefersDark = typeof window.matchMedia === 'function' ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  const savedTheme = typeof localStorage !== 'undefined' ? localStorage.getItem(THEME_STORAGE_KEY) : null;
+
+  if (savedTheme) {
+    userChoseTheme = true;
+    applyTheme(savedTheme, { persist: false });
+  } else if (prefersDark) {
+    applyTheme(prefersDark.matches ? 'dark' : 'light', { persist: false });
+  } else {
+    applyTheme('light', { persist: false });
+  }
+
+  const handleSchemeChange = event => {
+    if (!userChoseTheme) {
+      applyTheme(event.matches ? 'dark' : 'light', { persist: false });
+    }
+  };
+
   window.addEventListener('click', handleClickOutside);
   window.addEventListener('closeProfileMenu', closeProfileMenu);
+
+  if (prefersDark?.addEventListener) {
+    prefersDark.addEventListener('change', handleSchemeChange);
+  } else if (prefersDark?.addListener) {
+    prefersDark.addListener(handleSchemeChange);
+  }
 
   return () => {
     window.removeEventListener('click', handleClickOutside);
     window.removeEventListener('closeProfileMenu', closeProfileMenu);
+    if (prefersDark?.removeEventListener) {
+      prefersDark.removeEventListener('change', handleSchemeChange);
+    } else if (prefersDark?.removeListener) {
+      prefersDark.removeListener(handleSchemeChange);
+    }
   };
 });
   
@@ -183,7 +235,9 @@ const gameCards = [
     title: 'Угадай аниме',
     description: 'Узнай тайтл по короткой подсказке',
     accent: '#d883b1',
+    accentDark: '#a7b9ff',
     background: 'linear-gradient(180deg, #d0e0f0 0%, #e5eff5 100%)',
+    backgroundDark: 'linear-gradient(180deg, #1f2537 0%, #262f45 100%)',
     emoji: '🎧',
     action: () => activeView.set('guessAnime')
   },
@@ -191,7 +245,9 @@ const gameCards = [
     title: 'Угадай персонажа',
     description: 'Отгадай героя по внешности',
     accent: '#d8916a',
+    accentDark: '#f0c38d',
     background: 'linear-gradient(180deg, #f5e8e0 0%, #ede5da 100%)',
+    backgroundDark: 'linear-gradient(180deg, #2c2521 0%, #352c25 100%)',
     emoji: '🗡️',
     action: () => activeView.set('guessCharacter')
   },
@@ -199,7 +255,9 @@ const gameCards = [
     title: 'Угадай опенинг',
     description: 'Соревнуйся в скорости угадывания',
     accent: '#d886c6',
+    accentDark: '#dea8d6',
     background: 'linear-gradient(180deg, #f0e0ec 0%, #e8d0e0 100%)',
+    backgroundDark: 'linear-gradient(180deg, #2a2130 0%, #372438 100%)',
     emoji: '🎵',
     action: () => activeView.set('guessOpening')
   },
@@ -207,7 +265,9 @@ const gameCards = [
     title: 'Аниме баттлы',
     description: 'Соревнуйся за любимый тайтл в дуэлях',
     accent: '#8b7be8',
+    accentDark: '#c5b8ff',
     background: 'linear-gradient(180deg, #e0dce8 0%, #d0c8e0 100%)',
+    backgroundDark: 'linear-gradient(180deg, #231f33 0%, #2e2840 100%)',
     emoji: '⚔️',
     action: () => activeView.set('guessBattle')
   }
@@ -243,6 +303,15 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
             <span class="hero-nav-label">{item.label}</span>
           </button>
         {/each}
+        <button
+          class="theme-toggle"
+          type="button"
+          aria-pressed={theme === 'dark'}
+          on:click={toggleTheme}
+        >
+          <span class="theme-toggle-icon">{theme === 'dark' ? '🌙' : '☀️'}</span>
+          <span class="theme-toggle-label">{theme === 'dark' ? 'Тёмная' : 'Светлая'}</span>
+        </button>
         <div class="profile-nav-wrapper">
           <button
             class="profile-nav-button"
@@ -387,8 +456,12 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
               <section class="mode-cards-wrapper">
                 <section class="mode-cards">
                   {#each gameCards as card (card.title)}
-                    <button class="mode-card" style={`background:${card.background};`} on:click={card.action}>
-                      <div class="mode-avatar" style={`color:${card.accent}`}>
+                  <button
+                    class="mode-card"
+                    style={`--card-bg:${theme === 'dark' ? card.backgroundDark : card.background}; --card-accent:${theme === 'dark' ? card.accentDark : card.accent};`}
+                    on:click={card.action}
+                  >
+                    <div class="mode-avatar">
                         <span>{card.emoji}</span>
                       </div>
                       <span class="mode-label">{card.title}</span>
@@ -570,6 +643,92 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     --shadow-outer: 0 1.5rem 3.5rem rgba(60, 64, 98, 0.14);
     --shadow-soft: 0 1rem 2.5rem rgba(60, 64, 98, 0.12);
     --shadow-inset: inset 0 0 0 1px rgba(118, 126, 170, 0.12);
+    --tab-active-gradient: linear-gradient(135deg, #b8c1df 0%, #8d97c9 100%);
+    --tab-active-shadow: 0 0.75rem 1.625rem rgba(109, 123, 181, 0.3);
+    --rank-top-gradient: linear-gradient(135deg, #d5c49c 0%, #c3a96c 100%);
+    --rank-top-color: #6a4f1d;
+    --rank-pill-bg: rgba(128, 140, 202, 0.18);
+    --admin-submit-gradient: linear-gradient(135deg, #c9cde4 0%, #9da8cf 100%);
+    --admin-submit-shadow: 0 1rem 2rem rgba(114, 124, 167, 0.18);
+    --admin-submit-shadow-hover: 0 1.375rem 2.625rem rgba(114, 124, 167, 0.24);
+    --danger-color: #c4687f;
+    --danger-bg: rgba(204, 120, 134, 0.18);
+    --danger-bg-hover: rgba(204, 120, 134, 0.24);
+    --success-color: #3a8c72;
+    --success-bg: rgba(120, 176, 156, 0.2);
+    --success-bg-hover: rgba(120, 176, 156, 0.26);
+    --stats-error-color: #c46868;
+    --home-button-gradient: linear-gradient(135deg, #e1e6f5 0%, #d3daed 100%);
+    --home-button-shadow: 0 1.125rem 2.1875rem rgba(109, 122, 181, 0.22);
+    --home-button-shadow-hover: 0 1.25rem 2.5rem rgba(109, 122, 181, 0.3);
+    --home-button-color: var(--accent-primary-strong);
+    --profile-button-gradient: linear-gradient(135deg, #fdfefe 0%, #ecf1fb 100%);
+    --profile-button-shadow: 0 1.125rem 2rem rgba(101, 122, 178, 0.16);
+    --profile-button-hover-shadow: 0 1.5rem 2.75rem rgba(101, 122, 178, 0.24);
+    --profile-avatar-bg: rgba(137, 160, 209, 0.18);
+    --mode-card-shadow: 0 1.125rem 2.25rem rgba(109, 121, 177, 0.16);
+    --mode-card-shadow-hover: 0 1.5rem 2.75rem rgba(109, 121, 177, 0.24);
+    --mode-avatar-bg: rgba(255, 255, 255, 0.82);
+    --hero-toggle-bg: var(--surface-pill);
+    --hero-toggle-shadow: var(--shadow-soft);
+    --hero-toggle-hover-shadow: 0 0.875rem 1.75rem rgba(60, 64, 98, 0.22);
+    --hero-toggle-icon-color: var(--accent-primary-strong);
+    --hero-button-hover-shadow: 0 1.125rem 2.25rem rgba(60, 64, 98, 0.16);
+    --hero-replays-hover-bg: rgba(248, 249, 255, 0.96);
+  }
+
+  :global(:root[data-theme='dark']) {
+    --bg-gradient-start: #10121c;
+    --bg-gradient-end: #1b1f2d;
+    --surface-primary: rgba(19, 23, 36, 0.92);
+    --surface-secondary: rgba(22, 26, 40, 0.88);
+    --surface-muted: rgba(26, 30, 45, 0.85);
+    --surface-pill: rgba(32, 36, 52, 0.82);
+    --surface-card: rgba(29, 32, 48, 0.86);
+    --text-primary: #f5f6ff;
+    --text-secondary: rgba(230, 232, 255, 0.82);
+    --text-tertiary: rgba(230, 232, 255, 0.64);
+    --text-quaternary: rgba(230, 232, 255, 0.45);
+    --accent-primary: #9fb4ff;
+    --accent-primary-strong: #d8deff;
+    --accent-secondary: #d9c089;
+    --accent-rose: #d7aac4;
+    --accent-chip: linear-gradient(135deg, #2c3148 0%, #383d57 100%);
+    --shadow-outer: 0 1.5rem 3.5rem rgba(3, 4, 7, 0.65);
+    --shadow-soft: 0 1rem 2.5rem rgba(3, 4, 7, 0.5);
+    --shadow-inset: inset 0 0 0 1px rgba(89, 97, 140, 0.5);
+    --tab-active-gradient: linear-gradient(135deg, #353c5a 0%, #475279 100%);
+    --tab-active-shadow: 0 0.75rem 1.625rem rgba(0, 0, 0, 0.55);
+    --rank-top-gradient: linear-gradient(135deg, #6a5a2f 0%, #a8843a 100%);
+    --rank-top-color: #ffe1a2;
+    --rank-pill-bg: rgba(141, 155, 214, 0.2);
+    --admin-submit-gradient: linear-gradient(135deg, #3c4260 0%, #596387 100%);
+    --admin-submit-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.5);
+    --admin-submit-shadow-hover: 0 1.375rem 2.625rem rgba(0, 0, 0, 0.6);
+    --danger-color: #ff9bb0;
+    --danger-bg: rgba(176, 72, 94, 0.45);
+    --danger-bg-hover: rgba(176, 72, 94, 0.58);
+    --success-color: #7de0b4;
+    --success-bg: rgba(60, 140, 115, 0.45);
+    --success-bg-hover: rgba(60, 140, 115, 0.6);
+    --stats-error-color: #ff7d7d;
+    --home-button-gradient: linear-gradient(135deg, #2a3046 0%, #1f2336 100%);
+    --home-button-shadow: 0 1.125rem 2.1875rem rgba(0, 0, 0, 0.45);
+    --home-button-shadow-hover: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.55);
+    --home-button-color: #f5f6ff;
+    --profile-button-gradient: linear-gradient(135deg, #2b3148 0%, #212539 100%);
+    --profile-button-shadow: 0 1.125rem 2rem rgba(0, 0, 0, 0.45);
+    --profile-button-hover-shadow: 0 1.5rem 2.75rem rgba(0, 0, 0, 0.55);
+    --profile-avatar-bg: rgba(71, 80, 122, 0.5);
+    --mode-card-shadow: 0 1.125rem 2.25rem rgba(0, 0, 0, 0.5);
+    --mode-card-shadow-hover: 0 1.5rem 2.75rem rgba(0, 0, 0, 0.6);
+    --mode-avatar-bg: rgba(23, 27, 42, 0.85);
+    --hero-toggle-bg: rgba(36, 39, 55, 0.85);
+    --hero-toggle-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.55);
+    --hero-toggle-hover-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.65);
+    --hero-toggle-icon-color: #f5f6ff;
+    --hero-button-hover-shadow: 0 1.125rem 2.25rem rgba(0, 0, 0, 0.55);
+    --hero-replays-hover-bg: rgba(38, 43, 60, 0.95);
   }
 
   :global(body, #app) {
@@ -676,9 +835,9 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .leaderboard-tabs button.active {
-    background: linear-gradient(135deg, #b8c1df 0%, #8d97c9 100%);
+    background: var(--tab-active-gradient);
     color: #fff;
-    box-shadow: 0 0.75rem 1.625rem rgba(109, 123, 181, 0.3);
+    box-shadow: var(--tab-active-shadow);
   }
 
   .leaderboard-tabs button:not(.active):hover {
@@ -713,7 +872,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     width: 2.5rem;
     height: 2.5rem;
     border-radius: 0.875rem;
-    background: rgba(128, 140, 202, 0.18);
+    background: var(--rank-pill-bg);
     color: var(--accent-primary-strong);
     font-weight: 800;
     font-size: 0.9375rem;
@@ -724,8 +883,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .leaderboard-list li.top .leaderboard-rank {
-    background: linear-gradient(135deg, #d5c49c 0%, #c3a96c 100%);
-    color: #6a4f1d;
+    background: var(--rank-top-gradient);
+    color: var(--rank-top-color);
   }
 
   .leaderboard-info {
@@ -870,7 +1029,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     margin-top: 0.3rem;
     font-size: 0.75rem;
     font-weight: 600;
-    color: #c4687f;
+    color: var(--danger-color);
   }
 
   .admin-news-submit {
@@ -879,9 +1038,9 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     padding: 0.55rem 1.3rem;
     font-size: 0.8rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #c9cde4 0%, #9da8cf 100%);
+    background: var(--admin-submit-gradient);
     color: #fff;
-    box-shadow: 0 1rem 2rem rgba(114, 124, 167, 0.18);
+    box-shadow: var(--admin-submit-shadow);
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
     white-space: nowrap;
@@ -895,7 +1054,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .admin-news-submit:not(:disabled):hover {
     transform: translateY(-2px);
-    box-shadow: 0 1.375rem 2.625rem rgba(114, 124, 167, 0.24);
+    box-shadow: var(--admin-submit-shadow-hover);
   }
 
   .admin-news-list {
@@ -983,21 +1142,21 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .admin-news-delete {
-    background: rgba(204, 120, 134, 0.18);
-    color: #b85d71;
+    background: var(--danger-bg);
+    color: var(--danger-color);
   }
 
   .admin-news-delete:hover:not(:disabled) {
-    background: rgba(204, 120, 134, 0.24);
+    background: var(--danger-bg-hover);
   }
 
   .admin-news-save {
-    background: rgba(120, 176, 156, 0.2);
-    color: #3a8c72;
+    background: var(--success-bg);
+    color: var(--success-color);
   }
 
   .admin-news-save:hover:not(:disabled) {
-    background: rgba(120, 176, 156, 0.26);
+    background: var(--success-bg-hover);
   }
 
   .admin-news-cancel {
@@ -1019,7 +1178,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .admin-news-error-state {
-    color: #c4687f;
+    color: var(--danger-color);
     font-weight: 600;
   }
 
@@ -1121,7 +1280,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .stats-error {
-    color: #c46868;
+    color: var(--stats-error-color);
   }
 
   .hero-header {
@@ -1185,15 +1344,15 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #e1e6f5 0%, #d3daed 100%);
-    box-shadow: 0 1.125rem 2.1875rem rgba(109, 122, 181, 0.22);
-    color: var(--accent-primary-strong);
+    background: var(--home-button-gradient);
+    box-shadow: var(--home-button-shadow);
+    color: var(--home-button-color);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
   .home-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 1.25rem 2.5rem rgba(109, 122, 181, 0.3);
+    box-shadow: var(--home-button-shadow-hover);
   }
 
   .home-button:focus-visible {
@@ -1249,6 +1408,41 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     border-radius: 999px;
   }
 
+  .theme-toggle {
+    border: none;
+    border-radius: 999px;
+    padding: 0.45rem 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--hero-toggle-bg);
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.82rem;
+    cursor: pointer;
+    box-shadow: var(--hero-toggle-shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .theme-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--hero-toggle-hover-shadow);
+  }
+
+  .theme-toggle:focus-visible {
+    outline: 2px solid rgba(124, 139, 196, 0.4);
+    outline-offset: 3px;
+  }
+
+  .theme-toggle-icon {
+    font-size: 1rem;
+    color: var(--hero-toggle-icon-color);
+  }
+
+  .theme-toggle-label {
+    white-space: nowrap;
+  }
+
   .profile-nav-wrapper {
     position: relative;
   }
@@ -1260,18 +1454,18 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    background: linear-gradient(135deg, #fdfefe 0%, #ecf1fb 100%);
+    background: var(--profile-button-gradient);
     color: var(--text-primary);
     font-weight: 700;
     font-size: 0.875rem;
-    box-shadow: 0 1.125rem 2rem rgba(101, 122, 178, 0.16);
+    box-shadow: var(--profile-button-shadow);
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
   }
 
   .profile-nav-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 1.5rem 2.75rem rgba(101, 122, 178, 0.24);
+    box-shadow: var(--profile-button-hover-shadow);
     color: var(--accent-primary-strong);
   }
 
@@ -1284,7 +1478,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     width: 2.125rem;
     height: 2.125rem;
     border-radius: 50%;
-    background: rgba(137, 160, 209, 0.18);
+    background: var(--profile-avatar-bg);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1334,13 +1528,14 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     gap: 0.8rem;
     text-align: center;
     cursor: pointer;
-    box-shadow: 0 1.125rem 2.25rem rgba(109, 121, 177, 0.16);
+    background: var(--card-bg);
+    box-shadow: var(--mode-card-shadow);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
   .mode-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 1.5rem 2.75rem rgba(109, 121, 177, 0.24);
+    box-shadow: var(--mode-card-shadow-hover);
   }
 
   .mode-card:focus-visible {
@@ -1352,12 +1547,13 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     width: 6.125rem;
     height: 6.125rem;
     border-radius: 1.5rem;
-    background: rgba(255, 255, 255, 0.82);
+    background: var(--mode-avatar-bg);
     box-shadow: 0 0.75rem 1.75rem rgba(0, 0, 0, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 2rem;
+    color: var(--card-accent);
   }
 
   .mode-label {
@@ -1423,8 +1619,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .hero-replays-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 1.125rem 2.25rem rgba(60, 64, 98, 0.16);
-    background: rgba(248, 249, 255, 0.96);
+    box-shadow: var(--hero-button-hover-shadow);
+    background: var(--hero-replays-hover-bg);
   }
 
   .hero-replays-button:active {
@@ -1438,6 +1634,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .hero-replays-icon {
     font-size: 1.375rem;
+    color: var(--hero-toggle-icon-color);
   }
 
   .hero-replays-label {
