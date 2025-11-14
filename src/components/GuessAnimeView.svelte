@@ -499,7 +499,7 @@
   });
 </script>
 
-<div class="flex flex-col w-full">
+<div class="guess-anime-wrapper">
   <!-- Интерфейс для всех пользователей (админ загружает через отдельную панель) -->
   {#if animeGuesses.length === 0}
     <div class="quiz-container text-center">
@@ -693,6 +693,14 @@
   }
   
   /* Quiz Interface Styles (aniguessr-like) */
+  .guess-anime-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    min-height: 100%;
+  }
+
   .quiz-container {
     max-width: 1200px;
     margin: 0 auto;

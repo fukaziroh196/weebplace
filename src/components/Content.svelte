@@ -978,6 +978,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     flex-direction: column;
     gap: 0.75rem;
     overflow: visible;
+    margin: 0 auto;
   }
 
   .leaderboard-panel {
