@@ -622,8 +622,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   :global(:root) {
-    --bg-gradient-start: #f7f0f4;
-    --bg-gradient-end: #f7f0f4;
+    --bg-gradient-start: #f2edf0;
+    --bg-gradient-end: #f2edf0;
     --surface-primary: rgba(255, 255, 255, 0.94);
     --surface-secondary: rgba(247, 248, 253, 0.92);
     --surface-muted: rgba(241, 243, 252, 0.9);
@@ -691,8 +691,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   :global(:root[data-theme='dark']) {
-    --bg-gradient-start: #f7f0f4;
-    --bg-gradient-end: #f7f0f4;
+    --bg-gradient-start: #f2edf0;
+    --bg-gradient-end: #f2edf0;
     --surface-primary: rgba(36, 38, 44, 0.95);
     --surface-secondary: rgba(36, 38, 44, 0.92);
     --surface-muted: rgba(36, 38, 44, 0.9);
