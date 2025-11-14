@@ -1132,7 +1132,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     display: flex;
     flex-wrap: nowrap;
     gap: 0.875rem;
-    align-items: flex-start;
+    align-items: stretch;
     width: 100%;
   }
 
