@@ -1565,45 +1565,43 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .hero-game-info {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 0.35rem;
+    gap: 1.5rem;
     justify-content: center;
   }
 
   .hero-game-title {
-    font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+    font-size: clamp(1.375rem, 3vw, 1.875rem);
     font-weight: 900;
     color: var(--accent-primary, #9ecaff);
-    letter-spacing: 1.5px;
-    text-align: center;
-    line-height: 1.2;
+    letter-spacing: 2px;
+    white-space: nowrap;
   }
 
   .hero-game-round {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
     flex-wrap: wrap;
-    justify-content: center;
   }
 
   .hero-round-text {
-    font-size: clamp(0.75rem, 1.5vw, 0.9375rem);
+    font-size: clamp(0.9375rem, 2vw, 1.125rem);
     font-weight: 700;
     color: var(--text-primary, #f5f6ff);
-    line-height: 1.2;
+    white-space: nowrap;
   }
 
   .hero-difficulty-badge {
     background: var(--accent-primary, #9ecaff);
     color: var(--text-primary, #f5f6ff);
-    padding: 0.2rem 0.6rem;
+    padding: 0.3rem 0.75rem;
     border-radius: 999px;
-    font-size: clamp(0.625rem, 1.2vw, 0.75rem);
+    font-size: clamp(0.75rem, 1.5vw, 0.875rem);
     font-weight: 700;
     text-transform: uppercase;
-    line-height: 1.2;
+    white-space: nowrap;
   }
 
   .home-button {
