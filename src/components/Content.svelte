@@ -1599,7 +1599,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .hero-achievements {
-    background: var(--card-gradient-yellow);
+    background: var(--news-panel-gradient);
     border-radius: 1.375rem;
     padding: 1rem 1.625rem;
     display: flex;
