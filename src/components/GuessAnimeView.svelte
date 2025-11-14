@@ -698,6 +698,9 @@
     margin: 0 auto;
     padding: 5px 10px;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   
   .quiz-header {
