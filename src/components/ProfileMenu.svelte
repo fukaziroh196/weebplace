@@ -169,7 +169,7 @@
     align-items: center;
     gap: 12px;
     padding: 12px;
-    background: rgba(91, 117, 83, 0.1);
+    background: var(--surface-muted, rgba(255, 255, 255, 0.1));
     border-radius: 8px;
     margin-bottom: 8px;
   }
@@ -186,7 +186,7 @@
   }
   
   .avatar-letter {
-    color: white;
+    color: var(--text-primary, #f5f6ff);
     font-size: 20px;
     font-weight: 700;
   }
@@ -215,7 +215,7 @@
   
   .menu-divider {
     height: 1px;
-    background: rgba(91, 117, 83, 0.2);
+    background: var(--divider-color, rgba(255, 255, 255, 0.2));
     margin: 8px 0;
   }
   
@@ -237,8 +237,8 @@
   }
   
   .menu-item:hover {
-    background: rgba(91, 117, 83, 0.15);
-    color: var(--accent);
+    background: var(--divider-color, rgba(255, 255, 255, 0.2));
+    color: var(--accent-primary, #9ecaff);
   }
   
   .logout-btn {
@@ -260,7 +260,7 @@
     display: flex;
     gap: 8px;
     margin-bottom: 16px;
-    background: rgba(91, 117, 83, 0.1);
+    background: var(--surface-muted, rgba(255, 255, 255, 0.1));
     padding: 4px;
     border-radius: 8px;
   }
@@ -283,8 +283,8 @@
   }
   
   .tab-btn.active {
-    background: var(--accent);
-    color: white;
+    background: var(--accent-primary, #9ecaff);
+    color: var(--text-primary, #f5f6ff);
   }
   
   .form-group {
@@ -302,18 +302,18 @@
   .form-group input {
     width: 100%;
     padding: 10px 12px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 2px solid rgba(91, 117, 83, 0.2);
+    background: var(--input-surface, rgba(255, 255, 255, 0.15));
+    border: 2px solid var(--input-border-color, rgba(255, 255, 255, 0.28));
     border-radius: 8px;
-    color: var(--text);
+    color: var(--text-primary, #f5f6ff);
     font-size: 14px;
     transition: all 0.2s ease;
   }
   
   .form-group input:focus {
     outline: none;
-    border-color: var(--accent);
-    background: white;
+    border-color: var(--accent-primary, #9ecaff);
+    background: var(--input-surface, rgba(255, 255, 255, 0.2));
   }
   
   .form-group input:disabled {
@@ -334,10 +334,10 @@
   .submit-btn {
     width: 100%;
     padding: 12px;
-    background: var(--accent);
+    background: var(--accent-primary, #9ecaff);
     border: none;
     border-radius: 8px;
-    color: white;
+    color: var(--text-primary, #f5f6ff);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
