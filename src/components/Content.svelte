@@ -37,11 +37,13 @@ let theme = 'dark';
 let userChoseTheme = false;
 const themeOptions = [
   { id: 'light', label: 'Светлая' },
-  { id: 'dark', label: 'Тёмная' }
+  { id: 'dark', label: 'Тёмная' },
+  { id: 'glass', label: 'Стеклянная' }
 ];
 const themeLabels = {
   light: 'Светлая',
-  dark: 'Тёмная'
+  dark: 'Тёмная',
+  glass: 'Стеклянная'
 };
 
 function setDocumentTheme(value) {
@@ -743,6 +745,11 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     --hero-toggle-icon-color: var(--accent-primary-strong);
     --hero-button-hover-shadow: 0 1.125rem 2.25rem rgba(60, 64, 98, 0.16);
     --hero-replays-hover-bg: rgba(248, 249, 255, 0.96);
+    --app-background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+    --app-background-size: auto;
+    --app-background-attachment: scroll;
+    --app-background-repeat: no-repeat;
+    --app-background-position: center;
     --panel-highlight: #c0c7fe;
   }
 
@@ -812,14 +819,97 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     --hero-toggle-icon-color: #f4f7ff;
     --hero-button-hover-shadow: 0 1.125rem 2.25rem rgba(255, 255, 255, 0.12);
     --hero-replays-hover-bg: rgba(44, 46, 54, 1);
+    --app-background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+    --app-background-size: auto;
+    --app-background-attachment: scroll;
+    --app-background-repeat: no-repeat;
+    --app-background-position: center;
     --panel-highlight: #c0c7fe;
+  }
+
+  :global(:root[data-theme='glass']) {
+    --bg-gradient-start: rgba(8, 12, 20, 0.88);
+    --bg-gradient-end: rgba(18, 6, 22, 0.9);
+    --surface-primary: rgba(255, 255, 255, 0.16);
+    --surface-secondary: rgba(255, 255, 255, 0.12);
+    --surface-muted: rgba(255, 255, 255, 0.1);
+    --surface-pill: rgba(255, 255, 255, 0.18);
+    --surface-card: rgba(255, 255, 255, 0.14);
+    --input-surface: rgba(255, 255, 255, 0.2);
+    --input-border-color: rgba(255, 255, 255, 0.28);
+    --chip-bg: rgba(255, 255, 255, 0.22);
+    --chip-border-color: rgba(255, 255, 255, 0.32);
+    --panel-gradient-primary: rgba(255, 255, 255, 0.2);
+    --news-panel-gradient: rgba(255, 255, 255, 0.24);
+    --card-gradient-blue: rgba(255, 255, 255, 0.18);
+    --card-gradient-pink: rgba(255, 255, 255, 0.18);
+    --card-gradient-purple: rgba(255, 255, 255, 0.18);
+    --card-gradient-yellow: rgba(255, 255, 255, 0.18);
+    --text-primary: #f5f6ff;
+    --text-secondary: rgba(245, 246, 255, 0.75);
+    --text-tertiary: rgba(245, 246, 255, 0.52);
+    --text-quaternary: rgba(245, 246, 255, 0.32);
+    --focus-outline-color: rgba(255, 255, 255, 0.6);
+    --accent-primary: #9ecaff;
+    --accent-primary-strong: #b3d6ff;
+    --accent-secondary: #ffe194;
+    --accent-rose: #ffb7d5;
+    --accent-chip: rgba(255, 255, 255, 0.25);
+    --shadow-outer: 0 1.5rem 4rem rgba(0, 0, 0, 0.45);
+    --shadow-soft: 0 1rem 2.5rem rgba(0, 0, 0, 0.35);
+    --shadow-inset: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+    --divider-color: rgba(255, 255, 255, 0.22);
+    --divider-color-strong: rgba(255, 255, 255, 0.32);
+    --icon-pill-bg: rgba(255, 255, 255, 0.35);
+    --tab-active-gradient: rgba(255, 255, 255, 0.25);
+    --tab-active-shadow: 0 0.75rem 1.625rem rgba(0, 0, 0, 0.45);
+    --rank-top-gradient: rgba(255, 255, 255, 0.25);
+    --rank-top-color: #ffe8a5;
+    --rank-pill-bg: rgba(255, 255, 255, 0.3);
+    --admin-submit-gradient: rgba(255, 255, 255, 0.24);
+    --admin-submit-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.5);
+    --admin-submit-shadow-hover: 0 1.375rem 2.625rem rgba(0, 0, 0, 0.55);
+    --danger-color: #ffb7d5;
+    --danger-bg: rgba(255, 183, 213, 0.32);
+    --danger-bg-hover: rgba(255, 183, 213, 0.42);
+    --success-color: #92f5d4;
+    --success-bg: rgba(146, 245, 212, 0.28);
+    --success-bg-hover: rgba(146, 245, 212, 0.35);
+    --stats-error-color: #ffb7d5;
+    --home-button-gradient: rgba(255, 255, 255, 0.28);
+    --home-button-shadow: 0 1.125rem 2.1875rem rgba(0, 0, 0, 0.45);
+    --home-button-shadow-hover: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.55);
+    --home-button-color: #f5f6ff;
+    --profile-button-gradient: rgba(255, 255, 255, 0.2);
+    --profile-button-shadow: 0 1.125rem 2rem rgba(0, 0, 0, 0.4);
+    --profile-button-hover-shadow: 0 1.5rem 2.75rem rgba(0, 0, 0, 0.5);
+    --profile-avatar-bg: rgba(255, 255, 255, 0.3);
+    --mode-card-shadow: 0 1.125rem 2.25rem rgba(0, 0, 0, 0.45);
+    --mode-card-shadow-hover: 0 1.5rem 2.75rem rgba(0, 0, 0, 0.55);
+    --mode-avatar-bg: rgba(255, 255, 255, 0.22);
+    --hero-toggle-bg: rgba(255, 255, 255, 0.26);
+    --hero-toggle-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.45);
+    --hero-toggle-hover-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.55);
+    --hero-toggle-icon-color: #f5f6ff;
+    --hero-button-hover-shadow: 0 1.125rem 2.25rem rgba(0, 0, 0, 0.5);
+    --hero-replays-hover-bg: rgba(255, 255, 255, 0.28);
+    --panel-highlight: rgba(255, 255, 255, 0.3);
+    --app-background: linear-gradient(180deg, rgba(4, 7, 15, 0.7), rgba(21, 6, 28, 0.85)), url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1920&q=80');
+    --app-background-size: cover;
+    --app-background-attachment: fixed;
+    --app-background-repeat: no-repeat;
+    --app-background-position: center;
   }
 
   :global(body, #app) {
     height: 100%;
     min-height: 100vh;
     margin: 0;
-    background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+    background: var(--app-background, linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%));
+    background-size: var(--app-background-size, auto);
+    background-attachment: var(--app-background-attachment, scroll);
+    background-repeat: var(--app-background-repeat, no-repeat);
+    background-position: var(--app-background-position, center);
     color: var(--text-primary);
     font-family: "Inter", "SF Pro Display", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   }
