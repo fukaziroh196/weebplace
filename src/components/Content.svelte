@@ -1395,7 +1395,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     width: min(25vw, 320px);
     flex-shrink: 0;
     flex-grow: 0;
-    margin-left: clamp(6.5rem, 13vw, 24rem);
+    margin-left: clamp(7rem, 13.5vw, 24.5rem);
     background: var(--news-panel-gradient);
     border-radius: 1.625rem;
     padding: 1.25rem;
@@ -1917,7 +1917,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
     .global-stats-panel {
       width: min(25vw, calc(320px + (100vw - 1920px) * 0.23)); /* Плавное увеличение от 320px до 467px */
-      margin-left: clamp(6.5rem, calc(6.5rem + (100vw - 1920px) * 0.0109), 7.2rem); /* Плавное увеличение от 6.5rem до 7.2rem */
+      margin-left: clamp(7rem, calc(7rem + (100vw - 1920px) * 0.0109), 7.7rem); /* Плавное увеличение от 7rem до 7.7rem */
     }
 
     .admin-news-panel {
@@ -1941,7 +1941,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
     .global-stats-panel {
       width: min(25vw, 448px); /* 320px * 1.4 */
-      margin-left: clamp(7.2rem, 14.5vw, 27rem); /* Увеличенный отступ для правильного позиционирования на 2K */
+      margin-left: clamp(7.7rem, 15vw, 27.5rem); /* Увеличенный отступ для правильного позиционирования на 2K */
     }
 
     .admin-news-panel {
