@@ -1142,7 +1142,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .admin-news-panel {
-    width: min(24vw, 320px);
+    width: min(25vw, 320px);
     flex-shrink: 0;
     background: var(--news-panel-gradient);
     border-radius: 1.625rem;
@@ -1913,7 +1913,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     }
 
     .admin-news-panel {
-      width: min(24vw, calc(320px + (100vw - 1920px) * 0.23)); /* Плавное увеличение от 320px до 467px */
+      width: min(25vw, calc(320px + (100vw - 1920px) * 0.23)); /* Плавное увеличение от 320px до 467px */
     }
   }
 
@@ -1937,7 +1937,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     }
 
     .admin-news-panel {
-      width: min(24vw, 448px); /* 320px * 1.4 */
+      width: min(25vw, 448px); /* 320px * 1.4 */
     }
   }
 
@@ -1960,7 +1960,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     }
 
     .admin-news-panel {
-      width: min(24vw, 715px); /* 320px * 2.235 */
+      width: min(25vw, 715px); /* 320px * 2.235 */
     }
   }
 
