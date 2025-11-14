@@ -1504,7 +1504,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     background: var(--news-panel-gradient);
     backdrop-filter: blur(20px) saturation(130%);
     box-shadow: var(--shadow-outer);
-    margin-bottom: clamp(1.2rem, 2vw, 2.2rem);
+    margin-bottom: clamp(0.9rem, 1.5vw, 1.9rem);
     z-index: 200;
     flex-wrap: wrap;
   }
