@@ -1523,6 +1523,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .hero-footer {
     margin-top: 0.6rem;
     margin-right: clamp(-0.8rem, -1vw, -1.2rem);
+    margin-left: clamp(-0.2rem, -0.3vw, -0.4rem);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1532,7 +1533,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     border-radius: 1.75rem;
     background: var(--news-panel-gradient);
     box-shadow: var(--shadow-outer);
-    width: calc(100% + clamp(0.8rem, 1vw, 1.2rem));
+    width: calc(100% + clamp(1rem, 1.3vw, 1.6rem));
     box-sizing: border-box;
     position: relative;
   }
