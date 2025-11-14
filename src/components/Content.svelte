@@ -33,7 +33,7 @@ let themeButtonEl;
 let themeDropdownEl;
 
 const THEME_STORAGE_KEY = 'animeguessTheme';
-let theme = 'dark';
+let theme = 'glass';
 let userChoseTheme = false;
 const themeOptions = [
   { id: 'light', label: 'Светлая' },
@@ -240,12 +240,14 @@ onMount(() => {
     userChoseTheme = true;
     applyTheme(savedTheme, { persist: false });
   } else {
-    applyTheme('dark', { persist: false });
+    // По умолчанию используем стеклянную тему
+    applyTheme('glass', { persist: false });
   }
 
   const handleSchemeChange = () => {
     if (!userChoseTheme) {
-      applyTheme('dark', { persist: false });
+      // По умолчанию используем стеклянную тему
+      applyTheme('glass', { persist: false });
     }
   };
 
@@ -342,7 +344,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
             <span class="hero-nav-label">{item.label}</span>
           </button>
         {/each}
-        <div class="theme-selector">
+        <!-- Кнопка переключения тем временно скрыта -->
+        <!-- <div class="theme-selector">
           <button
             class="theme-toggle"
             type="button"
@@ -367,7 +370,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
               {/each}
             </div>
           {/if}
-        </div>
+        </div> -->
         <div class="profile-nav-wrapper">
           <button
             class="profile-nav-button"

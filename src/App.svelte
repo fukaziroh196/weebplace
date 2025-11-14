@@ -106,12 +106,15 @@
   .marquee-bottom {
     width: 100%;
     height: 24px;
-    background: var(--accent);
-    color: white;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    color: #f5f6ff;
     overflow: hidden;
     position: relative;
     flex-shrink: 0;
     z-index: 200;
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
   
   .marquee-top {
