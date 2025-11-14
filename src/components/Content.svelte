@@ -333,11 +333,12 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   <div class="animeguess-page">
     <header class="hero-header">
       <div class="hero-logo">
-        {#if $activeView !== 'guessAnime'}
-          <button class="home-button" on:click={goToHome} aria-label="Главная">
-            <span>🏠</span>
-          </button>
-        {/if}
+        <button class="home-button" on:click={goToHome} aria-label="Главная">
+          <span>🏠</span>
+        </button>
+        <div class="hero-title">OTAKUZ.FUN</div>
+      </div>
+      <div class="hero-center">
         {#if $activeView === 'guessAnime' && $gameState.title}
           <div class="hero-game-info">
             <div class="hero-game-title">{$gameState.title}</div>
@@ -346,8 +347,6 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
               <span class="hero-difficulty-badge">{$gameState.difficulty}</span>
             </div>
           </div>
-        {:else}
-          <div class="hero-title">OTAKUZ.FUN</div>
         {/if}
       </div>
       <nav class="hero-nav">
@@ -1509,9 +1508,9 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .hero-header {
     position: sticky;
     top: 0.5rem;
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
-    justify-content: space-between;
     gap: 2rem;
     padding: 1.5rem 1.875rem;
     border-radius: 1.75rem;
@@ -1520,7 +1519,12 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     box-shadow: var(--shadow-outer);
     margin-bottom: clamp(0.9rem, 1.5vw, 1.9rem);
     z-index: 200;
-    flex-wrap: wrap;
+  }
+
+  .hero-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .hero-main {
@@ -1556,8 +1560,6 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     display: flex;
     align-items: center;
     gap: 0.875rem;
-    flex: 1;
-    justify-content: center;
   }
 
   .hero-game-info {
