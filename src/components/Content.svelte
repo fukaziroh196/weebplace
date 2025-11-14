@@ -550,12 +550,34 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     font-size: clamp(14px, 0.833vw, 32px); /* 0.833vw = 16px на 1920px, 21.3px на 2560px, 32px на 3840px */
   }
 
+  :global(:root) {
+    --bg-gradient-start: #f4f6fb;
+    --bg-gradient-end: #f7f2f7;
+    --surface-primary: rgba(255, 255, 255, 0.94);
+    --surface-secondary: rgba(247, 248, 253, 0.92);
+    --surface-muted: rgba(241, 243, 252, 0.9);
+    --surface-pill: rgba(236, 238, 248, 0.85);
+    --surface-card: rgba(233, 236, 247, 0.8);
+    --text-primary: #4a495f;
+    --text-secondary: rgba(74, 73, 99, 0.75);
+    --text-tertiary: rgba(74, 73, 99, 0.58);
+    --text-quaternary: rgba(74, 73, 99, 0.4);
+    --accent-primary: #7c8bc4;
+    --accent-primary-strong: #6573ba;
+    --accent-secondary: #b8a078;
+    --accent-rose: #b28dab;
+    --accent-chip: linear-gradient(135deg, #dfe3f2 0%, #cad2ea 100%);
+    --shadow-outer: 0 1.5rem 3.5rem rgba(60, 64, 98, 0.14);
+    --shadow-soft: 0 1rem 2.5rem rgba(60, 64, 98, 0.12);
+    --shadow-inset: inset 0 0 0 1px rgba(118, 126, 170, 0.12);
+  }
+
   :global(body, #app) {
     height: 100%;
     min-height: 100vh;
     margin: 0;
-    background: linear-gradient(180deg, #fff5f7 0%, #ffeef8 100%);
-    color: #735f7e;
+    background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+    color: var(--text-primary);
     font-family: "Inter", "SF Pro Display", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   }
 
@@ -601,10 +623,10 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .leaderboard-card {
     position: sticky;
     top: 1rem;
-    background: rgba(255, 255, 255, 0.82);
+    background: var(--surface-primary);
     border-radius: 1.75rem;
     padding: 1.5rem 1.4rem 2rem;
-    box-shadow: 0 1.5rem 3.75rem rgba(151, 168, 255, 0.24);
+    box-shadow: var(--shadow-outer);
     display: flex;
     flex-direction: column;
     gap: 1.2rem;
@@ -621,7 +643,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.18em;
-    color: rgba(82, 72, 120, 0.55);
+    color: var(--text-tertiary);
     font-weight: 700;
   }
 
@@ -629,14 +651,14 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     margin: 0;
     font-size: 1.35rem;
     font-weight: 800;
-    color: #5a4a82;
+    color: var(--text-primary);
   }
 
   .leaderboard-tabs {
     display: inline-flex;
     padding: 0.2rem;
     border-radius: 999px;
-    background: rgba(122, 108, 190, 0.12);
+    background: rgba(124, 139, 196, 0.12);
     gap: 0.2rem;
   }
 
@@ -649,18 +671,18 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     letter-spacing: 0.06em;
     cursor: pointer;
     background: transparent;
-    color: rgba(76, 63, 120, 0.55);
+    color: var(--text-tertiary);
     transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   }
 
   .leaderboard-tabs button.active {
-    background: linear-gradient(135deg, #a0b5e8 0%, #7388d8 100%);
+    background: linear-gradient(135deg, #b8c1df 0%, #8d97c9 100%);
     color: #fff;
-    box-shadow: 0 0.75rem 1.625rem rgba(115, 136, 216, 0.25);
+    box-shadow: 0 0.75rem 1.625rem rgba(109, 123, 181, 0.3);
   }
 
   .leaderboard-tabs button:not(.active):hover {
-    color: rgba(76, 63, 120, 0.85);
+    color: var(--text-secondary);
   }
 
   .leaderboard-list {
@@ -678,21 +700,21 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     gap: 0.875rem;
     padding: 0.65rem 0.8rem;
     border-radius: 1.125rem;
-    background: rgba(248, 249, 255, 0.75);
-    box-shadow: inset 0 0 0 1px rgba(149, 168, 255, 0.12);
+    background: var(--surface-pill);
+    box-shadow: var(--shadow-inset);
   }
 
   .leaderboard-list li.top {
-    background: linear-gradient(135deg, rgba(240, 225, 236, 0.8) 0%, rgba(225, 235, 248, 0.85) 100%);
-    box-shadow: inset 0 0 0 1px rgba(220, 179, 216, 0.2);
+    background: var(--accent-chip);
+    box-shadow: inset 0 0 0 1px rgba(151, 155, 196, 0.2);
   }
 
   .leaderboard-rank {
     width: 2.5rem;
     height: 2.5rem;
     border-radius: 0.875rem;
-    background: rgba(136, 161, 255, 0.16);
-    color: #6a7aff;
+    background: rgba(128, 140, 202, 0.18);
+    color: var(--accent-primary-strong);
     font-weight: 800;
     font-size: 0.9375rem;
     display: flex;
@@ -702,8 +724,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .leaderboard-list li.top .leaderboard-rank {
-    background: linear-gradient(135deg, #e8d095 0%, #d8b865 100%);
-    color: #825b0d;
+    background: linear-gradient(135deg, #d5c49c 0%, #c3a96c 100%);
+    color: #6a4f1d;
   }
 
   .leaderboard-info {
@@ -716,7 +738,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .leaderboard-name {
     font-weight: 700;
-    color: #4e3f6f;
+    color: var(--text-primary);
     font-size: 0.875rem;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -725,14 +747,14 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .leaderboard-metric {
     font-size: 0.75rem;
-    color: rgba(78, 63, 111, 0.6);
+    color: var(--text-secondary);
     letter-spacing: 0.03em;
   }
 
   .leaderboard-empty {
     justify-content: center;
     font-weight: 600;
-    color: rgba(78, 63, 111, 0.56);
+    color: var(--text-secondary);
     font-size: 0.8rem;
     padding: 1.75rem 1.25rem;
   }
@@ -741,7 +763,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.18em;
-    color: rgba(78, 63, 111, 0.42);
+    color: var(--text-quaternary);
     font-weight: 700;
     padding-bottom: 0.5rem;
   }
@@ -762,10 +784,10 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .admin-news-panel {
     width: min(24vw, 320px);
     flex-shrink: 0;
-    background: rgba(255, 255, 255, 0.86);
+    background: var(--surface-primary);
     border-radius: 1.625rem;
     padding: 1.25rem;
-    box-shadow: 0 1.5rem 3.625rem rgba(220, 159, 194, 0.18);
+    box-shadow: var(--shadow-outer);
     display: flex;
     flex-direction: column;
     gap: 0.875rem;
@@ -784,7 +806,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.2em;
-    color: rgba(122, 88, 151, 0.6);
+    color: var(--text-tertiary);
     font-weight: 700;
   }
 
@@ -792,18 +814,18 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     margin: 0.2rem 0 0;
     font-size: 1.2rem;
     font-weight: 800;
-    color: #7a4ba7;
+    color: var(--text-primary);
   }
 
   .admin-news-role {
     font-size: 0.6875rem;
     font-weight: 700;
     letter-spacing: 0.08em;
-    color: rgba(122, 88, 151, 0.55);
+    color: var(--text-tertiary);
     padding: 0.3rem 0.7rem;
     border-radius: 999px;
-    background: rgba(239, 229, 255, 0.6);
-    box-shadow: inset 0 0 0 1px rgba(130, 90, 190, 0.18);
+    background: rgba(228, 231, 248, 0.7);
+    box-shadow: inset 0 0 0 1px rgba(128, 136, 189, 0.16);
     white-space: nowrap;
   }
 
@@ -818,16 +840,16 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     border: none;
     border-radius: 1.125rem;
     padding: 0.8rem 1rem;
-    background: rgba(248, 242, 255, 0.9);
-    box-shadow: inset 0 0 0 1px rgba(173, 149, 255, 0.18);
+    background: rgba(239, 241, 252, 0.9);
+    box-shadow: inset 0 0 0 1px rgba(156, 165, 214, 0.18);
     font-size: 0.875rem;
-    color: #5b4a7a;
+    color: var(--text-primary);
     resize: none;
     font-family: inherit;
   }
 
   .admin-news-input:focus-visible {
-    outline: 2px solid rgba(149, 118, 255, 0.45);
+    outline: 2px solid rgba(122, 139, 196, 0.5);
     outline-offset: 2px;
   }
 
@@ -840,7 +862,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .admin-news-counter {
     font-size: 0.75rem;
-    color: rgba(90, 67, 108, 0.6);
+    color: var(--text-secondary);
   }
 
   .admin-news-error {
@@ -848,7 +870,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     margin-top: 0.3rem;
     font-size: 0.75rem;
     font-weight: 600;
-    color: #d8587f;
+    color: #c4687f;
   }
 
   .admin-news-submit {
@@ -857,9 +879,9 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     padding: 0.55rem 1.3rem;
     font-size: 0.8rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #e08bb8 0%, #cc5f9a 100%);
+    background: linear-gradient(135deg, #c9cde4 0%, #9da8cf 100%);
     color: #fff;
-    box-shadow: 0 1rem 2rem rgba(204, 95, 154, 0.22);
+    box-shadow: 0 1rem 2rem rgba(114, 124, 167, 0.18);
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
     white-space: nowrap;
@@ -873,7 +895,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .admin-news-submit:not(:disabled):hover {
     transform: translateY(-2px);
-    box-shadow: 0 1.375rem 2.625rem rgba(204, 95, 154, 0.28);
+    box-shadow: 0 1.375rem 2.625rem rgba(114, 124, 167, 0.24);
   }
 
   .admin-news-list {
@@ -886,10 +908,10 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .admin-news-list li {
-    background: rgba(250, 247, 255, 0.92);
+    background: var(--surface-secondary);
     border-radius: 1.125rem;
     padding: 0.8rem 1rem;
-    box-shadow: inset 0 0 0 1px rgba(173, 149, 255, 0.14);
+    box-shadow: inset 0 0 0 1px rgba(173, 179, 216, 0.12);
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
@@ -902,13 +924,13 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .admin-news-list li p {
     margin: 0;
     font-size: 0.875rem;
-    color: #5c4a81;
+    color: var(--text-primary);
     line-height: 1.5;
   }
 
   .admin-news-list li span {
     font-size: 0.6875rem;
-    color: rgba(92, 74, 129, 0.6);
+    color: var(--text-secondary);
     letter-spacing: 0.05em;
   }
 
@@ -923,7 +945,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .admin-news-timestamp {
     font-size: 0.7rem;
-    color: rgba(92, 74, 129, 0.58);
+    color: var(--text-secondary);
     letter-spacing: 0.05em;
   }
 
@@ -943,15 +965,15 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    background: rgba(149, 118, 255, 0.14);
-    color: #6c54b2;
+    background: rgba(124, 139, 196, 0.15);
+    color: var(--accent-primary-strong);
     cursor: pointer;
     transition: background 0.2s ease, transform 0.2s ease;
     white-space: nowrap;
   }
 
   .admin-news-btn:hover:not(:disabled) {
-    background: rgba(149, 118, 255, 0.22);
+    background: rgba(124, 139, 196, 0.22);
     transform: translateY(-1px);
   }
 
@@ -961,25 +983,25 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .admin-news-delete {
-    background: rgba(240, 90, 130, 0.16);
-    color: #d8587f;
+    background: rgba(204, 120, 134, 0.18);
+    color: #b85d71;
   }
 
   .admin-news-delete:hover:not(:disabled) {
-    background: rgba(240, 90, 130, 0.22);
+    background: rgba(204, 120, 134, 0.24);
   }
 
   .admin-news-save {
-    background: rgba(118, 205, 170, 0.2);
-    color: #29a07d;
+    background: rgba(120, 176, 156, 0.2);
+    color: #3a8c72;
   }
 
   .admin-news-save:hover:not(:disabled) {
-    background: rgba(118, 205, 170, 0.26);
+    background: rgba(120, 176, 156, 0.26);
   }
 
   .admin-news-cancel {
-    background: rgba(149, 118, 255, 0.14);
+    background: rgba(124, 139, 196, 0.15);
   }
 
   .admin-news-edit-input {
@@ -987,17 +1009,17 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .admin-news-empty {
-    background: rgba(250, 247, 255, 0.85);
+    background: var(--surface-secondary);
     border-radius: 1.125rem;
     padding: 1rem;
     font-size: 0.8rem;
     text-align: center;
-    color: rgba(92, 74, 129, 0.6);
-    box-shadow: inset 0 0 0 1px rgba(173, 149, 255, 0.12);
+    color: var(--text-secondary);
+    box-shadow: inset 0 0 0 1px rgba(173, 179, 216, 0.12);
   }
 
   .admin-news-error-state {
-    color: #d8587f;
+    color: #c4687f;
     font-weight: 600;
   }
 
@@ -1006,10 +1028,10 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     flex-shrink: 0;
     flex-grow: 0;
     margin-left: clamp(6.5rem, 13vw, 24rem);
-    background: rgba(255, 255, 255, 0.86);
+    background: var(--surface-primary);
     border-radius: 1.625rem;
     padding: 1.25rem;
-    box-shadow: 0 1.5rem 3.625rem rgba(174, 199, 255, 0.23);
+    box-shadow: var(--shadow-outer);
     display: flex;
     flex-direction: column;
     gap: 1.1rem;
@@ -1026,7 +1048,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.2em;
-    color: rgba(80, 88, 151, 0.55);
+    color: var(--text-tertiary);
     font-weight: 700;
   }
 
@@ -1034,7 +1056,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     margin: 0.2rem 0 0;
     font-size: 1.2rem;
     font-weight: 800;
-    color: #5860a2;
+    color: var(--text-primary);
   }
 
   .global-stats-content {
@@ -1044,17 +1066,17 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .stats-block {
-    background: rgba(244, 246, 255, 0.9);
+    background: var(--surface-muted);
     border-radius: 1.25rem;
     padding: 0.8rem 1rem;
-    box-shadow: inset 0 0 0 1px rgba(165, 180, 255, 0.16);
+    box-shadow: inset 0 0 0 1px rgba(165, 176, 218, 0.16);
   }
 
   .stats-block h4 {
     margin: 0 0 0.5rem;
     font-size: 0.9rem;
     font-weight: 800;
-    color: #4e5796;
+    color: var(--text-primary);
   }
 
   .stats-block ol {
@@ -1071,7 +1093,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     justify-content: space-between;
     align-items: center;
     font-size: 0.8125rem;
-    color: #4b3f74;
+    color: var(--text-primary);
   }
 
   .stats-label {
@@ -1084,22 +1106,22 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .stats-value {
     font-weight: 700;
-    color: #6a78ff;
+    color: var(--accent-primary-strong);
   }
 
   .stats-empty {
     font-size: 0.75rem;
-    color: rgba(75, 63, 116, 0.55);
+    color: var(--text-secondary);
     text-align: center;
     padding: 1rem 0;
   }
 
   .stats-loading {
-    color: rgba(75, 63, 116, 0.7);
+    color: var(--text-primary);
   }
 
   .stats-error {
-    color: #d66a6a;
+    color: #c46868;
   }
 
   .hero-header {
@@ -1111,9 +1133,9 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     gap: 2rem;
     padding: 0.75rem 1.875rem;
     border-radius: 1.75rem;
-    background: rgba(255, 255, 255, 0.78);
+    background: var(--surface-primary);
     backdrop-filter: blur(20px) saturation(130%);
-    box-shadow: 0 1.5rem 3.75rem rgba(216, 158, 185, 0.2);
+    box-shadow: var(--shadow-outer);
     margin-bottom: clamp(1.5rem, 2.5vw, 2.5rem);
     z-index: 200;
     flex-wrap: wrap;
@@ -1140,8 +1162,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     flex-wrap: wrap;
     padding: 1.25rem 1.875rem;
     border-radius: 1.75rem;
-    background: rgba(255, 255, 255, 0.78);
-    box-shadow: 0 1.75rem 3.75rem rgba(161, 143, 255, 0.18);
+    background: var(--surface-primary);
+    box-shadow: var(--shadow-outer);
     width: calc(100% + clamp(0.8rem, 1vw, 1.2rem));
     box-sizing: border-box;
     position: relative;
@@ -1163,26 +1185,26 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #f0d4e0 0%, #e5b5d1 100%);
-    box-shadow: 0 1.125rem 2.1875rem rgba(216, 138, 175, 0.25);
-    color: #d85a8e;
+    background: linear-gradient(135deg, #e1e6f5 0%, #d3daed 100%);
+    box-shadow: 0 1.125rem 2.1875rem rgba(109, 122, 181, 0.22);
+    color: var(--accent-primary-strong);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
   .home-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 1.25rem 2.5rem rgba(216, 138, 175, 0.3);
+    box-shadow: 0 1.25rem 2.5rem rgba(109, 122, 181, 0.3);
   }
 
   .home-button:focus-visible {
-    outline: 2px solid rgba(216, 118, 166, 0.4);
+    outline: 2px solid rgba(109, 122, 181, 0.4);
     outline-offset: 3px;
   }
 
   .hero-title {
     font-size: 2rem;
     font-weight: 800;
-    color: #d9649a;
+    color: var(--text-primary);
     letter-spacing: 0.02em;
     white-space: nowrap;
   }
@@ -1202,7 +1224,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     align-items: center;
     gap: 0.3rem;
     cursor: pointer;
-    color: #8d7aa1;
+    color: var(--text-secondary);
     font-weight: 600;
     font-size: 0.8rem;
     letter-spacing: 0.04em;
@@ -1210,19 +1232,19 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .hero-nav-item:hover {
-    color: #d86293;
+    color: var(--accent-primary);
     transform: translateY(-2px);
   }
 
   .hero-nav-item:focus-visible {
-    outline: 2px solid rgba(255, 118, 186, 0.4);
+    outline: 2px solid rgba(124, 139, 196, 0.4);
     outline-offset: 3px;
   }
 
   .hero-nav-icon {
     font-size: 1.1rem;
-    background: rgba(230, 191, 219, 0.4);
-    color: #d870a4;
+    background: rgba(215, 221, 240, 0.6);
+    color: var(--accent-primary-strong);
     padding: 0.35rem 0.6rem;
     border-radius: 999px;
   }
@@ -1238,23 +1260,23 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    background: linear-gradient(135deg, #ffffff 0%, #f2f7ff 100%);
-    color: #6a6780;
+    background: linear-gradient(135deg, #fdfefe 0%, #ecf1fb 100%);
+    color: var(--text-primary);
     font-weight: 700;
     font-size: 0.875rem;
-    box-shadow: 0 1.125rem 2rem rgba(123, 176, 255, 0.22);
+    box-shadow: 0 1.125rem 2rem rgba(101, 122, 178, 0.16);
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
   }
 
   .profile-nav-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 1.5rem 2.75rem rgba(123, 176, 255, 0.28);
-    color: #4463ff;
+    box-shadow: 0 1.5rem 2.75rem rgba(101, 122, 178, 0.24);
+    color: var(--accent-primary-strong);
   }
 
   .profile-nav-button:focus-visible {
-    outline: 2px solid rgba(123, 176, 255, 0.45);
+    outline: 2px solid rgba(101, 122, 178, 0.45);
     outline-offset: 3px;
   }
 
@@ -1262,7 +1284,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     width: 2.125rem;
     height: 2.125rem;
     border-radius: 50%;
-    background: rgba(172, 205, 255, 0.2);
+    background: rgba(137, 160, 209, 0.18);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1287,9 +1309,9 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     top: calc(100% + 0.7rem);
     right: 0;
     min-width: 16.25rem;
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--surface-primary);
     border-radius: 1.25rem;
-    box-shadow: 0 1.625rem 3.75rem rgba(98, 127, 255, 0.22);
+    box-shadow: var(--shadow-outer);
     padding: 1rem;
     z-index: 600;
     backdrop-filter: blur(20px);
@@ -1312,17 +1334,17 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     gap: 0.8rem;
     text-align: center;
     cursor: pointer;
-    box-shadow: 0 1.125rem 2.25rem rgba(186, 173, 255, 0.16);
+    box-shadow: 0 1.125rem 2.25rem rgba(109, 121, 177, 0.16);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
   .mode-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 1.5rem 2.75rem rgba(173, 152, 255, 0.22);
+    box-shadow: 0 1.5rem 2.75rem rgba(109, 121, 177, 0.24);
   }
 
   .mode-card:focus-visible {
-    outline: 2px solid rgba(255, 160, 210, 0.4);
+    outline: 2px solid rgba(124, 139, 196, 0.4);
     outline-offset: 4px;
   }
 
@@ -1341,25 +1363,25 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .mode-label {
     font-size: 0.9375rem;
     font-weight: 800;
-    color: #635075;
+    color: var(--text-primary);
     letter-spacing: 0.05em;
   }
 
   .mode-description {
     font-size: 0.8rem;
-    color: rgba(87, 70, 99, 0.62);
+    color: var(--text-secondary);
     max-width: 13.75rem;
     line-height: 1.4;
   }
 
   .hero-achievements {
-    background: rgba(245, 235, 242, 0.88);
+    background: var(--surface-pill);
     border-radius: 1.375rem;
     padding: 1rem 1.625rem;
     display: flex;
     align-items: center;
     gap: 1.25rem;
-    box-shadow: 0 1rem 2rem rgba(220, 168, 195, 0.16);
+    box-shadow: var(--shadow-soft);
     flex-wrap: wrap;
   }
 
@@ -1368,41 +1390,41 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: rgba(90, 72, 108, 0.6);
+    color: var(--text-tertiary);
     white-space: nowrap;
   }
 
   .hero-achievements-value {
     font-size: 1.75rem;
     font-weight: 800;
-    color: #d86293;
+    color: var(--accent-primary-strong);
     white-space: nowrap;
   }
 
   .hero-achievements-meta {
     font-size: 0.8125rem;
-    color: rgba(90, 72, 108, 0.58);
+    color: var(--text-secondary);
     white-space: nowrap;
   }
 
   .hero-replays-button {
     border: none;
-    background: rgba(245, 235, 242, 0.88);
+    background: var(--surface-pill);
     border-radius: 1.375rem;
     padding: 1rem 1.625rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
     cursor: pointer;
-    box-shadow: 0 1rem 2rem rgba(220, 168, 195, 0.16);
+    box-shadow: var(--shadow-soft);
     transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
     font-family: inherit;
   }
 
   .hero-replays-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 1.125rem 2.25rem rgba(220, 168, 195, 0.2);
-    background: rgba(255, 248, 253, 0.95);
+    box-shadow: 0 1.125rem 2.25rem rgba(60, 64, 98, 0.16);
+    background: rgba(248, 249, 255, 0.96);
   }
 
   .hero-replays-button:active {
@@ -1410,7 +1432,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .hero-replays-button:focus-visible {
-    outline: 2px solid rgba(255, 118, 186, 0.4);
+    outline: 2px solid rgba(124, 139, 196, 0.4);
     outline-offset: 3px;
   }
 
@@ -1421,12 +1443,12 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .hero-replays-label {
     font-size: 0.9375rem;
     font-weight: 600;
-    color: #8d7aa1;
+    color: var(--text-secondary);
     white-space: nowrap;
   }
 
   .hero-replays-button:hover .hero-replays-label {
-    color: #d86293;
+    color: var(--accent-primary-strong);
   }
 
   /* ============================================
