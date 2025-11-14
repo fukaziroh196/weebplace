@@ -16,11 +16,11 @@
   }
   function levelColor(d) {
     const c = getCount(d);
-    if (c <= 0) return 'rgba(162,57,202,.12)';
-    if (c === 1) return 'rgba(162,57,202,.20)';
-    if (c === 2) return 'rgba(162,57,202,.32)';
-    if (c <= 4) return 'rgba(162,57,202,.45)';
-    return 'rgba(162,57,202,.65)';
+    if (c <= 0) return 'rgba(158, 202, 255, .12)';
+    if (c === 1) return 'rgba(158, 202, 255, .20)';
+    if (c === 2) return 'rgba(158, 202, 255, .32)';
+    if (c <= 4) return 'rgba(158, 202, 255, .45)';
+    return 'rgba(158, 202, 255, .65)';
   }
 
   function choose(d) {
@@ -78,8 +78,8 @@
 
 <style>
   .replay-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.10); color:var(--text); background: var(--panel); text-align:left; transition: background .15s ease, border-color .15s ease, box-shadow .15s ease; box-shadow: 0 4px 12px rgba(0,0,0,.25); }
-  .replay-item:hover { background: var(--panelStrong); border-color: var(--accent); box-shadow: 0 6px 18px rgba(162,57,202,.25); }
-  .dot { font-size:10px; color:var(--accent); border:1px solid var(--accent); border-radius:9999px; padding:2px 6px; line-height:1; background:transparent; }
+  .replay-item:hover { background: var(--panelStrong); border-color: var(--accent-primary, #9ecaff); box-shadow: 0 6px 18px rgba(158, 202, 255, .25); }
+  .dot { font-size:10px; color:var(--accent-primary, #9ecaff); border:1px solid var(--accent-primary, #9ecaff); border-radius:9999px; padding:2px 6px; line-height:1; background:transparent; }
   .label { font-weight:700; font-size:14px; }
   .badge { margin-left:auto; font-size:12px; font-weight:800; color:var(--text); background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); padding:2px 8px; border-radius:9999px; }
 </style>

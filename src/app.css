@@ -188,13 +188,13 @@ body.theme-dark input[type="text"]::placeholder { color: rgba(91,117,83,.5); }
 
 /* Buttons/links in header */
 .top-link { color: var(--text); opacity:.75; transition: color .15s ease, opacity .15s ease; }
-.top-link:hover { color: var(--accent); opacity:1; }
+.top-link:hover { color: var(--accent-primary, #9ecaff); opacity:1; }
 
 /* Old pink utility remap to pastel accents */
-.text-pink-200, .hover\:text-pink-200:hover { color: var(--accent) !important; }
-.text-pink-300 { color: var(--accent) !important; }
-.bg-pink-600, .bg-pink-700, .bg-pink-700\/95 { background-color: var(--accent) !important; }
-.focus\:ring-pink-500\/60:focus { --tw-ring-color: rgba(162,57,202,.6) !important; }
+.text-pink-200, .hover\:text-pink-200:hover { color: var(--accent-primary, #9ecaff) !important; }
+.text-pink-300 { color: var(--accent-primary, #9ecaff) !important; }
+.bg-pink-600, .bg-pink-700, .bg-pink-700\/95 { background-color: var(--accent-primary, #9ecaff) !important; }
+.focus\:ring-pink-500\/60:focus { --tw-ring-color: rgba(158, 202, 255, .6) !important; }
 
 /* Скрытие скроллбара для горизонтального слайдера */
 .scrollbar-hide {

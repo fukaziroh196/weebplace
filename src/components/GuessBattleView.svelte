@@ -359,7 +359,7 @@
   }
 
   .retry-btn {
-    background: var(--accent);
+    background: var(--accent-primary, #9ecaff);
     color: white;
     border: none;
     padding: 12px 24px;
@@ -382,7 +382,7 @@
   .battle-title {
     font-size: clamp(2rem, 5vw, 3rem);
     font-weight: 900;
-    color: var(--accent);
+    color: var(--accent-primary, #9ecaff);
     margin-bottom: 1rem;
   }
 
@@ -404,7 +404,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: var(--accent);
+    background: var(--accent-primary, #9ecaff);
     color: white;
     width: 60px;
     height: 60px;
@@ -437,7 +437,7 @@
 
   .anime-option:hover {
     transform: translateY(-4px);
-    border-color: var(--accent);
+    border-color: var(--accent-primary, #9ecaff);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   }
 
@@ -461,7 +461,7 @@
   }
 
   .vote-btn {
-    background: var(--accent);
+    background: var(--accent-primary, #9ecaff);
     color: white;
     padding: 12px 24px;
     border-radius: 8px;
@@ -485,7 +485,7 @@
 
   .stat-value {
     font-weight: 600;
-    color: var(--accent);
+    color: var(--accent-primary, #9ecaff);
   }
 
   /* === РЕЗУЛЬТАТЫ === */
@@ -502,7 +502,7 @@
   .results-title {
     font-size: clamp(2rem, 5vw, 3rem);
     font-weight: 900;
-    color: var(--accent);
+    color: var(--accent-primary, #9ecaff);
     margin-bottom: 1rem;
   }
 
@@ -524,7 +524,7 @@
   .table-header {
     display: grid;
     grid-template-columns: 80px 120px 1fr 100px 100px 100px;
-    background: var(--accent);
+    background: var(--accent-primary, #9ecaff);
     color: white;
     font-weight: 700;
     padding: 1rem;
@@ -574,7 +574,7 @@
   }
 
   .col-points {
-    color: var(--accent);
+    color: var(--accent-primary, #9ecaff);
   }
 
   .results-actions {
@@ -594,12 +594,12 @@
   }
 
   .action-btn.primary {
-    background: var(--accent);
+    background: var(--accent-primary, #9ecaff);
     color: white;
   }
 
   .action-btn.primary:hover {
-    background: var(--accent2);
+    background: var(--accent-primary-strong, #b3d6ff);
     transform: translateY(-2px);
   }
 
@@ -610,7 +610,7 @@
   }
 
   .action-btn.secondary:hover {
-    background: var(--accent);
+    background: var(--accent-primary, #9ecaff);
     color: white;
   }
 

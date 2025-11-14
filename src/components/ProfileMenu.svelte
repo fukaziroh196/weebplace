@@ -178,7 +178,7 @@
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: var(--accent);
+    background: var(--accent-primary, #9ecaff);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -279,7 +279,7 @@
   }
   
   .tab-btn:hover {
-    color: var(--accent);
+    color: var(--accent-primary, #9ecaff);
   }
   
   .tab-btn.active {
@@ -347,7 +347,7 @@
   .submit-btn:hover:not(:disabled) {
     background: var(--extra);
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(91, 117, 83, 0.3);
+    box-shadow: 0 4px 8px rgba(158, 202, 255, 0.3);
   }
   
   .submit-btn:disabled {

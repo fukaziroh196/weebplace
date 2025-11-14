@@ -110,7 +110,7 @@
   }
 
   .back-btn:hover {
-    background: var(--accent);
+    background: var(--accent-primary, #9ecaff);
     color: white;
   }
 
@@ -175,7 +175,7 @@
   }
 
   .pack-card:hover {
-    border-color: var(--accent);
+    border-color: var(--accent-primary, #9ecaff);
     background: rgba(255, 255, 255, 0.05);
     transform: translateY(-2px);
   }
@@ -211,7 +211,7 @@
 
   .pack-arrow {
     font-size: 1.5rem;
-    color: var(--accent);
+    color: var(--accent-primary, #9ecaff);
     flex-shrink: 0;
   }
 

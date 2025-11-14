@@ -200,8 +200,8 @@
   }
 
   .profile-tab.active {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
+    color: var(--accent-primary, #9ecaff);
+    border-bottom-color: var(--accent-primary, #9ecaff);
   }
 
   .achievements-tab-content {

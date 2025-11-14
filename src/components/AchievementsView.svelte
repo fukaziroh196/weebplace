@@ -42,7 +42,7 @@
       title: 'Мастер угадывания',
       description: 'Угадай без подсказок',
       icon: '🧠',
-      color: '#A8E6CF',
+      color: '#92f5d4',
       rarity: 'common'
     },
     {
@@ -50,7 +50,7 @@
       title: 'С первого взгляда',
       description: 'Угадай с первой попытки',
       icon: '⚡',
-      color: '#95E1D3',
+      color: '#8fe3c1',
       rarity: 'rare'
     },
     {
@@ -221,7 +221,7 @@
   }
 
   .achievements-stats {
-    background: var(--accent);
+    background: var(--accent-primary, #9ecaff);
     padding: 0.5rem 1.5rem;
     border-radius: 12px;
     font-weight: 700;
@@ -279,13 +279,13 @@
   }
 
   .achievement-card.unlocked {
-    border-color: var(--accent);
-    box-shadow: 0 4px 20px rgba(91, 117, 83, 0.2);
+    border-color: var(--accent-primary, #9ecaff);
+    box-shadow: 0 4px 20px rgba(158, 202, 255, 0.2);
   }
 
   .achievement-card.unlocked:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 30px rgba(91, 117, 83, 0.3);
+    box-shadow: 0 8px 30px rgba(158, 202, 255, 0.3);
   }
 
   .achievement-card.common.unlocked {
@@ -403,9 +403,9 @@
   }
 
   .unlocked-badge {
-    background: var(--accent);
+    background: var(--accent-primary, #9ecaff);
     color: white;
-    box-shadow: 0 2px 8px rgba(91, 117, 83, 0.4);
+    box-shadow: 0 2px 8px rgba(158, 202, 255, 0.4);
   }
 
   @media (max-width: 768px) {

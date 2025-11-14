@@ -125,9 +125,9 @@
   }
   
   .nav-item.is-active .icon-wrapper {
-    background: var(--accent);
+    background: var(--accent-primary, #9ecaff);
     color: #FFFFFF;
-    box-shadow: 0 2px 8px rgba(91, 117, 83, 0.4);
+    box-shadow: 0 2px 8px rgba(158, 202, 255, 0.4);
   }
   
   .nav-label {
@@ -149,7 +149,7 @@
   .nav-item.is-active .nav-label {
     opacity: 1;
     transform: translateX(0);
-    color: var(--accent);
+    color: var(--accent-primary, #9ecaff);
   }
   .theme-switch {
     appearance: none;

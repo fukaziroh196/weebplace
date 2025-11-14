@@ -945,7 +945,7 @@
   .admin-main-title {
     font-size: clamp(1.5rem, 4vw, 2.5rem);
     font-weight: 900;
-    color: var(--accent, #A239CA);
+    color: var(--accent-primary, #9ecaff);
     letter-spacing: 1px;
     text-shadow: 0 0 20px rgba(162, 57, 202, 0.5);
   }
@@ -1003,13 +1003,13 @@
 
   .date-input:focus {
     outline: none;
-    border-color: var(--accent, #A239CA);
+    border-color: var(--accent-primary, #9ecaff);
     background: rgba(255, 255, 255, 0.08);
   }
 
   .today-btn {
     padding: 12px 24px;
-    background: var(--accent, #A239CA);
+    background: var(--accent-primary, #9ecaff);
     color: white;
     font-weight: 700;
     border: none;
@@ -1019,7 +1019,7 @@
   }
 
   .today-btn:hover {
-    background: var(--accent2, #8B2FC9);
+    background: var(--accent-primary-strong, #b3d6ff);
     transform: translateY(-2px);
   }
 
@@ -1029,7 +1029,7 @@
   }
 
   .selected-date strong {
-    color: var(--accent, #A239CA);
+    color: var(--accent-primary, #9ecaff);
     font-weight: 700;
   }
 
@@ -1052,7 +1052,7 @@
   }
 
   .slot-number {
-    background: var(--accent, #A239CA);
+    background: var(--accent-primary, #9ecaff);
     color: white;
     width: 32px;
     height: 32px;
@@ -1099,7 +1099,7 @@
   }
 
   .file-placeholder:hover {
-    border-color: var(--accent, #A239CA);
+    border-color: var(--accent-primary, #9ecaff);
     background: rgba(162, 57, 202, 0.1);
   }
 
@@ -1126,7 +1126,7 @@
 
   .title-input:focus {
     outline: none;
-    border-color: var(--accent, #A239CA);
+    border-color: var(--accent-primary, #9ecaff);
     background: rgba(255, 255, 255, 0.08);
   }
 
@@ -1174,8 +1174,8 @@
   }
 
   .hint-placeholder:hover {
-    border-color: var(--accent);
-    background: rgba(91, 117, 83, 0.1);
+    border-color: var(--accent-primary, #9ecaff);
+    background: rgba(158, 202, 255, 0.1);
   }
 
   .hint-preview {
@@ -1242,7 +1242,7 @@
   }
 
   .battle-slot:hover {
-    border-color: var(--accent);
+    border-color: var(--accent-primary, #9ecaff);
     background: rgba(0, 0, 0, 0.2);
   }
 
@@ -1317,12 +1317,12 @@
 
   .pack-item:hover {
     background: rgba(0, 0, 0, 0.3);
-    border-color: var(--accent);
+    border-color: var(--accent-primary, #9ecaff);
   }
 
   .pack-item.selected {
     background: rgba(0, 0, 0, 0.4);
-    border-color: var(--accent);
+    border-color: var(--accent-primary, #9ecaff);
   }
 
   .pack-info {
@@ -1341,7 +1341,7 @@
   }
 
   .pack-arrow {
-    color: var(--accent);
+    color: var(--accent-primary, #9ecaff);
     font-size: 1.2rem;
     font-weight: bold;
   }
@@ -1355,14 +1355,14 @@
   }
 
   .opening-slot:hover {
-    border-color: var(--accent);
+    border-color: var(--accent-primary, #9ecaff);
     background: rgba(0, 0, 0, 0.2);
   }
 
   .slot-header {
     font-size: 1.1rem;
     font-weight: 800;
-    color: var(--accent);
+    color: var(--accent-primary, #9ecaff);
     text-transform: uppercase;
     margin-bottom: 16px;
     text-align: center;
@@ -1414,7 +1414,7 @@
 
   .form-input:focus {
     outline: none;
-    border-color: var(--accent, #A239CA);
+    border-color: var(--accent-primary, #9ecaff);
     background: rgba(255, 255, 255, 0.08);
   }
 
@@ -1426,7 +1426,7 @@
   .submit-btn {
     width: 100%;
     padding: 16px 24px;
-    background: var(--accent, #A239CA);
+    background: var(--accent-primary, #9ecaff);
     color: white;
     font-weight: 900;
     font-size: 1.1rem;
@@ -1438,7 +1438,7 @@
   }
 
   .submit-btn:hover:not(:disabled) {
-    background: var(--accent2, #8B2FC9);
+    background: var(--accent-primary-strong, #b3d6ff);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(162, 57, 202, 0.5);
   }
@@ -1491,7 +1491,7 @@
 
   .uploaded-item:hover {
     background: rgba(255, 255, 255, 0.08);
-    border-color: var(--accent);
+    border-color: var(--accent-primary, #9ecaff);
   }
 
   .item-preview {
@@ -1554,9 +1554,9 @@
 
   .hint-badge {
     font-size: 0.75rem;
-    color: var(--accent);
+    color: var(--accent-primary, #9ecaff);
     padding: 3px 8px;
-    background: rgba(91, 117, 83, 0.15);
+    background: rgba(158, 202, 255, 0.15);
     border-radius: 4px;
     display: inline-block;
     font-weight: 600;
@@ -1601,7 +1601,7 @@
     max-height: 300px;
     overflow-y: auto;
     background: var(--panelStrong);
-    border: 2px solid var(--accent);
+    border: 2px solid var(--accent-primary, #9ecaff);
     border-radius: 8px;
     margin-top: 4px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
@@ -1624,7 +1624,7 @@
   }
 
   .suggestion-item:hover {
-    background: rgba(91, 117, 83, 0.2);
+    background: rgba(158, 202, 255, 0.2);
   }
 
   .suggestion-title {

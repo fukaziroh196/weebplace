@@ -80,7 +80,7 @@
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: var(--accent, #A239CA);
+    background: var(--accent-primary, #9ecaff);
     color: white;
     font-size: 24px;
     border: none;
@@ -91,7 +91,7 @@
   }
   
   .scroll-top-btn:hover {
-    background: var(--accent2, #8B2FC9);
+    background: var(--accent-primary-strong, #b3d6ff);
     transform: translateY(-2px);
   }
   
