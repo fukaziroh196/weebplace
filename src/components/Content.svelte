@@ -810,7 +810,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .leaderboard-card {
     position: sticky;
     top: 1rem;
-    background: var(--panel-highlight);
+    background: var(--news-panel-gradient);
     border-radius: 1.75rem;
     padding: 1.5rem 1.4rem 2rem;
     box-shadow: var(--shadow-outer);
@@ -1320,7 +1320,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     gap: 2rem;
     padding: 0.75rem 1.875rem;
     border-radius: 1.75rem;
-    background: var(--panel-highlight);
+    background: var(--news-panel-gradient);
     backdrop-filter: blur(20px) saturation(130%);
     box-shadow: var(--shadow-outer);
     margin-bottom: clamp(1.5rem, 2.5vw, 2.5rem);
