@@ -232,40 +232,40 @@ const gameCards = [
   {
     title: 'Угадай аниме',
     description: 'Узнай тайтл по короткой подсказке',
-    accent: '#d883b1',
-    accentDark: '#a7b9ff',
-    background: 'linear-gradient(180deg, #d0e0f0 0%, #e5eff5 100%)',
-    backgroundDark: 'linear-gradient(180deg, #1f2537 0%, #262f45 100%)',
+    accent: '#a6cfff',
+    accentDark: '#b3d6ff',
+    background: 'linear-gradient(135deg, #a6cfff 0%, #9ec6ff 50%, #b3d6ff 100%)',
+    backgroundDark: 'linear-gradient(135deg, #a6cfff 0%, #9ec6ff 50%, #b3d6ff 100%)',
     emoji: '🎧',
     action: () => activeView.set('guessAnime')
   },
   {
     title: 'Угадай персонажа',
     description: 'Отгадай героя по внешности',
-    accent: '#d8916a',
-    accentDark: '#f0c38d',
-    background: 'linear-gradient(180deg, #f5e8e0 0%, #ede5da 100%)',
-    backgroundDark: 'linear-gradient(180deg, #2c2521 0%, #352c25 100%)',
+    accent: '#ffaac2',
+    accentDark: '#ffb5c8',
+    background: 'linear-gradient(135deg, #ffaac2 0%, #ff9eb4 50%, #ffb5c8 100%)',
+    backgroundDark: 'linear-gradient(135deg, #ffaac2 0%, #ff9eb4 50%, #ffb5c8 100%)',
     emoji: '🗡️',
     action: () => activeView.set('guessCharacter')
   },
   {
     title: 'Угадай опенинг',
     description: 'Соревнуйся в скорости угадывания',
-    accent: '#d886c6',
-    accentDark: '#dea8d6',
-    background: 'linear-gradient(180deg, #f0e0ec 0%, #e8d0e0 100%)',
-    backgroundDark: 'linear-gradient(180deg, #2a2130 0%, #372438 100%)',
+    accent: '#9e8fff',
+    accentDark: '#c2b7ff',
+    background: 'linear-gradient(135deg, #9e8fff 0%, #a894ff 45%, #8c7dff 100%)',
+    backgroundDark: 'linear-gradient(135deg, #9e8fff 0%, #a894ff 45%, #8c7dff 100%)',
     emoji: '🎵',
     action: () => activeView.set('guessOpening')
   },
   {
     title: 'Аниме баттлы',
     description: 'Соревнуйся за любимый тайтл в дуэлях',
-    accent: '#8b7be8',
-    accentDark: '#c5b8ff',
-    background: 'linear-gradient(180deg, #e0dce8 0%, #d0c8e0 100%)',
-    backgroundDark: 'linear-gradient(180deg, #231f33 0%, #2e2840 100%)',
+    accent: '#8c7dff',
+    accentDark: '#c2b7ff',
+    background: 'linear-gradient(135deg, #8c7dff 0%, #9e8fff 45%, #a894ff 100%)',
+    backgroundDark: 'linear-gradient(135deg, #8c7dff 0%, #9e8fff 45%, #a894ff 100%)',
     emoji: '⚔️',
     action: () => activeView.set('guessBattle')
   }
@@ -633,10 +633,17 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     --input-border-color: rgba(156, 165, 214, 0.18);
     --chip-bg: rgba(228, 231, 248, 0.7);
     --chip-border-color: rgba(128, 136, 189, 0.16);
+    --panel-gradient-primary: linear-gradient(135deg, #ffffff 0%, #f3f5ff 100%);
+    --news-panel-gradient: linear-gradient(135deg, #ffeef4 0%, #ffe0ec 100%);
+    --card-gradient-blue: linear-gradient(135deg, #d0e0f0 0%, #e5eff5 100%);
+    --card-gradient-pink: linear-gradient(135deg, #ffe6f4 0%, #ffd8ee 100%);
+    --card-gradient-purple: linear-gradient(135deg, #eae6ff 0%, #dcd1ff 100%);
+    --card-gradient-yellow: linear-gradient(135deg, #ffe9bd 0%, #ffe1a3 100%);
     --text-primary: #4a495f;
     --text-secondary: rgba(74, 73, 99, 0.75);
     --text-tertiary: rgba(74, 73, 99, 0.58);
     --text-quaternary: rgba(74, 73, 99, 0.4);
+    --focus-outline-color: rgba(124, 139, 196, 0.4);
     --accent-primary: #7c8bc4;
     --accent-primary-strong: #6573ba;
     --accent-secondary: #b8a078;
@@ -694,24 +701,31 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     --input-border-color: rgba(255, 255, 255, 0.05);
     --chip-bg: rgba(255, 255, 255, 0.05);
     --chip-border-color: rgba(255, 255, 255, 0.08);
-    --text-primary: #ffffff;
-    --text-secondary: rgba(255, 255, 255, 0.6);
-    --text-tertiary: rgba(255, 255, 255, 0.35);
-    --text-quaternary: rgba(255, 255, 255, 0.2);
-    --accent-primary: #8fd6ff;
-    --accent-primary-strong: #a8e4ff;
-    --accent-secondary: #ffe9a3;
-    --accent-rose: #ffb7d5;
+    --panel-gradient-primary: linear-gradient(135deg, #3d4260 0%, #353a55 55%, #41486a 100%);
+    --news-panel-gradient: linear-gradient(135deg, #ffaac2 0%, #ff9eb4 45%, #ffb5c8 100%);
+    --card-gradient-blue: linear-gradient(135deg, #a6cfff 0%, #9ec6ff 50%, #b3d6ff 100%);
+    --card-gradient-pink: linear-gradient(135deg, #ffaac2 0%, #ff9eb4 50%, #ffb5c8 100%);
+    --card-gradient-purple: linear-gradient(135deg, #9e8fff 0%, #a894ff 45%, #8c7dff 100%);
+    --card-gradient-yellow: linear-gradient(135deg, #ffd77e 0%, #ffe194 50%, #fcd06a 100%);
+    --text-primary: #f4f7ff;
+    --text-secondary: #d8dcef;
+    --text-tertiary: #bfc4d6;
+    --text-quaternary: rgba(191, 196, 214, 0.4);
+    --focus-outline-color: rgba(202, 212, 255, 0.55);
+    --accent-primary: #a6cfff;
+    --accent-primary-strong: #b3d6ff;
+    --accent-secondary: #ffd77e;
+    --accent-rose: #ffaac2;
     --accent-chip: linear-gradient(135deg, #c8bfff 0%, #b8a9ff 100%);
     --shadow-outer: 0 1.5rem 3.5rem rgba(0, 0, 0, 0.35);
     --shadow-soft: 0 1rem 2.5rem rgba(0, 0, 0, 0.35);
     --shadow-inset: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
     --divider-color: rgba(255, 255, 255, 0.05);
     --divider-color-strong: rgba(255, 255, 255, 0.12);
-    --icon-pill-bg: rgba(255, 255, 255, 0.08);
+    --icon-pill-bg: rgba(202, 212, 255, 0.2);
     --tab-active-gradient: linear-gradient(135deg, #8fd6ff 0%, #a8e4ff 100%);
     --tab-active-shadow: 0 0.75rem 1.625rem rgba(0, 0, 0, 0.35);
-    --rank-top-gradient: linear-gradient(135deg, #ffe9a3 0%, #fddc85 100%);
+    --rank-top-gradient: linear-gradient(135deg, #ffd77e 0%, #ffe194 50%, #fcd06a 100%);
     --rank-top-color: #2e1f00;
     --rank-pill-bg: rgba(255, 255, 255, 0.12);
     --admin-submit-gradient: linear-gradient(135deg, #ffb7d5 0%, #fcaFCb 100%);
@@ -727,7 +741,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     --home-button-gradient: linear-gradient(135deg, #2a2c32 0%, #1f2025 100%);
     --home-button-shadow: 0 1.125rem 2.1875rem rgba(0, 0, 0, 0.45);
     --home-button-shadow-hover: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.55);
-    --home-button-color: #ffffff;
+    --home-button-color: #f4f7ff;
     --profile-button-gradient: linear-gradient(135deg, #2b2d34 0%, #212227 100%);
     --profile-button-shadow: 0 1.125rem 2rem rgba(0, 0, 0, 0.45);
     --profile-button-hover-shadow: 0 1.5rem 2.75rem rgba(0, 0, 0, 0.55);
@@ -738,7 +752,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     --hero-toggle-bg: rgba(36, 38, 44, 1);
     --hero-toggle-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.35);
     --hero-toggle-hover-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.45);
-    --hero-toggle-icon-color: #ffffff;
+    --hero-toggle-icon-color: #f4f7ff;
     --hero-button-hover-shadow: 0 1.125rem 2.25rem rgba(0, 0, 0, 0.45);
     --hero-replays-hover-bg: rgba(44, 46, 54, 1);
   }
@@ -794,7 +808,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .leaderboard-card {
     position: sticky;
     top: 1rem;
-    background: var(--surface-primary);
+    background: var(--panel-gradient-primary);
     border-radius: 1.75rem;
     padding: 1.5rem 1.4rem 2rem;
     box-shadow: var(--shadow-outer);
@@ -955,7 +969,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .admin-news-panel {
     width: min(24vw, 320px);
     flex-shrink: 0;
-    background: var(--surface-primary);
+    background: var(--news-panel-gradient);
     border-radius: 1.625rem;
     padding: 1.25rem;
     box-shadow: var(--shadow-outer);
@@ -1020,7 +1034,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .admin-news-input:focus-visible {
-    outline: 2px solid rgba(122, 139, 196, 0.5);
+    outline: 2px solid var(--focus-outline-color);
     outline-offset: 2px;
   }
 
@@ -1199,7 +1213,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     flex-shrink: 0;
     flex-grow: 0;
     margin-left: clamp(6.5rem, 13vw, 24rem);
-    background: var(--surface-primary);
+    background: var(--panel-gradient-primary);
     border-radius: 1.625rem;
     padding: 1.25rem;
     box-shadow: var(--shadow-outer);
@@ -1304,7 +1318,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     gap: 2rem;
     padding: 0.75rem 1.875rem;
     border-radius: 1.75rem;
-    background: var(--surface-primary);
+    background: var(--panel-gradient-primary);
     backdrop-filter: blur(20px) saturation(130%);
     box-shadow: var(--shadow-outer);
     margin-bottom: clamp(1.5rem, 2.5vw, 2.5rem);
@@ -1333,7 +1347,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     flex-wrap: wrap;
     padding: 1.25rem 1.875rem;
     border-radius: 1.75rem;
-    background: var(--surface-primary);
+    background: var(--panel-gradient-primary);
     box-shadow: var(--shadow-outer);
     width: calc(100% + clamp(0.8rem, 1vw, 1.2rem));
     box-sizing: border-box;
@@ -1368,7 +1382,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .home-button:focus-visible {
-    outline: 2px solid rgba(109, 122, 181, 0.4);
+    outline: 2px solid var(--focus-outline-color);
     outline-offset: 3px;
   }
 
@@ -1408,7 +1422,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .hero-nav-item:focus-visible {
-    outline: 2px solid rgba(124, 139, 196, 0.4);
+    outline: 2px solid var(--focus-outline-color);
     outline-offset: 3px;
   }
 
@@ -1442,7 +1456,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .theme-toggle:focus-visible {
-    outline: 2px solid rgba(124, 139, 196, 0.4);
+    outline: 2px solid var(--focus-outline-color);
     outline-offset: 3px;
   }
 
@@ -1482,7 +1496,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .profile-nav-button:focus-visible {
-    outline: 2px solid rgba(101, 122, 178, 0.45);
+    outline: 2px solid var(--focus-outline-color);
     outline-offset: 3px;
   }
 
@@ -1515,7 +1529,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     top: calc(100% + 0.7rem);
     right: 0;
     min-width: 16.25rem;
-    background: var(--surface-primary);
+    background: var(--panel-gradient-primary);
     border-radius: 1.25rem;
     box-shadow: var(--shadow-outer);
     padding: 1rem;
@@ -1551,7 +1565,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .mode-card:focus-visible {
-    outline: 2px solid rgba(124, 139, 196, 0.4);
+    outline: 2px solid var(--focus-outline-color);
     outline-offset: 4px;
   }
 
@@ -1583,7 +1597,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .hero-achievements {
-    background: var(--surface-pill);
+    background: var(--card-gradient-yellow);
     border-radius: 1.375rem;
     padding: 1rem 1.625rem;
     display: flex;
@@ -1605,7 +1619,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .hero-achievements-value {
     font-size: 1.75rem;
     font-weight: 800;
-    color: var(--accent-primary-strong);
+    color: var(--accent-secondary);
     white-space: nowrap;
   }
 
@@ -1617,7 +1631,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .hero-replays-button {
     border: none;
-    background: var(--surface-pill);
+    background: var(--panel-gradient-primary);
     border-radius: 1.375rem;
     padding: 1rem 1.625rem;
     display: flex;
@@ -1640,7 +1654,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .hero-replays-button:focus-visible {
-    outline: 2px solid rgba(124, 139, 196, 0.4);
+    outline: 2px solid var(--focus-outline-color);
     outline-offset: 3px;
   }
 
