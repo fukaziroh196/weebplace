@@ -894,7 +894,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     --hero-button-hover-shadow: 0 1.125rem 2.25rem rgba(0, 0, 0, 0.5);
     --hero-replays-hover-bg: rgba(255, 255, 255, 0.28);
     --panel-highlight: rgba(255, 255, 255, 0.3);
-    --app-background: linear-gradient(180deg, rgba(4, 7, 15, 0.7), rgba(21, 6, 28, 0.85)), url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1920&q=80');
+    --app-background: linear-gradient(180deg, rgba(4, 7, 15, 0.7), rgba(21, 6, 28, 0.85)), url('/backgrounds/backsak.jpg');
     --app-background-size: cover;
     --app-background-attachment: fixed;
     --app-background-repeat: no-repeat;
