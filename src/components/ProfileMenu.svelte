@@ -345,9 +345,9 @@
   }
   
   .submit-btn:hover:not(:disabled) {
-    background: var(--extra);
+    background: var(--accent-primary-strong, #b3d6ff);
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(158, 202, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(158, 202, 255, 0.4);
   }
   
   .submit-btn:disabled {
