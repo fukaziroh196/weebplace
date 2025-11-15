@@ -36,33 +36,33 @@
 
 {#if !$currentUser}
   <div class="mt-4">
-    <h1 class="text-2xl font-bold text-white mb-4">Профиль</h1>
-    <div class="bg-pink-900/50 rounded-xl p-4 glass-frame">
-      <div class="flex gap-3 mb-3">
-        <button class="px-3 py-1 rounded-full text-sm font-medium {mode === 'login' ? 'bg-pink-600 text-white' : 'bg-white/20 text-white'}" on:click={() => mode = 'login'}>Войти</button>
-        <button class="px-3 py-1 rounded-full text-sm font-medium {mode === 'register' ? 'bg-pink-600 text-white' : 'bg-white/20 text-white'}" on:click={() => mode = 'register'}>Регистрация</button>
+    <h1 class="profile-page-title">Профиль</h1>
+      <div class="auth-container">
+        <div class="auth-tabs">
+          <button class="auth-tab {mode === 'login' ? 'active' : ''}" on:click={() => mode = 'login'}>Войти</button>
+          <button class="auth-tab {mode === 'register' ? 'active' : ''}" on:click={() => mode = 'register'}>Регистрация</button>
+        </div>
+        <div class="auth-form">
+          <input class="auth-input" placeholder="Имя" bind:value={username} />
+          <input class="auth-input" type="password" placeholder="Пароль" bind:value={password} />
+          {#if error}
+            <div class="auth-error">{error}</div>
+          {/if}
+          <button class="auth-submit" on:click={submit}>{mode === 'login' ? 'Войти' : 'Зарегистрироваться'}</button>
+        </div>
       </div>
-      <div class="grid grid-cols-2 gap-3 max-w-[480px]">
-        <input class="px-3 py-2 rounded border border-white/30 bg-white/80 text-black" placeholder="Имя" bind:value={username} />
-        <input class="px-3 py-2 rounded border border-white/30 bg-white/80 text-black" type="password" placeholder="Пароль" bind:value={password} />
-      </div>
-      {#if error}
-        <div class="text-red-300 text-sm mt-2">{error}</div>
-      {/if}
-      <button class="mt-3 bg-pink-600 text-white rounded px-4 py-2 font-semibold" on:click={submit}>{mode === 'login' ? 'Войти' : 'Зарегистрироваться'}</button>
-    </div>
   </div>
 {:else}
   <div class="mt-4">
     <div class="flex items-start gap-6 mb-4">
-      <div class="relative group w-[250px] h-[250px]">
+      <div class="profile-avatar-wrapper">
         {#if $currentUser.avatarUrl}
-          <img src={$currentUser.avatarUrl} alt="avatar" class="w-[250px] h-[250px] object-cover" />
+          <img src={$currentUser.avatarUrl} alt="avatar" class="profile-avatar-img" />
         {:else}
-          <div class="w-[250px] h-[250px] bg-pink-700 flex items-center justify-center text-white text-7xl font-bold">{$currentUser.username[0]?.toUpperCase() || 'U'}</div>
+          <div class="profile-avatar-placeholder">{$currentUser.username[0]?.toUpperCase() || 'U'}</div>
         {/if}
-        <div class="absolute left-0 right-0 bottom-0 p-2 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-          <label class="bg-white/90 text-pink-700 rounded px-3 py-1 text-sm font-semibold hover:bg-white cursor-pointer">
+        <div class="profile-avatar-overlay">
+          <label class="profile-avatar-btn">
             Загрузить
             <input type="file" accept="image/*" class="hidden" on:change={(e) => {
               const file = e.currentTarget.files?.[0];
@@ -73,13 +73,13 @@
             }} />
           </label>
           {#if $currentUser.avatarUrl}
-            <button class="bg-white/90 text-pink-700 rounded px-3 py-1 text-sm font-semibold hover:bg-white" on:click={clearCurrentUserAvatar}>Удалить</button>
+            <button class="profile-avatar-btn" on:click={clearCurrentUserAvatar}>Удалить</button>
           {/if}
         </div>
       </div>
       <div>
-        <div class="text-3xl font-bold text-white">{$currentUser.username}</div>
-        <div class="text-white/70 text-sm">С нами с {new Date($currentUser.createdAt).toLocaleDateString()}</div>
+        <div class="profile-username">{$currentUser.username}</div>
+        <div class="profile-joined-date">С нами с {new Date($currentUser.createdAt).toLocaleDateString()}</div>
       </div>
     </div>
 
@@ -109,63 +109,63 @@
       <div class="info-tab-content">
         <div class="space-y-6">
           <div>
-            <h2 class="text-white font-semibold mb-2">Друзья</h2>
-            <div class="bg-pink-900/50 rounded-xl p-3 glass-frame space-y-2">
+            <h2 class="section-title">Друзья</h2>
+            <div class="glass-panel">
               {#if $friends.length}
                 {#each $friends as fid}
-                  <div class="flex items-center justify-between bg-white/10 rounded px-3 py-2">
-                    <div class="text-white">{@html ($users.find(u=>u.id===fid)?.username || fid)}</div>
-                    <button class="text-white/90 hover:text-white" on:click={() => removeFriend(fid)}>Удалить</button>
+                  <div class="friend-item">
+                    <div class="friend-name">{@html ($users.find(u=>u.id===fid)?.username || fid)}</div>
+                    <button class="friend-remove-btn" on:click={() => removeFriend(fid)}>Удалить</button>
                   </div>
                 {/each}
               {:else}
-                <div class="text-white/70">Пока нет друзей</div>
+                <div class="empty-state">Пока нет друзей</div>
               {/if}
             </div>
             <!-- Блок заявок в друзья перенесён в меню сообщений -->
           </div>
 
           <div>
-            <h2 class="text-white font-semibold mb-2">Избранное</h2>
+            <h2 class="section-title">Избранное</h2>
             {#if $favorites.length}
-              <div class="grid grid-cols-3 gap-3">
+              <div class="favorites-grid">
                 {#each $favorites as it}
-                  <div class="bg-pink-900/50 rounded-xl h-32 overflow-hidden relative cursor-pointer"
+                  <div class="favorite-card"
                        on:click={() => window.open(it.url || '#', '_blank')}>
                     {#if it.image}
-                      <img src={it.image} alt={it.title} class="absolute inset-0 w-full h-full object-cover opacity-80" />
+                      <img src={it.image} alt={it.title} class="favorite-image" />
                     {/if}
-                    <button class="absolute top-1 right-1 bg-white/90 text-pink-700 rounded-full w-6 h-6 text-xs flex items-center justify-center hover:bg-white"
+                    <button class="favorite-remove-btn"
                             title="Удалить из избранного"
                             on:click|stopPropagation={() => removeFromFavorites(it.id)}>×</button>
-                    <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent text-white text-xs">{it.title}</div>
+                    <div class="favorite-title">{it.title}</div>
                   </div>
                 {/each}
               </div>
             {:else}
-              <div class="text-white/70">Пока пусто</div>
+              <div class="empty-state">Пока пусто</div>
             {/if}
           </div>
         </div>
 
         <div class="mt-6">
-          <h2 class="text-white font-semibold mb-2">Комментарии</h2>
-          <div class="bg-pink-900/50 rounded-xl p-3 glass-frame">
-            <div class="flex gap-2 mb-3">
-              <input class="flex-1 px-3 py-2 rounded border border-white/30 bg-white/80 text-black" placeholder="Оставьте комментарий" bind:value={commentText} />
-              <button class="bg-pink-600 text-white rounded px-3 py-2 font-semibold" on:click={postComment}>Отправить</button>
+          <h2 class="section-title">Комментарии</h2>
+          <div class="glass-panel">
+            <div class="comment-form">
+              <input class="comment-input" placeholder="Оставьте комментарий" bind:value={commentText} />
+              <button class="comment-submit" on:click={postComment}>Отправить</button>
             </div>
             {#if $comments.length}
-              <div class="flex flex-col gap-2 max-h-[220px] overflow-auto pr-2 scrollable scrollable--active">
+              <div class="comments-list">
                 {#each $comments as c}
-                  <div class="bg-white/10 rounded px-3 py-2 text-white/90 text-sm">
-                    <div class="text-white font-medium text-xs mb-1">{new Date(c.createdAt).toLocaleString()}</div>
-                    {c.text}
+                  <div class="comment-item">
+                    <div class="comment-date">{new Date(c.createdAt).toLocaleString()}</div>
+                    <div class="comment-text">{c.text}</div>
                   </div>
                 {/each}
               </div>
             {:else}
-              <div class="text-white/70">Комментариев пока нет</div>
+              <div class="empty-state">Комментариев пока нет</div>
             {/if}
           </div>
         </div>
@@ -175,6 +175,192 @@
 {/if}
 
 <style>
+  /* Profile page title */
+  .profile-page-title {
+    font-size: 1.75rem;
+    font-weight: 900;
+    color: var(--text-primary, #f5f6ff);
+    margin-bottom: 1.5rem;
+  }
+
+  /* Auth section */
+  .auth-container {
+    background: var(--surface-primary, rgba(255, 255, 255, 0.1));
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 1.75rem;
+    padding: 1.5rem;
+    max-width: 500px;
+  }
+
+  .auth-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .auth-tab {
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 0.75rem;
+    color: var(--text-secondary, rgba(245, 246, 255, 0.85));
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .auth-tab:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--text-primary, #f5f6ff);
+  }
+
+  .auth-tab.active {
+    background: var(--accent-primary, #9ecaff);
+    color: var(--text-primary, #f5f6ff);
+    border-color: var(--accent-primary, #9ecaff);
+  }
+
+  .auth-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .auth-input {
+    grid-column: span 2;
+    padding: 0.75rem 1rem;
+    background: var(--input-surface, rgba(255, 255, 255, 0.15));
+    border: 2px solid var(--input-border-color, rgba(255, 255, 255, 0.35));
+    border-radius: 0.75rem;
+    color: var(--text-primary, #f5f6ff);
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+  }
+
+  .auth-input:focus {
+    outline: none;
+    border-color: var(--accent-primary, #9ecaff);
+    background: var(--input-surface, rgba(255, 255, 255, 0.2));
+  }
+
+  .auth-input::placeholder {
+    color: var(--text-quaternary, rgba(245, 246, 255, 0.45));
+  }
+
+  .auth-error {
+    grid-column: span 2;
+    color: var(--danger-color, #ffb7d5);
+    font-size: 0.75rem;
+    margin-top: -0.25rem;
+  }
+
+  .auth-submit {
+    grid-column: span 2;
+    margin-top: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--accent-primary, #9ecaff);
+    color: var(--text-primary, #f5f6ff);
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .auth-submit:hover {
+    background: var(--accent-primary-strong, #b3d6ff);
+    transform: translateY(-1px);
+  }
+
+  /* Profile header */
+  .profile-username {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--text-primary, #f5f6ff);
+    margin-bottom: 0.25rem;
+  }
+
+  .profile-joined-date {
+    color: var(--text-tertiary, rgba(245, 246, 255, 0.65));
+    font-size: 0.875rem;
+  }
+
+  /* Profile avatar */
+  .profile-avatar-wrapper {
+    position: relative;
+    width: 250px;
+    height: 250px;
+  }
+
+  .profile-avatar-wrapper:hover .profile-avatar-overlay {
+    opacity: 1;
+  }
+
+  .profile-avatar-img {
+    width: 250px;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 1.5rem;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .profile-avatar-placeholder {
+    width: 250px;
+    height: 250px;
+    background: var(--accent-primary, #9ecaff);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary, #f5f6ff);
+    font-size: 5rem;
+    font-weight: 900;
+  }
+
+  .profile-avatar-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 0 0 1.5rem 1.5rem;
+  }
+
+
+  .profile-avatar-btn {
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--accent-primary, #9ecaff);
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .profile-avatar-btn:hover {
+    background: white;
+    transform: translateY(-1px);
+  }
+
+  /* Tabs */
   .profile-tabs {
     display: flex;
     gap: 1rem;
@@ -186,7 +372,7 @@
     padding: 0.75rem 1.5rem;
     background: transparent;
     border: none;
-    color: var(--muted);
+    color: var(--text-tertiary, rgba(245, 246, 255, 0.65));
     font-weight: 700;
     font-size: 1rem;
     cursor: pointer;
@@ -196,7 +382,7 @@
   }
 
   .profile-tab:hover {
-    color: var(--text);
+    color: var(--text-primary, #f5f6ff);
   }
 
   .profile-tab.active {
@@ -210,6 +396,206 @@
 
   .info-tab-content {
     margin-top: 1rem;
+  }
+
+  /* Sections */
+  .section-title {
+    color: var(--text-primary, #f5f6ff);
+    font-weight: 700;
+    font-size: 1.125rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .glass-panel {
+    background: var(--surface-primary, rgba(255, 255, 255, 0.1));
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 1.5rem;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .empty-state {
+    color: var(--text-tertiary, rgba(245, 246, 255, 0.65));
+    font-size: 0.875rem;
+    text-align: center;
+    padding: 1rem;
+  }
+
+  /* Friends */
+  .friend-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .friend-name {
+    color: var(--text-primary, #f5f6ff);
+    font-size: 0.875rem;
+  }
+
+  .friend-remove-btn {
+    color: var(--text-tertiary, rgba(245, 246, 255, 0.65));
+    background: none;
+    border: none;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .friend-remove-btn:hover {
+    color: var(--text-primary, #f5f6ff);
+  }
+
+  /* Favorites */
+  .favorites-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+  }
+
+  .favorite-card {
+    position: relative;
+    height: 8rem;
+    border-radius: 1rem;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--surface-secondary, rgba(255, 255, 255, 0.08));
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.2s ease;
+  }
+
+  .favorite-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .favorite-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.8;
+  }
+
+  .favorite-remove-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--accent-primary, #9ecaff);
+    border: none;
+    border-radius: 50%;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+  }
+
+  .favorite-remove-btn:hover {
+    background: white;
+    transform: scale(1.1);
+  }
+
+  .favorite-title {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0.75rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    color: var(--text-primary, #f5f6ff);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  /* Comments */
+  .comment-form {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .comment-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    background: var(--input-surface, rgba(255, 255, 255, 0.15));
+    border: 2px solid var(--input-border-color, rgba(255, 255, 255, 0.35));
+    border-radius: 0.75rem;
+    color: var(--text-primary, #f5f6ff);
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+  }
+
+  .comment-input:focus {
+    outline: none;
+    border-color: var(--accent-primary, #9ecaff);
+    background: var(--input-surface, rgba(255, 255, 255, 0.2));
+  }
+
+  .comment-input::placeholder {
+    color: var(--text-quaternary, rgba(245, 246, 255, 0.45));
+  }
+
+  .comment-submit {
+    padding: 0.75rem 1.5rem;
+    background: var(--accent-primary, #9ecaff);
+    color: var(--text-primary, #f5f6ff);
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .comment-submit:hover {
+    background: var(--accent-primary-strong, #b3d6ff);
+    transform: translateY(-1px);
+  }
+
+  .comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 220px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+  }
+
+  .comment-item {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .comment-date {
+    color: var(--text-primary, #f5f6ff);
+    font-weight: 600;
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .comment-text {
+    color: var(--text-secondary, rgba(245, 246, 255, 0.85));
+    font-size: 0.875rem;
+    line-height: 1.5;
   }
 </style>
 
