@@ -1,6 +1,6 @@
 <script>
-  import { currentUser, login, register } from '../stores/authApi';
-  import { favorites, comments, addComment, removeFromFavorites, setCurrentUserAvatar, clearCurrentUserAvatar, users, friends, friendRequestsIncoming, friendRequestsOutgoing } from '../stores/auth';
+  import { currentUser, login, register, setCurrentUserAvatar, clearCurrentUserAvatar } from '../stores/authApi';
+  import { favorites, comments, addComment, removeFromFavorites, users, friends, friendRequestsIncoming, friendRequestsOutgoing } from '../stores/auth';
   import { sendFriendRequest, acceptFriendRequest, declineFriendRequest, removeFriend, refreshFriendState } from '../stores/auth';
   import { profileTab } from '../stores/ui';
   import AvatarCropper from './AvatarCropper.svelte';
@@ -118,11 +118,17 @@
           showCropper = false; 
           tempImage = ''; 
         }} 
-        onApply={(url) => { 
+        onApply={async (url) => { 
           console.log('[ProfileView] Applying avatar URL:', url ? 'URL received' : 'NO URL');
           if (url) {
-            setCurrentUserAvatar(url);
-            console.log('[ProfileView] Avatar set, current user:', $currentUser);
+            try {
+              await setCurrentUserAvatar(url);
+              console.log('[ProfileView] Avatar set successfully, current user:', $currentUser);
+            } catch (error) {
+              console.error('[ProfileView] Failed to set avatar:', error);
+              alert('Ошибка при сохранении аватара. Попробуйте еще раз.');
+              return; // Не закрываем окно обрезки при ошибке
+            }
           }
           showCropper = false; 
           tempImage = ''; 

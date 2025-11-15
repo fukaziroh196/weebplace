@@ -193,6 +193,24 @@ export function toggleFavorite(item) {
   }
 }
 
+// Update current user avatar
+export async function setCurrentUserAvatar(avatarUrl) {
+  try {
+    const updatedUser = await auth.updateMe({ avatarUrl });
+    currentUser.set(updatedUser);
+    console.log('[setCurrentUserAvatar] Avatar updated on server:', updatedUser);
+    return updatedUser;
+  } catch (error) {
+    console.error('[setCurrentUserAvatar] Failed to update avatar on server:', error);
+    throw error;
+  }
+}
+
+// Clear current user avatar
+export function clearCurrentUserAvatar() {
+  return setCurrentUserAvatar(null);
+}
+
 // Initialize on import
 if (typeof window !== 'undefined') {
   const token = localStorage.getItem('api_token');

@@ -96,6 +96,13 @@ export const auth = {
   async getMe() {
     return await apiRequest('/me');
   },
+
+  async updateMe(data) {
+    return await apiRequest('/me', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  },
 };
 
 // Stats API

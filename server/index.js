@@ -302,6 +302,39 @@ app.get('/api/me', authenticateToken, (req, res) => {
   });
 });
 
+// Обновление профиля пользователя (включая аватар)
+app.patch('/api/me', authenticateToken, (req, res) => {
+  const { avatarUrl } = req.body;
+  
+  if (avatarUrl !== undefined && avatarUrl !== null && typeof avatarUrl !== 'string') {
+    return res.status(400).json({ error: 'avatarUrl must be a string or null' });
+  }
+
+  db.run(
+    'UPDATE users SET avatar_url = ? WHERE id = ?',
+    [avatarUrl || null, req.user.id],
+    function(err) {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+
+      // Возвращаем обновленного пользователя
+      db.get('SELECT * FROM users WHERE id = ?', [req.user.id], (err, user) => {
+        if (err || !user) {
+          return res.status(500).json({ error: 'Failed to fetch updated user' });
+        }
+
+        res.json({
+          id: user.id,
+          username: user.username,
+          isAdmin: !!user.is_admin,
+          avatarUrl: user.avatar_url
+        });
+      });
+    }
+  );
+});
+
 // Статистика пользователя: уникальные дни, текущее/лучшее комбо, распределение по датам
 app.get('/api/stats/me', authenticateToken, (req, res) => {
   const userId = req.user.id;
