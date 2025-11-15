@@ -158,38 +158,38 @@
     const deltaY = e.clientY - dragStartY;
     
     // Вычисляем изменение размера в зависимости от ручки
+    // Для сохранения квадратной формы используем большее из смещений
     let deltaSize = 0;
-    let deltaXPos = 0;
-    let deltaYPos = 0;
     
     switch (resizeHandle) {
       case 'br':
+        // Правый нижний угол - используем среднее для плавности
         deltaSize = (deltaX + deltaY) / 2;
         break;
       case 'bl':
+        // Левый нижний угол
         deltaSize = (-deltaX + deltaY) / 2;
-        deltaXPos = deltaX;
         break;
       case 'tr':
+        // Правый верхний угол
         deltaSize = (deltaX - deltaY) / 2;
-        deltaYPos = deltaY;
         break;
       case 'tl':
+        // Левый верхний угол
         deltaSize = (-deltaX - deltaY) / 2;
-        deltaXPos = deltaX;
-        deltaYPos = deltaY;
         break;
     }
     
-    const newSize = dragStartCropSize + deltaSize * 2;
+    const newSize = dragStartCropSize + deltaSize;
     cropSize = Math.max(MIN_CROP_SIZE, Math.min(MAX_CROP_SIZE, newSize));
     
-    // Корректируем позицию при изменении размера
+    // Корректируем позицию при изменении размера от левого/верхнего края
+    const sizeDiff = cropSize - dragStartCropSize;
     if (resizeHandle.includes('l')) {
-      cropX = dragStartCropX - (cropSize - dragStartCropSize);
+      cropX = dragStartCropX - sizeDiff;
     }
     if (resizeHandle.includes('t')) {
-      cropY = dragStartCropY - (cropSize - dragStartCropSize);
+      cropY = dragStartCropY - sizeDiff;
     }
     
     constrainCropSize();
@@ -204,40 +204,64 @@
   }
 
   function applyCrop() {
-    if (!imageEl || !naturalWidth || !naturalHeight || !containerEl) return;
+    if (!imageEl || !naturalWidth || !naturalHeight || !containerEl || !imageEl.complete) {
+      console.error('[AvatarCropper] Cannot crop: image not ready');
+      return;
+    }
     
-    const containerRect = containerEl.getBoundingClientRect();
-    const containerWidth = containerRect.width;
-    const containerHeight = containerRect.height;
-    
-    const imageDisplayWidth = naturalWidth * imageScale;
-    const imageDisplayHeight = naturalHeight * imageScale;
-    const imageOffsetX = (containerWidth - imageDisplayWidth) / 2;
-    const imageOffsetY = (containerHeight - imageDisplayHeight) / 2;
-    
-    // Вычисляем координаты относительно изображения
-    const relativeX = cropX - imageOffsetX;
-    const relativeY = cropY - imageOffsetY;
-    
-    // Вычисляем координаты в исходном изображении
-    const sourceX = relativeX / imageScale;
-    const sourceY = relativeY / imageScale;
-    const sourceSize = cropSize / imageScale;
-    
-    const canvas = document.createElement('canvas');
-    canvas.width = OUTPUT_SIZE;
-    canvas.height = OUTPUT_SIZE;
-    const ctx = canvas.getContext('2d');
-    
-    ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(
-      imageEl,
-      sourceX, sourceY, sourceSize, sourceSize,
-      0, 0, OUTPUT_SIZE, OUTPUT_SIZE
-    );
-    
-    const dataUrl = canvas.toDataURL('image/png');
-    onApply(dataUrl);
+    try {
+      const containerRect = containerEl.getBoundingClientRect();
+      const containerWidth = containerRect.width;
+      const containerHeight = containerRect.height;
+      
+      const imageDisplayWidth = naturalWidth * imageScale;
+      const imageDisplayHeight = naturalHeight * imageScale;
+      const imageOffsetX = (containerWidth - imageDisplayWidth) / 2;
+      const imageOffsetY = (containerHeight - imageDisplayHeight) / 2;
+      
+      // Вычисляем координаты относительно изображения
+      const relativeX = cropX - imageOffsetX;
+      const relativeY = cropY - imageOffsetY;
+      
+      // Вычисляем координаты в исходном изображении
+      const sourceX = Math.max(0, relativeX / imageScale);
+      const sourceY = Math.max(0, relativeY / imageScale);
+      const sourceSize = cropSize / imageScale;
+      
+      // Убеждаемся, что не выходим за границы изображения
+      const clampedSourceX = Math.min(sourceX, naturalWidth - sourceSize);
+      const clampedSourceY = Math.min(sourceY, naturalHeight - sourceSize);
+      const clampedSourceSize = Math.min(sourceSize, naturalWidth - clampedSourceX, naturalHeight - clampedSourceY);
+      
+      const canvas = document.createElement('canvas');
+      canvas.width = OUTPUT_SIZE;
+      canvas.height = OUTPUT_SIZE;
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) {
+        console.error('[AvatarCropper] Cannot get canvas context');
+        return;
+      }
+      
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(
+        imageEl,
+        clampedSourceX, clampedSourceY, clampedSourceSize, clampedSourceSize,
+        0, 0, OUTPUT_SIZE, OUTPUT_SIZE
+      );
+      
+      const dataUrl = canvas.toDataURL('image/png');
+      
+      if (!dataUrl || dataUrl === 'data:,') {
+        console.error('[AvatarCropper] Failed to create data URL');
+        return;
+      }
+      
+      console.log('[AvatarCropper] Crop applied successfully');
+      onApply(dataUrl);
+    } catch (error) {
+      console.error('[AvatarCropper] Error applying crop:', error);
+    }
   }
 </script>
 
