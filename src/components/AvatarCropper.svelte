@@ -4,7 +4,9 @@
   export let onApply = (dataUrl) => {};
 
   const OUTPUT_SIZE = 512;
-  const CROP_SIZE = 400;
+  const MIN_CROP_SIZE = 200;
+  const MAX_CROP_SIZE = 600;
+  const DEFAULT_CROP_SIZE = 400;
   
   let imageEl;
   let containerEl;
@@ -15,12 +17,16 @@
   let imageScale = 1;
   let cropX = 0;
   let cropY = 0;
+  let cropSize = DEFAULT_CROP_SIZE;
   
   let isDragging = false;
+  let isResizing = false;
+  let resizeHandle = '';
   let dragStartX = 0;
   let dragStartY = 0;
   let dragStartCropX = 0;
   let dragStartCropY = 0;
+  let dragStartCropSize = 0;
 
   function handleImageLoad() {
     if (!imageEl || !containerEl) return;
@@ -46,8 +52,8 @@
     const imageOffsetX = (containerWidth - imageDisplayWidth) / 2;
     const imageOffsetY = (containerHeight - imageDisplayHeight) / 2;
     
-    cropX = imageOffsetX + (imageDisplayWidth - CROP_SIZE) / 2;
-    cropY = imageOffsetY + (imageDisplayHeight - CROP_SIZE) / 2;
+    cropX = imageOffsetX + (imageDisplayWidth - cropSize) / 2;
+    cropY = imageOffsetY + (imageDisplayHeight - cropSize) / 2;
     
     // Ограничиваем позицию сетки
     constrainCropPosition();
@@ -68,16 +74,53 @@
     
     const minX = imageOffsetX;
     const minY = imageOffsetY;
-    const maxX = imageOffsetX + imageDisplayWidth - CROP_SIZE;
-    const maxY = imageOffsetY + imageDisplayHeight - CROP_SIZE;
+    const maxX = imageOffsetX + imageDisplayWidth - cropSize;
+    const maxY = imageOffsetY + imageDisplayHeight - cropSize;
     
     cropX = Math.max(minX, Math.min(maxX, cropX));
     cropY = Math.max(minY, Math.min(maxY, cropY));
   }
 
+  function constrainCropSize() {
+    if (!imageEl || !containerEl) return;
+    
+    const containerRect = containerEl.getBoundingClientRect();
+    const containerWidth = containerRect.width;
+    const containerHeight = containerRect.height;
+    
+    const imageDisplayWidth = naturalWidth * imageScale;
+    const imageDisplayHeight = naturalHeight * imageScale;
+    
+    const imageOffsetX = (containerWidth - imageDisplayWidth) / 2;
+    const imageOffsetY = (containerHeight - imageDisplayHeight) / 2;
+    
+    const maxSize = Math.min(imageDisplayWidth, imageDisplayHeight);
+    cropSize = Math.max(MIN_CROP_SIZE, Math.min(MAX_CROP_SIZE, Math.min(cropSize, maxSize)));
+  }
+
   function handleMouseDown(e) {
-    if (!cropBoxEl?.contains(e.target)) return;
     if (e.button !== 0) return;
+    
+    // Проверяем, кликнули ли на ручку изменения размера
+    const handle = e.target.closest('.resize-handle');
+    if (handle) {
+      isResizing = true;
+      resizeHandle = handle.dataset.handle || '';
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      dragStartCropX = cropX;
+      dragStartCropY = cropY;
+      dragStartCropSize = cropSize;
+      
+      e.preventDefault();
+      e.stopPropagation();
+      document.addEventListener('mousemove', handleResizeMove);
+      document.addEventListener('mouseup', handleResizeUp);
+      return;
+    }
+    
+    // Обычное перетаскивание сетки
+    if (!cropBoxEl?.contains(e.target)) return;
     
     isDragging = true;
     dragStartX = e.clientX;
@@ -108,6 +151,58 @@
     document.removeEventListener('mouseup', handleMouseUp);
   }
 
+  function handleResizeMove(e) {
+    if (!isResizing) return;
+    
+    const deltaX = e.clientX - dragStartX;
+    const deltaY = e.clientY - dragStartY;
+    
+    // Вычисляем изменение размера в зависимости от ручки
+    let deltaSize = 0;
+    let deltaXPos = 0;
+    let deltaYPos = 0;
+    
+    switch (resizeHandle) {
+      case 'br':
+        deltaSize = (deltaX + deltaY) / 2;
+        break;
+      case 'bl':
+        deltaSize = (-deltaX + deltaY) / 2;
+        deltaXPos = deltaX;
+        break;
+      case 'tr':
+        deltaSize = (deltaX - deltaY) / 2;
+        deltaYPos = deltaY;
+        break;
+      case 'tl':
+        deltaSize = (-deltaX - deltaY) / 2;
+        deltaXPos = deltaX;
+        deltaYPos = deltaY;
+        break;
+    }
+    
+    const newSize = dragStartCropSize + deltaSize * 2;
+    cropSize = Math.max(MIN_CROP_SIZE, Math.min(MAX_CROP_SIZE, newSize));
+    
+    // Корректируем позицию при изменении размера
+    if (resizeHandle.includes('l')) {
+      cropX = dragStartCropX - (cropSize - dragStartCropSize);
+    }
+    if (resizeHandle.includes('t')) {
+      cropY = dragStartCropY - (cropSize - dragStartCropSize);
+    }
+    
+    constrainCropSize();
+    constrainCropPosition();
+  }
+
+  function handleResizeUp() {
+    isResizing = false;
+    resizeHandle = '';
+    document.removeEventListener('mousemove', handleResizeMove);
+    document.removeEventListener('mouseup', handleResizeUp);
+  }
+
   function applyCrop() {
     if (!imageEl || !naturalWidth || !naturalHeight || !containerEl) return;
     
@@ -127,7 +222,7 @@
     // Вычисляем координаты в исходном изображении
     const sourceX = relativeX / imageScale;
     const sourceY = relativeY / imageScale;
-    const sourceSize = CROP_SIZE / imageScale;
+    const sourceSize = cropSize / imageScale;
     
     const canvas = document.createElement('canvas');
     canvas.width = OUTPUT_SIZE;
@@ -171,19 +266,19 @@
           <div 
             class="cropper-box" 
             bind:this={cropBoxEl}
-            style="left: {cropX}px; top: {cropY}px; cursor: {isDragging ? 'grabbing' : 'grab'};"
+            style="left: {cropX}px; top: {cropY}px; width: {cropSize}px; height: {cropSize}px; cursor: {isDragging ? 'grabbing' : 'grab'};"
             on:mousedown={handleMouseDown}
           >
             <div class="cropper-box-border"></div>
             <div class="cropper-box-grid"></div>
             <div class="cropper-box-handles">
-              <div class="handle handle-tl"></div>
-              <div class="handle handle-tr"></div>
-              <div class="handle handle-bl"></div>
-              <div class="handle handle-br"></div>
+              <div class="resize-handle handle-tl" data-handle="tl" title="Изменить размер"></div>
+              <div class="resize-handle handle-tr" data-handle="tr" title="Изменить размер"></div>
+              <div class="resize-handle handle-bl" data-handle="bl" title="Изменить размер"></div>
+              <div class="resize-handle handle-br" data-handle="br" title="Изменить размер"></div>
             </div>
           </div>
-          <div class="cropper-overlay" style="--crop-x: {cropX}px; --crop-y: {cropY}px; --crop-size: {CROP_SIZE}px;">
+          <div class="cropper-overlay" style="--crop-x: {cropX}px; --crop-y: {cropY}px; --crop-size: {cropSize}px;">
             <div class="cropper-overlay-top"></div>
             <div class="cropper-overlay-bottom"></div>
             <div class="cropper-overlay-left"></div>
@@ -381,8 +476,6 @@
 
   .cropper-box {
     position: absolute;
-    width: 400px;
-    height: 400px;
     border: 3px solid var(--accent-primary, #9ecaff);
     box-shadow: 0 0 20px rgba(158, 202, 255, 0.5);
     z-index: 4;
@@ -418,34 +511,47 @@
     pointer-events: none;
   }
 
-  .handle {
+  .resize-handle {
     position: absolute;
-    width: 12px;
-    height: 12px;
+    width: 16px;
+    height: 16px;
     background: var(--accent-primary, #9ecaff);
     border: 2px solid rgba(255, 255, 255, 0.9);
     border-radius: 50%;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    cursor: nwse-resize;
+    z-index: 5;
+    transition: all 0.2s ease;
+  }
+
+  .resize-handle:hover {
+    background: var(--accent-primary-strong, #b3d6ff);
+    transform: scale(1.2);
+    box-shadow: 0 4px 12px rgba(158, 202, 255, 0.6);
   }
 
   .handle-tl {
-    top: -6px;
-    left: -6px;
+    top: -8px;
+    left: -8px;
+    cursor: nwse-resize;
   }
 
   .handle-tr {
-    top: -6px;
-    right: -6px;
+    top: -8px;
+    right: -8px;
+    cursor: nesw-resize;
   }
 
   .handle-bl {
-    bottom: -6px;
-    left: -6px;
+    bottom: -8px;
+    left: -8px;
+    cursor: nesw-resize;
   }
 
   .handle-br {
-    bottom: -6px;
-    right: -6px;
+    bottom: -8px;
+    right: -8px;
+    cursor: nwse-resize;
   }
 
   .cropper-footer {
@@ -499,8 +605,10 @@
 
   @media (max-width: 768px) {
     .cropper-box {
-      width: min(400px, 80vw);
-      height: min(400px, 80vw);
+      min-width: min(200px, 40vw);
+      min-height: min(200px, 40vw);
+      max-width: min(600px, 90vw);
+      max-height: min(600px, 90vw);
     }
 
     .cropper-modal {
