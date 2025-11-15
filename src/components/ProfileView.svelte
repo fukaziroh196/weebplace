@@ -57,7 +57,21 @@
     <div class="flex items-start gap-6 mb-4">
       <div class="profile-avatar-wrapper">
         {#if $currentUser.avatarUrl}
-          <img src={$currentUser.avatarUrl} alt="avatar" class="profile-avatar-img" />
+          {#key $currentUser.avatarUrl}
+            <img 
+              src={$currentUser.avatarUrl} 
+              alt="avatar" 
+              class="profile-avatar-img"
+              on:error={(e) => {
+                console.error('[ProfileView] Failed to load avatar:', $currentUser.avatarUrl);
+                console.error('[ProfileView] Image error event:', e);
+                e.target.style.display = 'none';
+              }}
+              on:load={() => {
+                console.log('[ProfileView] Avatar loaded successfully:', $currentUser.avatarUrl?.substring(0, 50) + '...');
+              }}
+            />
+          {/key}
         {:else}
           <div class="profile-avatar-placeholder">{$currentUser.username[0]?.toUpperCase() || 'U'}</div>
         {/if}
@@ -79,7 +93,7 @@
       </div>
       <div>
         <div class="profile-username">{$currentUser.username}</div>
-        <div class="profile-joined-date">С нами с {new Date($currentUser.createdAt).toLocaleDateString()}</div>
+        <div class="profile-joined-date">С нами с {$currentUser.createdAt ? new Date($currentUser.createdAt).toLocaleDateString('ru-RU') : 'недавно'}</div>
       </div>
     </div>
 
@@ -98,7 +112,22 @@
     </div>
 
     {#if showCropper}
-      <AvatarCropper src={tempImage} onCancel={() => { showCropper = false; tempImage = ''; }} onApply={(url) => { setCurrentUserAvatar(url); showCropper = false; tempImage = ''; }} />
+      <AvatarCropper 
+        src={tempImage} 
+        onCancel={() => { 
+          showCropper = false; 
+          tempImage = ''; 
+        }} 
+        onApply={(url) => { 
+          console.log('[ProfileView] Applying avatar URL:', url ? 'URL received' : 'NO URL');
+          if (url) {
+            setCurrentUserAvatar(url);
+            console.log('[ProfileView] Avatar set, current user:', $currentUser);
+          }
+          showCropper = false; 
+          tempImage = ''; 
+        }} 
+      />
     {/if}
 
     {#if $profileTab === 'achievements'}

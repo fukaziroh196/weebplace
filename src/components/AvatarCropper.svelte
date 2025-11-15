@@ -250,14 +250,14 @@
         0, 0, OUTPUT_SIZE, OUTPUT_SIZE
       );
       
-      const dataUrl = canvas.toDataURL('image/png');
+      const dataUrl = canvas.toDataURL('image/png', 0.95);
       
       if (!dataUrl || dataUrl === 'data:,') {
         console.error('[AvatarCropper] Failed to create data URL');
         return;
       }
       
-      console.log('[AvatarCropper] Crop applied successfully');
+      console.log('[AvatarCropper] Crop applied successfully, URL length:', dataUrl.length);
       onApply(dataUrl);
     } catch (error) {
       console.error('[AvatarCropper] Error applying crop:', error);

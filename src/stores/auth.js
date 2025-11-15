@@ -354,14 +354,22 @@ export function clearRating(itemId) {
 
 export function setCurrentUserAvatar(avatarUrl) {
   let active; currentUser.subscribe((v) => (active = v))();
-  if (!active) return;
+  if (!active) {
+    console.error('[setCurrentUserAvatar] No active user');
+    return;
+  }
   let list; users.subscribe((v) => (list = v))();
   const idx = list.findIndex((u) => u.id === active.id);
-  if (idx < 0) return;
+  if (idx < 0) {
+    console.error('[setCurrentUserAvatar] User not found in list');
+    return;
+  }
+  console.log('[setCurrentUserAvatar] Setting avatar, URL length:', avatarUrl ? avatarUrl.length : 0);
   const updated = { ...list[idx], avatarUrl };
   const newList = [...list.slice(0, idx), updated, ...list.slice(idx + 1)];
   users.set(newList);
   currentUser.set({ ...active, avatarUrl });
+  console.log('[setCurrentUserAvatar] Avatar updated, new user:', { ...active, avatarUrl });
 }
 
 export function clearCurrentUserAvatar() {
