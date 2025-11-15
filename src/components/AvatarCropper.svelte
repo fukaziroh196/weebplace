@@ -34,6 +34,13 @@
     naturalWidth = imageEl.naturalWidth;
     naturalHeight = imageEl.naturalHeight;
     
+    console.log('[AvatarCropper] Image loaded:', {
+      naturalWidth,
+      naturalHeight,
+      clientWidth: imageEl.clientWidth,
+      clientHeight: imageEl.clientHeight
+    });
+    
     // Масштабируем изображение чтобы оно поместилось в контейнер
     const containerRect = containerEl.getBoundingClientRect();
     const containerWidth = containerRect.width;
@@ -47,13 +54,26 @@
     const imageDisplayWidth = naturalWidth * imageScale;
     const imageDisplayHeight = naturalHeight * imageScale;
     
+    console.log('[AvatarCropper] Scaling:', {
+      containerSize: { width: containerWidth, height: containerHeight },
+      naturalSize: { width: naturalWidth, height: naturalHeight },
+      scales: { x: scaleX, y: scaleY, final: imageScale },
+      displaySize: { width: imageDisplayWidth, height: imageDisplayHeight }
+    });
+    
     // Центрируем сетку обрезки в центре изображения
-    // Изображение центрировано в контейнере
+    // Изображение центрировано в контейнере через CSS transform
     const imageOffsetX = (containerWidth - imageDisplayWidth) / 2;
     const imageOffsetY = (containerHeight - imageDisplayHeight) / 2;
     
+    // Начальная позиция сетки обрезки - по центру изображения
     cropX = imageOffsetX + (imageDisplayWidth - cropSize) / 2;
     cropY = imageOffsetY + (imageDisplayHeight - cropSize) / 2;
+    
+    console.log('[AvatarCropper] Initial crop position:', {
+      imageOffset: { x: imageOffsetX, y: imageOffsetY },
+      cropBox: { x: cropX, y: cropY, size: cropSize }
+    });
     
     // Ограничиваем позицию сетки
     constrainCropPosition();
@@ -214,24 +234,48 @@
       const containerWidth = containerRect.width;
       const containerHeight = containerRect.height;
       
+      // Вычисляем отображаемый размер изображения
       const imageDisplayWidth = naturalWidth * imageScale;
       const imageDisplayHeight = naturalHeight * imageScale;
+      
+      // Изображение центрируется через CSS transform: translate(-50%, -50%)
+      // Это означает, что центр изображения находится в центре контейнера
+      // Левая верхняя точка изображения находится в:
       const imageOffsetX = (containerWidth - imageDisplayWidth) / 2;
       const imageOffsetY = (containerHeight - imageDisplayHeight) / 2;
       
-      // Вычисляем координаты относительно изображения
+      // cropX и cropY - это координаты левого верхнего угла сетки обрезки
+      // относительно контейнера. Вычисляем координаты относительно изображения:
       const relativeX = cropX - imageOffsetX;
       const relativeY = cropY - imageOffsetY;
       
-      // Вычисляем координаты в исходном изображении
-      const sourceX = Math.max(0, relativeX / imageScale);
-      const sourceY = Math.max(0, relativeY / imageScale);
+      // Переводим координаты из отображаемого размера в исходный размер изображения
+      const sourceX = relativeX / imageScale;
+      const sourceY = relativeY / imageScale;
       const sourceSize = cropSize / imageScale;
       
-      // Убеждаемся, что не выходим за границы изображения
-      const clampedSourceX = Math.min(sourceX, naturalWidth - sourceSize);
-      const clampedSourceY = Math.min(sourceY, naturalHeight - sourceSize);
-      const clampedSourceSize = Math.min(sourceSize, naturalWidth - clampedSourceX, naturalHeight - clampedSourceY);
+      // Убеждаемся, что координаты не выходят за границы изображения
+      const clampedSourceX = Math.max(0, Math.min(sourceX, naturalWidth - sourceSize));
+      const clampedSourceY = Math.max(0, Math.min(sourceY, naturalHeight - sourceSize));
+      
+      // Убеждаемся, что размер не превышает доступное пространство
+      const maxSourceSize = Math.min(
+        naturalWidth - clampedSourceX,
+        naturalHeight - clampedSourceY
+      );
+      const clampedSourceSize = Math.min(sourceSize, maxSourceSize);
+      
+      console.log('[AvatarCropper] Crop calculations:', {
+        containerSize: { width: containerWidth, height: containerHeight },
+        imageDisplay: { width: imageDisplayWidth, height: imageDisplayHeight },
+        imageOffset: { x: imageOffsetX, y: imageOffsetY },
+        cropBox: { x: cropX, y: cropY, size: cropSize },
+        relative: { x: relativeX, y: relativeY },
+        source: { x: sourceX, y: sourceY, size: sourceSize },
+        clamped: { x: clampedSourceX, y: clampedSourceY, size: clampedSourceSize },
+        natural: { width: naturalWidth, height: naturalHeight },
+        scale: imageScale
+      });
       
       const canvas = document.createElement('canvas');
       canvas.width = OUTPUT_SIZE;
@@ -243,7 +287,11 @@
         return;
       }
       
+      // Используем высокое качество интерполяции
       ctx.imageSmoothingQuality = 'high';
+      ctx.imageSmoothingEnabled = true;
+      
+      // Вырезаем нужную область из исходного изображения и масштабируем до OUTPUT_SIZE
       ctx.drawImage(
         imageEl,
         clampedSourceX, clampedSourceY, clampedSourceSize, clampedSourceSize,
@@ -261,6 +309,7 @@
       onApply(dataUrl);
     } catch (error) {
       console.error('[AvatarCropper] Error applying crop:', error);
+      console.error('[AvatarCropper] Error stack:', error.stack);
     }
   }
 </script>
