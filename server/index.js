@@ -14,7 +14,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-key-change-in-pr
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' })); // Увеличиваем лимит для больших data URL аватаров
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Создаем папки если их нет
@@ -304,9 +305,16 @@ app.get('/api/me', authenticateToken, (req, res) => {
 
 // Обновление профиля пользователя (включая аватар)
 app.patch('/api/me', authenticateToken, (req, res) => {
+  console.log('[PATCH /api/me] Request received from user:', req.user.id);
   const { avatarUrl } = req.body;
   
+  // Логируем размер аватара для отладки
+  if (avatarUrl) {
+    console.log('[PATCH /api/me] Avatar URL length:', avatarUrl.length, 'chars');
+  }
+  
   if (avatarUrl !== undefined && avatarUrl !== null && typeof avatarUrl !== 'string') {
+    console.error('[PATCH /api/me] Invalid avatarUrl type:', typeof avatarUrl);
     return res.status(400).json({ error: 'avatarUrl must be a string or null' });
   }
 
@@ -315,12 +323,16 @@ app.patch('/api/me', authenticateToken, (req, res) => {
     [avatarUrl || null, req.user.id],
     function(err) {
       if (err) {
+        console.error('[PATCH /api/me] Database error:', err);
         return res.status(500).json({ error: err.message });
       }
+
+      console.log('[PATCH /api/me] Avatar updated successfully for user:', req.user.id);
 
       // Возвращаем обновленного пользователя
       db.get('SELECT * FROM users WHERE id = ?', [req.user.id], (err, user) => {
         if (err || !user) {
+          console.error('[PATCH /api/me] Error fetching updated user:', err);
           return res.status(500).json({ error: 'Failed to fetch updated user' });
         }
 

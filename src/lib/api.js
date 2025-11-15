@@ -55,16 +55,29 @@ async function apiRequest(endpoint, options = {}) {
       finalHeaders['Content-Type'] = 'application/json';
     }
 
+    console.log(`[apiRequest] ${options.method || 'GET'} ${endpoint}`, {
+      hasBody: !!options.body,
+      bodyLength: options.body ? String(options.body).length : 0,
+      hasAuth: !!headers.Authorization
+    });
+
     const response = await fetch(url, { ...options, headers: finalHeaders });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Network error' }));
+      const errorText = await response.text();
+      let error;
+      try {
+        error = JSON.parse(errorText);
+      } catch {
+        error = { error: errorText || `HTTP ${response.status}` };
+      }
+      console.error(`[apiRequest] Error ${response.status} ${endpoint}:`, error);
       throw new Error(error.error || `HTTP ${response.status}`);
     }
 
     return await response.json();
   } catch (error) {
-    console.error('API Error:', error);
+    console.error(`[apiRequest] Exception for ${endpoint}:`, error);
     throw error;
   }
 }

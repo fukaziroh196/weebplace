@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 import { auth, library as libraryApi } from '../lib/api';
 
 // Current user store
@@ -196,12 +196,24 @@ export function toggleFavorite(item) {
 // Update current user avatar
 export async function setCurrentUserAvatar(avatarUrl) {
   try {
+    // Проверяем, что пользователь авторизован
+    const user = get(currentUser);
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+
+    console.log('[setCurrentUserAvatar] Updating avatar for user:', user.id, 'URL length:', avatarUrl ? avatarUrl.length : 0);
+    
     const updatedUser = await auth.updateMe({ avatarUrl });
     currentUser.set(updatedUser);
-    console.log('[setCurrentUserAvatar] Avatar updated on server:', updatedUser);
+    console.log('[setCurrentUserAvatar] Avatar updated on server successfully:', updatedUser);
     return updatedUser;
   } catch (error) {
     console.error('[setCurrentUserAvatar] Failed to update avatar on server:', error);
+    console.error('[setCurrentUserAvatar] Error details:', {
+      message: error.message,
+      stack: error.stack
+    });
     throw error;
   }
 }
