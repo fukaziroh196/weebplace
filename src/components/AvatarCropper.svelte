@@ -6,9 +6,9 @@
   export let onApply = (dataUrl) => {};
 
   const OUTPUT_SIZE = 512;
-  const MIN_ZOOM = 1;
+  const MIN_ZOOM = 0.5;
   const MAX_ZOOM = 4;
-  const DEFAULT_ZOOM = 1.5;
+  const DEFAULT_ZOOM = 1;
 
   let imageEl;
   let containerEl;
@@ -58,6 +58,23 @@
     naturalHeight = imageEl.naturalHeight;
     
     updateDimensions();
+    
+    // Вычисляем оптимальный зум, чтобы изображение полностью поместилось в контейнер
+    // и область обрезки была заполнена
+    const containerMinSize = Math.min(containerWidth, containerHeight);
+    const imageMaxSize = Math.max(naturalWidth, naturalHeight);
+    
+    // Вычисляем зум так, чтобы изображение занимало ~80% контейнера
+    // Это даст больше контекста и возможность выбора области обрезки
+    const fitScale = (containerMinSize * 0.8) / imageMaxSize;
+    
+    // Но не меньше чем нужно, чтобы область обрезки была заполнена
+    const cropScale = cropSize / Math.min(naturalWidth, naturalHeight);
+    
+    // Используем большее значение, но не превышаем максимум
+    zoom = Math.min(Math.max(fitScale, cropScale * 0.9), MAX_ZOOM);
+    zoom = Math.max(zoom, MIN_ZOOM);
+    
     centerImage();
     
     // Resize observer for container
