@@ -512,7 +512,26 @@
   
   onMount(async () => {
     await refreshQuizDates();
-    await fetchAllGuesses();
+    
+    // Устанавливаем дату на сегодня при открытии, если она доступна
+    let dates;
+    availableQuizDates.subscribe(v => dates = v)();
+    let currentDate;
+    quizDate.subscribe(v => currentDate = v)();
+    
+    const today = todayStr();
+    
+    // Если сегодняшняя дата доступна, устанавливаем её
+    if (dates && dates.includes(today)) {
+      if (currentDate !== today) {
+        setQuizDate(today);
+      }
+      await fetchAllGuesses(today);
+    } else {
+      // Иначе используем текущую дату или загружаем данные для неё
+      await fetchAllGuesses();
+    }
+    
     // init admin date from AniQuiz on first mount
     let d; quizDate.subscribe(v=>d=v)();
     adminUploadDate = d || todayStr();

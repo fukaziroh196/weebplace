@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+import { setQuizDate, availableQuizDates } from './quizzes';
 
 // Possible values: 'home' | 'search' | 'details' | 'profile' | 'admin' | 'lists' | 'messages' | 'catalog' | 'aniquiz' | 'guessAnime' | 'guessCharacter' | 'guessOpening' | 'adminQuiz'
 export const activeView = writable('home');
@@ -42,6 +43,7 @@ export function goToCatalog() {
 
 export function goToGuessAnime() {
   activeView.set('guessAnime');
+  // Дата будет установлена автоматически в refreshQuizDates() при загрузке компонента
 }
 
 export function goToAniQuiz() {
