@@ -1,75 +1,89 @@
 <script>
-  import { onMount, onDestroy } from 'svelte';
-  
   export let src = '';
   export let onCancel = () => {};
   export let onApply = (dataUrl) => {};
 
-  const CROP_SIZE = 400;
   const OUTPUT_SIZE = 512;
+  const CROP_SIZE = 400;
   
   let imageEl;
   let containerEl;
+  let cropBoxEl;
   let naturalWidth = 0;
   let naturalHeight = 0;
   
-  let scale = 1;
-  let minScale = 1;
-  let x = 0;
-  let y = 0;
+  let imageScale = 1;
+  let cropX = 0;
+  let cropY = 0;
   
   let isDragging = false;
   let dragStartX = 0;
   let dragStartY = 0;
-  let dragStartImageX = 0;
-  let dragStartImageY = 0;
+  let dragStartCropX = 0;
+  let dragStartCropY = 0;
 
   function handleImageLoad() {
-    if (!imageEl) return;
+    if (!imageEl || !containerEl) return;
     
     naturalWidth = imageEl.naturalWidth;
     naturalHeight = imageEl.naturalHeight;
     
-    // Вычисляем минимальный масштаб, чтобы изображение покрывало всю область обрезки
-    const scaleX = CROP_SIZE / naturalWidth;
-    const scaleY = CROP_SIZE / naturalHeight;
-    minScale = Math.max(scaleX, scaleY);
-    scale = minScale;
+    // Масштабируем изображение чтобы оно поместилось в контейнер
+    const containerRect = containerEl.getBoundingClientRect();
+    const containerWidth = containerRect.width;
+    const containerHeight = containerRect.height;
     
-    // Центрируем изображение
-    centerImage();
+    const scaleX = containerWidth / naturalWidth;
+    const scaleY = containerHeight / naturalHeight;
+    imageScale = Math.min(scaleX, scaleY);
+    
+    // Вычисляем размер отображаемого изображения
+    const imageDisplayWidth = naturalWidth * imageScale;
+    const imageDisplayHeight = naturalHeight * imageScale;
+    
+    // Центрируем сетку обрезки в центре изображения
+    // Изображение центрировано в контейнере
+    const imageOffsetX = (containerWidth - imageDisplayWidth) / 2;
+    const imageOffsetY = (containerHeight - imageDisplayHeight) / 2;
+    
+    cropX = imageOffsetX + (imageDisplayWidth - CROP_SIZE) / 2;
+    cropY = imageOffsetY + (imageDisplayHeight - CROP_SIZE) / 2;
+    
+    // Ограничиваем позицию сетки
+    constrainCropPosition();
   }
 
-  function centerImage() {
-    const displayWidth = naturalWidth * scale;
-    const displayHeight = naturalHeight * scale;
-    x = (CROP_SIZE - displayWidth) / 2;
-    y = (CROP_SIZE - displayHeight) / 2;
-    constrainPosition();
-  }
-
-  function constrainPosition() {
-    const displayWidth = naturalWidth * scale;
-    const displayHeight = naturalHeight * scale;
+  function constrainCropPosition() {
+    if (!imageEl || !containerEl) return;
     
-    const minX = Math.min(0, CROP_SIZE - displayWidth);
-    const minY = Math.min(0, CROP_SIZE - displayHeight);
-    const maxX = 0;
-    const maxY = 0;
+    const containerRect = containerEl.getBoundingClientRect();
+    const containerWidth = containerRect.width;
+    const containerHeight = containerRect.height;
     
-    x = Math.max(minX, Math.min(maxX, x));
-    y = Math.max(minY, Math.min(maxY, y));
+    const imageDisplayWidth = naturalWidth * imageScale;
+    const imageDisplayHeight = naturalHeight * imageScale;
+    
+    const imageOffsetX = (containerWidth - imageDisplayWidth) / 2;
+    const imageOffsetY = (containerHeight - imageDisplayHeight) / 2;
+    
+    const minX = imageOffsetX;
+    const minY = imageOffsetY;
+    const maxX = imageOffsetX + imageDisplayWidth - CROP_SIZE;
+    const maxY = imageOffsetY + imageDisplayHeight - CROP_SIZE;
+    
+    cropX = Math.max(minX, Math.min(maxX, cropX));
+    cropY = Math.max(minY, Math.min(maxY, cropY));
   }
 
   function handleMouseDown(e) {
-    if (!containerEl || e.target === containerEl || e.target.closest('.cropper-controls')) return;
-    if (e.button !== 0) return; // только левая кнопка мыши
+    if (!cropBoxEl?.contains(e.target)) return;
+    if (e.button !== 0) return;
     
     isDragging = true;
     dragStartX = e.clientX;
     dragStartY = e.clientY;
-    dragStartImageX = x;
-    dragStartImageY = y;
+    dragStartCropX = cropX;
+    dragStartCropY = cropY;
     
     e.preventDefault();
     document.addEventListener('mousemove', handleMouseMove);
@@ -82,10 +96,10 @@
     const deltaX = e.clientX - dragStartX;
     const deltaY = e.clientY - dragStartY;
     
-    x = dragStartImageX + deltaX;
-    y = dragStartImageY + deltaY;
+    cropX = dragStartCropX + deltaX;
+    cropY = dragStartCropY + deltaY;
     
-    constrainPosition();
+    constrainCropPosition();
   }
 
   function handleMouseUp() {
@@ -94,102 +108,42 @@
     document.removeEventListener('mouseup', handleMouseUp);
   }
 
-  function handleWheel(e) {
-    if (!containerEl?.contains(e.target)) return;
-    e.preventDefault();
-    
-    const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    const oldScale = scale;
-    scale = Math.max(minScale, Math.min(minScale * 3, scale + minScale * delta));
-    
-    // Масштабируем относительно центра области обрезки
-    const centerX = x + (naturalWidth * oldScale) / 2;
-    const centerY = y + (naturalHeight * oldScale) / 2;
-    x = centerX - (naturalWidth * scale) / 2;
-    y = centerY - (naturalHeight * scale) / 2;
-    
-    constrainPosition();
-  }
-
-  function handleScaleChange(e) {
-    const newScale = parseFloat(e.target.value);
-    const oldScale = scale;
-    scale = newScale;
-    
-    // Сохраняем центр при изменении масштаба
-    const centerX = x + (naturalWidth * oldScale) / 2;
-    const centerY = y + (naturalHeight * oldScale) / 2;
-    x = centerX - (naturalWidth * scale) / 2;
-    y = centerY - (naturalHeight * scale) / 2;
-    
-    constrainPosition();
-  }
-
-  function zoomIn() {
-    if (scale >= minScale * 3) return;
-    const oldScale = scale;
-    scale = Math.min(minScale * 3, scale + minScale * 0.1);
-    
-    const centerX = x + (naturalWidth * oldScale) / 2;
-    const centerY = y + (naturalHeight * oldScale) / 2;
-    x = centerX - (naturalWidth * scale) / 2;
-    y = centerY - (naturalHeight * scale) / 2;
-    
-    constrainPosition();
-  }
-
-  function zoomOut() {
-    if (scale <= minScale) return;
-    const oldScale = scale;
-    scale = Math.max(minScale, scale - minScale * 0.1);
-    
-    const centerX = x + (naturalWidth * oldScale) / 2;
-    const centerY = y + (naturalHeight * oldScale) / 2;
-    x = centerX - (naturalWidth * scale) / 2;
-    y = centerY - (naturalHeight * scale) / 2;
-    
-    constrainPosition();
-  }
-
   function applyCrop() {
-    if (!imageEl || !naturalWidth || !naturalHeight) return;
+    if (!imageEl || !naturalWidth || !naturalHeight || !containerEl) return;
+    
+    const containerRect = containerEl.getBoundingClientRect();
+    const containerWidth = containerRect.width;
+    const containerHeight = containerRect.height;
+    
+    const imageDisplayWidth = naturalWidth * imageScale;
+    const imageDisplayHeight = naturalHeight * imageScale;
+    const imageOffsetX = (containerWidth - imageDisplayWidth) / 2;
+    const imageOffsetY = (containerHeight - imageDisplayHeight) / 2;
+    
+    // Вычисляем координаты относительно изображения
+    const relativeX = cropX - imageOffsetX;
+    const relativeY = cropY - imageOffsetY;
+    
+    // Вычисляем координаты в исходном изображении
+    const sourceX = relativeX / imageScale;
+    const sourceY = relativeY / imageScale;
+    const sourceSize = CROP_SIZE / imageScale;
     
     const canvas = document.createElement('canvas');
     canvas.width = OUTPUT_SIZE;
     canvas.height = OUTPUT_SIZE;
     const ctx = canvas.getContext('2d');
     
-    // Вычисляем координаты и размеры для обрезки
-    const sourceX = -x / scale;
-    const sourceY = -y / scale;
-    const sourceWidth = CROP_SIZE / scale;
-    const sourceHeight = CROP_SIZE / scale;
-    
     ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(
       imageEl,
-      sourceX, sourceY, sourceWidth, sourceHeight,
+      sourceX, sourceY, sourceSize, sourceSize,
       0, 0, OUTPUT_SIZE, OUTPUT_SIZE
     );
     
     const dataUrl = canvas.toDataURL('image/png');
     onApply(dataUrl);
   }
-
-  function getScalePercent() {
-    if (minScale === 0) return 100;
-    return Math.round((scale / minScale) * 100);
-  }
-
-  onMount(() => {
-    window.addEventListener('wheel', handleWheel, { passive: false });
-  });
-
-  onDestroy(() => {
-    window.removeEventListener('wheel', handleWheel);
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('mouseup', handleMouseUp);
-  });
 </script>
 
 <div class="cropper-backdrop" on:click={(e) => e.target === e.currentTarget && onCancel()}>
@@ -201,67 +155,40 @@
 
     <div class="cropper-body">
       <div class="cropper-preview-wrapper">
-        <div class="cropper-label">Предпросмотр</div>
-        <div 
-          class="cropper-viewport" 
-          bind:this={containerEl}
-          on:mousedown={handleMouseDown}
-          style="cursor: {isDragging ? 'grabbing' : 'grab'};"
-        >
-          <div class="cropper-image-wrapper" style="transform: translate({x}px, {y}px);">
+        <div class="cropper-label">Перетаскивайте сетку для выбора области</div>
+        <div class="cropper-container" bind:this={containerEl}>
+          <div class="cropper-image-wrapper">
             <img
               bind:this={imageEl}
               src={src}
               alt="Crop"
               class="cropper-image"
-              style="width: {naturalWidth * scale}px; height: {naturalHeight * scale}px;"
+              style="width: {naturalWidth * imageScale}px; height: {naturalHeight * imageScale}px;"
               on:load={handleImageLoad}
               draggable="false"
             />
           </div>
-          <div class="cropper-overlay"></div>
-          <div class="cropper-grid"></div>
-        </div>
-      </div>
-
-      <div class="cropper-controls-panel">
-        <div class="control-group">
-          <div class="control-label">
-            <span>Масштаб</span>
-            <span class="scale-value">{getScalePercent()}%</span>
+          <div 
+            class="cropper-box" 
+            bind:this={cropBoxEl}
+            style="left: {cropX}px; top: {cropY}px; cursor: {isDragging ? 'grabbing' : 'grab'};"
+            on:mousedown={handleMouseDown}
+          >
+            <div class="cropper-box-border"></div>
+            <div class="cropper-box-grid"></div>
+            <div class="cropper-box-handles">
+              <div class="handle handle-tl"></div>
+              <div class="handle handle-tr"></div>
+              <div class="handle handle-bl"></div>
+              <div class="handle handle-br"></div>
+            </div>
           </div>
-          <div class="slider-container">
-            <button 
-              class="zoom-btn" 
-              on:click={zoomOut}
-              disabled={scale <= minScale}
-              aria-label="Уменьшить"
-            >
-              −
-            </button>
-            <input
-              type="range"
-              class="scale-slider"
-              min={minScale}
-              max={minScale * 3}
-              step="0.01"
-              value={scale}
-              on:input={handleScaleChange}
-              disabled={naturalWidth === 0}
-            />
-            <button 
-              class="zoom-btn" 
-              on:click={zoomIn}
-              disabled={scale >= minScale * 3}
-              aria-label="Увеличить"
-            >
-              +
-            </button>
+          <div class="cropper-overlay" style="--crop-x: {cropX}px; --crop-y: {cropY}px; --crop-size: {CROP_SIZE}px;">
+            <div class="cropper-overlay-top"></div>
+            <div class="cropper-overlay-bottom"></div>
+            <div class="cropper-overlay-left"></div>
+            <div class="cropper-overlay-right"></div>
           </div>
-        </div>
-
-        <div class="control-hint">
-          💡 Перетаскивайте изображение мышью или используйте колесико для масштабирования
         </div>
       </div>
     </div>
@@ -308,7 +235,7 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 2rem;
     width: 100%;
-    max-width: 900px;
+    max-width: 700px;
     box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.4);
     animation: slideUp 0.3s ease;
     overflow: hidden;
@@ -363,9 +290,6 @@
 
   .cropper-body {
     padding: 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
   }
 
   .cropper-preview-wrapper {
@@ -383,22 +307,24 @@
     letter-spacing: 0.1em;
   }
 
-  .cropper-viewport {
+  .cropper-container {
     position: relative;
-    width: 400px;
-    height: 400px;
-    border-radius: 1.5rem;
+    width: 100%;
+    max-width: 600px;
+    aspect-ratio: 1;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 1rem;
     overflow: hidden;
-    background: rgba(0, 0, 0, 0.5);
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .cropper-image-wrapper {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     will-change: transform;
   }
 
@@ -406,148 +332,120 @@
     display: block;
     user-select: none;
     pointer-events: none;
+    max-width: none;
+    max-height: none;
   }
 
   .cropper-overlay {
     position: absolute;
     inset: 0;
-    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
     pointer-events: none;
     z-index: 2;
   }
 
-  .cropper-grid {
+  .cropper-overlay-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--crop-y);
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .cropper-overlay-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: calc(var(--crop-y) + var(--crop-size));
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .cropper-overlay-left {
+    position: absolute;
+    top: var(--crop-y);
+    left: 0;
+    width: var(--crop-x);
+    height: var(--crop-size);
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .cropper-overlay-right {
+    position: absolute;
+    top: var(--crop-y);
+    right: 0;
+    left: calc(var(--crop-x) + var(--crop-size));
+    height: var(--crop-size);
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .cropper-box {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    border: 3px solid var(--accent-primary, #9ecaff);
+    box-shadow: 0 0 20px rgba(158, 202, 255, 0.5);
+    z-index: 4;
+    user-select: none;
+    transition: transform 0.1s ease;
+    will-change: transform;
+  }
+
+  .cropper-box:active {
+    transform: scale(0.98);
+  }
+
+  .cropper-box-border {
+    position: absolute;
+    inset: 0;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    pointer-events: none;
+  }
+
+  .cropper-box-grid {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    z-index: 3;
     background-image: 
-      linear-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+      linear-gradient(rgba(255, 255, 255, 0.3) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.3) 1px, transparent 1px);
     background-size: calc(100% / 3) calc(100% / 3);
   }
 
-  .cropper-controls-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    max-width: 500px;
-    margin: 0 auto;
-    width: 100%;
+  .cropper-box-handles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
   }
 
-  .control-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .control-label {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 0.875rem;
-    font-weight: 700;
-    color: var(--text-primary, #f5f6ff);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .scale-value {
-    color: var(--accent-primary, #9ecaff);
-    font-size: 1rem;
-    font-weight: 900;
-  }
-
-  .slider-container {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .zoom-btn {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 0.75rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: var(--text-primary, #f5f6ff);
-    font-size: 1.25rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .zoom-btn:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.15);
-    transform: scale(1.05);
-  }
-
-  .zoom-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-
-  .scale-slider {
-    flex: 1;
-    height: 0.5rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.1);
-    outline: none;
-    -webkit-appearance: none;
-    appearance: none;
-    cursor: pointer;
-  }
-
-  .scale-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 1.25rem;
-    height: 1.25rem;
-    border-radius: 50%;
+  .handle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
     background: var(--accent-primary, #9ecaff);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(158, 202, 255, 0.4);
-    transition: all 0.2s ease;
-  }
-
-  .scale-slider::-webkit-slider-thumb:hover {
-    background: var(--accent-primary-strong, #b3d6ff);
-    transform: scale(1.15);
-    box-shadow: 0 4px 12px rgba(158, 202, 255, 0.6);
-  }
-
-  .scale-slider::-moz-range-thumb {
-    width: 1.25rem;
-    height: 1.25rem;
+    border: 2px solid rgba(255, 255, 255, 0.9);
     border-radius: 50%;
-    background: var(--accent-primary, #9ecaff);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(158, 202, 255, 0.4);
-    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 
-  .scale-slider::-moz-range-thumb:hover {
-    background: var(--accent-primary-strong, #b3d6ff);
-    transform: scale(1.15);
-    box-shadow: 0 4px 12px rgba(158, 202, 255, 0.6);
+  .handle-tl {
+    top: -6px;
+    left: -6px;
   }
 
-  .control-hint {
-    padding: 1rem;
-    border-radius: 0.75rem;
-    background: rgba(158, 202, 255, 0.1);
-    border: 1px solid rgba(158, 202, 255, 0.2);
-    color: var(--text-secondary, rgba(245, 246, 255, 0.85));
-    font-size: 0.875rem;
-    text-align: center;
-    line-height: 1.5;
+  .handle-tr {
+    top: -6px;
+    right: -6px;
+  }
+
+  .handle-bl {
+    bottom: -6px;
+    left: -6px;
+  }
+
+  .handle-br {
+    bottom: -6px;
+    right: -6px;
   }
 
   .cropper-footer {
@@ -600,9 +498,9 @@
   }
 
   @media (max-width: 768px) {
-    .cropper-viewport {
-      width: min(400px, 90vw);
-      height: min(400px, 90vw);
+    .cropper-box {
+      width: min(400px, 80vw);
+      height: min(400px, 80vw);
     }
 
     .cropper-modal {
