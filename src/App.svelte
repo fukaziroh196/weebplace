@@ -54,15 +54,14 @@
     flex: 1;
     height: 100%;
     position: relative;
-    overflow: hidden;
+    overflow: auto;
+    overflow-x: hidden;
   }
   
   .content-scroll {
     width: 100%;
     height: auto;
     min-height: 100%;
-    overflow-y: hidden;
-    overflow-x: hidden;
     padding: 20px;
     box-sizing: border-box;
   }
