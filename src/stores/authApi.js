@@ -193,8 +193,8 @@ export function toggleFavorite(item) {
   }
 }
 
-// Update current user avatar
-export async function setCurrentUserAvatar(avatarUrl) {
+// Update current user avatar (from file)
+export async function setCurrentUserAvatar(file) {
   try {
     // Проверяем, что пользователь авторизован
     const user = get(currentUser);
@@ -202,25 +202,49 @@ export async function setCurrentUserAvatar(avatarUrl) {
       throw new Error('User not authenticated');
     }
 
-    console.log('[setCurrentUserAvatar] Updating avatar for user:', user.id, 'URL length:', avatarUrl ? avatarUrl.length : 0);
+    if (!(file instanceof File)) {
+      throw new Error('Invalid file: expected File object');
+    }
+
+    console.log('[setCurrentUserAvatar] Uploading avatar file:', {
+      name: file.name,
+      size: file.size,
+      type: file.type
+    });
     
-    const updatedUser = await auth.updateMe({ avatarUrl });
+    const result = await auth.uploadAvatar(file);
+    
+    // Обновляем пользователя
+    const updatedUser = await auth.getMe();
     currentUser.set(updatedUser);
-    console.log('[setCurrentUserAvatar] Avatar updated on server successfully:', updatedUser);
+    
+    console.log('[setCurrentUserAvatar] Avatar uploaded successfully:', updatedUser);
     return updatedUser;
   } catch (error) {
-    console.error('[setCurrentUserAvatar] Failed to update avatar on server:', error);
-    console.error('[setCurrentUserAvatar] Error details:', {
-      message: error.message,
-      stack: error.stack
-    });
+    console.error('[setCurrentUserAvatar] Failed to upload avatar:', error);
     throw error;
   }
 }
 
 // Clear current user avatar
-export function clearCurrentUserAvatar() {
-  return setCurrentUserAvatar(null);
+export async function clearCurrentUserAvatar() {
+  try {
+    const user = get(currentUser);
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+
+    await auth.deleteAvatar();
+    
+    // Обновляем пользователя
+    const updatedUser = await auth.getMe();
+    currentUser.set(updatedUser);
+    
+    return updatedUser;
+  } catch (error) {
+    console.error('[clearCurrentUserAvatar] Failed to delete avatar:', error);
+    throw error;
+  }
 }
 
 // Initialize on import

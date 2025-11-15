@@ -7,6 +7,8 @@ const bcrypt = require('bcryptjs');
 const sqlite3 = require('sqlite3').verbose();
 const jwt = require('jsonwebtoken');
 const AdmZip = require('adm-zip');
+const sharp = require('sharp');
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,15 +18,33 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-key-change-in-pr
 app.use(cors());
 app.use(express.json({ limit: '10mb' })); // Увеличиваем лимит для больших data URL аватаров
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Статические файлы - только для чтения, без выполнения
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  setHeaders: (res, filePath) => {
+    // Устанавливаем безопасные заголовки
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Content-Disposition', 'inline');
+    
+    // Для изображений устанавливаем правильный Content-Type
+    if (filePath.endsWith('.jpg') || filePath.endsWith('.jpeg')) {
+      res.setHeader('Content-Type', 'image/jpeg');
+    } else if (filePath.endsWith('.png')) {
+      res.setHeader('Content-Type', 'image/png');
+    }
+  }
+}));
 
 // Создаем папки если их нет
 const uploadsDir = path.join(__dirname, 'uploads');
+const avatarsDir = path.join(__dirname, 'uploads', 'avatars');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
+if (!fs.existsSync(avatarsDir)) {
+  fs.mkdirSync(avatarsDir, { recursive: true });
+}
 
-// Настройка multer для загрузки файлов
+// Настройка multer для загрузки файлов (общая)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadsDir);
@@ -50,6 +70,94 @@ const upload = multer({
     }
   }
 });
+
+// Безопасная настройка multer для аватаров
+const avatarStorage = multer.memoryStorage(); // Используем memory storage для обработки через Sharp
+
+const avatarUpload = multer({
+  storage: avatarStorage,
+  limits: { 
+    fileSize: 5 * 1024 * 1024, // Максимум 5MB
+    files: 1
+  },
+  fileFilter: (req, file, cb) => {
+    // Разрешаем только JPEG и PNG
+    const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    const allowedExtensions = /\.(jpg|jpeg|png)$/i;
+    
+    const isValidMime = allowedMimeTypes.includes(file.mimetype);
+    const isValidExt = allowedExtensions.test(file.originalname);
+    
+    if (isValidMime && isValidExt) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Разрешены только изображения в формате JPEG или PNG'));
+    }
+  }
+});
+
+// Функция для безопасной обработки и сохранения аватара
+async function processAvatarImage(fileBuffer, userId) {
+  try {
+    // 1. Проверяем реальный формат через Sharp
+    const metadata = await sharp(fileBuffer).metadata();
+    
+    // Проверяем, что это действительно изображение
+    if (!metadata.format || !['jpeg', 'png'].includes(metadata.format)) {
+      throw new Error('Файл не является валидным изображением JPEG или PNG');
+    }
+    
+    // 2. Проверяем размеры изображения
+    const MAX_DIMENSION = 6000;
+    if (metadata.width > MAX_DIMENSION || metadata.height > MAX_DIMENSION) {
+      throw new Error(`Размер изображения слишком большой. Максимум: ${MAX_DIMENSION}x${MAX_DIMENSION}px`);
+    }
+    
+    // 3. Генерируем безопасное имя файла (UUID)
+    const fileId = uuidv4();
+    const filename = `${fileId}.jpg`; // Всегда сохраняем как JPG для безопасности
+    
+    // 4. Пересохраняем изображение через Sharp (это уничтожит любой вредоносный код)
+    // Обрезаем до квадрата и масштабируем до 512x512
+    const outputPath = path.join(avatarsDir, filename);
+    
+    await sharp(fileBuffer)
+      .resize(512, 512, {
+        fit: 'cover',
+        position: 'center'
+      })
+      .jpeg({ 
+        quality: 90,
+        mozjpeg: true
+      })
+      .toFile(outputPath);
+    
+    // 5. Возвращаем относительный путь
+    return `/uploads/avatars/${filename}`;
+  } catch (error) {
+    console.error('[processAvatarImage] Error:', error);
+    throw error;
+  }
+}
+
+// Функция для удаления старого аватара
+function deleteOldAvatar(avatarUrl) {
+  if (!avatarUrl || !avatarUrl.startsWith('/uploads/avatars/')) {
+    return; // Не удаляем, если это не наш аватар или data URL
+  }
+  
+  const filename = path.basename(avatarUrl);
+  const filePath = path.join(avatarsDir, filename);
+  
+  if (fs.existsSync(filePath)) {
+    try {
+      fs.unlinkSync(filePath);
+      console.log('[deleteOldAvatar] Deleted:', filePath);
+    } catch (error) {
+      console.error('[deleteOldAvatar] Error deleting file:', error);
+    }
+  }
+}
 
 // Инициализация базы данных
 const dbPath = path.join(__dirname, 'database.sqlite');
@@ -303,48 +411,116 @@ app.get('/api/me', authenticateToken, (req, res) => {
   });
 });
 
-// Обновление профиля пользователя (включая аватар)
-app.patch('/api/me', authenticateToken, (req, res) => {
-  console.log('[PATCH /api/me] Request received from user:', req.user.id);
-  const { avatarUrl } = req.body;
-  
-  // Логируем размер аватара для отладки
-  if (avatarUrl) {
-    console.log('[PATCH /api/me] Avatar URL length:', avatarUrl.length, 'chars');
-  }
-  
-  if (avatarUrl !== undefined && avatarUrl !== null && typeof avatarUrl !== 'string') {
-    console.error('[PATCH /api/me] Invalid avatarUrl type:', typeof avatarUrl);
-    return res.status(400).json({ error: 'avatarUrl must be a string or null' });
-  }
+// Загрузка аватара (безопасный endpoint)
+app.post('/api/me/avatar', authenticateToken, avatarUpload.single('avatar'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'Файл не был загружен' });
+    }
 
-  db.run(
-    'UPDATE users SET avatar_url = ? WHERE id = ?',
-    [avatarUrl || null, req.user.id],
-    function(err) {
-      if (err) {
-        console.error('[PATCH /api/me] Database error:', err);
-        return res.status(500).json({ error: err.message });
+    console.log('[POST /api/me/avatar] Upload request from user:', req.user.id);
+    console.log('[POST /api/me/avatar] File info:', {
+      mimetype: req.file.mimetype,
+      size: req.file.size,
+      originalname: req.file.originalname
+    });
+
+    // Получаем текущего пользователя для удаления старого аватара
+    db.get('SELECT avatar_url FROM users WHERE id = ?', [req.user.id], async (err, user) => {
+      if (err || !user) {
+        return res.status(404).json({ error: 'Пользователь не найден' });
       }
 
-      console.log('[PATCH /api/me] Avatar updated successfully for user:', req.user.id);
-
-      // Возвращаем обновленного пользователя
-      db.get('SELECT * FROM users WHERE id = ?', [req.user.id], (err, user) => {
-        if (err || !user) {
-          console.error('[PATCH /api/me] Error fetching updated user:', err);
-          return res.status(500).json({ error: 'Failed to fetch updated user' });
+      try {
+        // Обрабатываем и сохраняем новый аватар
+        const newAvatarUrl = await processAvatarImage(req.file.buffer, req.user.id);
+        
+        // Удаляем старый аватар, если он существует
+        if (user.avatar_url) {
+          deleteOldAvatar(user.avatar_url);
         }
 
-        res.json({
-          id: user.id,
-          username: user.username,
-          isAdmin: !!user.is_admin,
-          avatarUrl: user.avatar_url
+        // Обновляем в базе данных
+        db.run(
+          'UPDATE users SET avatar_url = ? WHERE id = ?',
+          [newAvatarUrl, req.user.id],
+          function(updateErr) {
+            if (updateErr) {
+              console.error('[POST /api/me/avatar] Database error:', updateErr);
+              return res.status(500).json({ error: 'Ошибка при сохранении аватара в базу данных' });
+            }
+
+            console.log('[POST /api/me/avatar] Avatar uploaded successfully for user:', req.user.id);
+
+            res.json({
+              success: true,
+              avatarUrl: newAvatarUrl
+            });
+          }
+        );
+      } catch (processError) {
+        console.error('[POST /api/me/avatar] Processing error:', processError);
+        res.status(400).json({ 
+          error: processError.message || 'Ошибка при обработке изображения' 
         });
-      });
+      }
+    });
+  } catch (error) {
+    console.error('[POST /api/me/avatar] Error:', error);
+    res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+  }
+});
+
+// Удаление аватара
+app.delete('/api/me/avatar', authenticateToken, (req, res) => {
+  db.get('SELECT avatar_url FROM users WHERE id = ?', [req.user.id], (err, user) => {
+    if (err || !user) {
+      return res.status(404).json({ error: 'Пользователь не найден' });
     }
-  );
+
+    if (user.avatar_url) {
+      deleteOldAvatar(user.avatar_url);
+    }
+
+    db.run(
+      'UPDATE users SET avatar_url = NULL WHERE id = ?',
+      [req.user.id],
+      function(updateErr) {
+        if (updateErr) {
+          return res.status(500).json({ error: 'Ошибка при удалении аватара' });
+        }
+
+        res.json({ success: true, avatarUrl: null });
+      }
+    );
+  });
+});
+
+// Обновление профиля пользователя (безопасная версия - только для других полей, не аватара)
+app.patch('/api/me', authenticateToken, (req, res) => {
+  // Удаляем avatarUrl из body, если он есть - аватары загружаются через отдельный endpoint
+  const { avatarUrl, ...otherFields } = req.body;
+  
+  if (avatarUrl !== undefined) {
+    return res.status(400).json({ 
+      error: 'Для загрузки аватара используйте POST /api/me/avatar. Для удаления используйте DELETE /api/me/avatar' 
+    });
+  }
+
+  // Здесь можно добавить обновление других полей профиля
+  // Пока просто возвращаем текущего пользователя
+  db.get('SELECT * FROM users WHERE id = ?', [req.user.id], (err, user) => {
+    if (err || !user) {
+      return res.status(404).json({ error: 'Пользователь не найден' });
+    }
+
+    res.json({
+      id: user.id,
+      username: user.username,
+      isAdmin: !!user.is_admin,
+      avatarUrl: user.avatar_url
+    });
+  });
 });
 
 // Статистика пользователя: уникальные дни, текущее/лучшее комбо, распределение по датам

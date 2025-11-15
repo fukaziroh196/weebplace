@@ -116,6 +116,42 @@ export const auth = {
       body: JSON.stringify(data),
     });
   },
+
+  async uploadAvatar(file) {
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    const url = `${API_URL}/me/avatar`;
+    const headers = getAuthHeaders();
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        ...headers,
+        // Не устанавливаем Content-Type - браузер установит его автоматически с boundary для FormData
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      let error;
+      try {
+        error = JSON.parse(errorText);
+      } catch {
+        error = { error: errorText || `HTTP ${response.status}` };
+      }
+      throw new Error(error.error || `HTTP ${response.status}`);
+    }
+
+    return await response.json();
+  },
+
+  async deleteAvatar() {
+    return await apiRequest('/me/avatar', {
+      method: 'DELETE',
+    });
+  },
 };
 
 // Stats API

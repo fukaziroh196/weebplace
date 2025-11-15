@@ -118,20 +118,26 @@
           showCropper = false; 
           tempImage = ''; 
         }} 
-        onApply={async (url) => { 
-          console.log('[ProfileView] Applying avatar URL:', url ? 'URL received' : 'NO URL');
-          if (url) {
-            try {
-              await setCurrentUserAvatar(url);
-              console.log('[ProfileView] Avatar set successfully, current user:', $currentUser);
-            } catch (error) {
-              console.error('[ProfileView] Failed to set avatar:', error);
-              alert('Ошибка при сохранении аватара. Попробуйте еще раз.');
-              return; // Не закрываем окно обрезки при ошибке
-            }
+        onApply={async (dataUrl) => { 
+          console.log('[ProfileView] Applying avatar, converting to file...');
+          if (!dataUrl) return;
+          
+          try {
+            // Конвертируем data URL в Blob, затем в File
+            const response = await fetch(dataUrl);
+            const blob = await response.blob();
+            const file = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
+            
+            await setCurrentUserAvatar(file);
+            console.log('[ProfileView] Avatar uploaded successfully, current user:', $currentUser);
+            
+            showCropper = false; 
+            tempImage = ''; 
+          } catch (error) {
+            console.error('[ProfileView] Failed to upload avatar:', error);
+            alert(error.message || 'Ошибка при сохранении аватара. Попробуйте еще раз.');
+            // Не закрываем окно обрезки при ошибке
           }
-          showCropper = false; 
-          tempImage = ''; 
         }} 
       />
     {/if}
