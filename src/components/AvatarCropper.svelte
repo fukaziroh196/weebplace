@@ -386,7 +386,6 @@
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), 0 1rem 2.5rem rgba(0, 0, 0, 0.5);
     cursor: move;
     touch-action: none;
-    bind:this={cropContainer}
   }
 
   .cropper-preview-mask {
