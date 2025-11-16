@@ -300,11 +300,23 @@
           function relevanceScore(title) {
             if (!title) return 0;
             const t = String(title).toLowerCase();
-            if (t === q) return 1000;             // exact match first
-            if (t.startsWith(q)) return 700;      // then prefix matches
-            const idx = t.indexOf(q);
-            if (idx >= 0) return 400 - Math.min(idx, 300); // contains, earlier is better
-            return 0;
+            // Base score by match position
+            let score = 0;
+            if (t === q) score = 1000;                 // exact match first
+            else if (t.startsWith(q)) score = 700;      // prefix match
+            else {
+              const idx = t.indexOf(q);
+              if (idx >= 0) score = 400 - Math.min(idx, 300); // contains, earlier is better
+            }
+
+            // Penalize titles with early numbers/suffixes (e.g., "1.11", "Season 2", etc.)
+            const earlyChunk = t.slice(0, Math.min(t.length, 8));
+            if (/\d/.test(earlyChunk)) {
+              score -= 60; // push numbered variants down vs base title
+            }
+            // Slightly prefer shorter, cleaner titles when scores are close
+            score -= Math.min(t.length, 120) * 0.5; // shorter is better by small margin
+            return score;
           }
 
           const scored = data.map((anime, idx) => {
@@ -321,6 +333,11 @@
 
           scored.sort((a, b) => {
             if (b._score !== a._score) return b._score - a._score;
+            // if scores equal, prefer shorter title
+            const la = (a.title || '').length;
+            const lb = (b.title || '').length;
+            if (la !== lb) return la - lb;
+            // finally keep API popularity order
             return a._idx - b._idx;
           });
 
