@@ -964,8 +964,9 @@
   .answer-input {
     flex: 1;
     padding: 14px 16px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    /* Always look like focused */
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid var(--accent-primary, #9ecaff);
     border-radius: 8px;
     color: #ffffff !important; /* Force white text for high contrast */
     -webkit-text-fill-color: #ffffff; /* Safari/Chrome */
@@ -978,7 +979,8 @@
   .answer-input:focus {
     outline: none;
     border-color: var(--accent-primary, #9ecaff);
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.10);
+    box-shadow: 0 0 0 3px rgba(158, 202, 255, 0.18);
   }
   
   .answer-input::placeholder {
