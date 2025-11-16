@@ -965,12 +965,15 @@
     flex: 1;
     padding: 14px 16px;
     /* Transparent background as requested */
-    background: transparent;
+    background: transparent !important;
+    background-color: transparent !important;
     border: 2px solid var(--accent-primary, #9ecaff);
     border-radius: 8px;
     color: #ffffff !important; /* Force white text for high contrast */
     -webkit-text-fill-color: #ffffff; /* Safari/Chrome */
     caret-color: #ffffff;
+    -webkit-appearance: none;
+    appearance: none;
     font-size: clamp(0.875rem, 2.5vw, 1rem);
     transition: all 0.3s;
     min-width: 0;
@@ -979,7 +982,8 @@
   .answer-input:focus {
     outline: none;
     border-color: var(--accent-primary, #9ecaff);
-    background: transparent; /* keep transparent on focus */
+    background: transparent !important; /* keep transparent on focus */
+    background-color: transparent !important;
     box-shadow: 0 0 0 3px rgba(158, 202, 255, 0.18);
   }
   
@@ -994,8 +998,11 @@
   .answer-input:-internal-autofill-selected {
     -webkit-text-fill-color: #ffffff;
     transition: background-color 5000s ease-in-out 0s;
+    -webkit-box-shadow: 0 0 0px 1000px rgba(0,0,0,0) inset; /* no white fill */
     box-shadow: 0 0 0px 1000px rgba(0, 0, 0, 0) inset; /* no white fill */
     border: 2px solid var(--accent-primary, #9ecaff);
+    background: transparent !important;
+    background-color: transparent !important;
   }
   
   .answer-input.answer-correct {
