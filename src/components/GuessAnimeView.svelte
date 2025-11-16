@@ -300,22 +300,33 @@
           function relevanceScore(title) {
             if (!title) return 0;
             const t = String(title).toLowerCase();
-            // Base score by match position
-            let score = 0;
-            if (t === q) score = 1000;                 // exact match first
-            else if (t.startsWith(q)) score = 700;      // prefix match
-            else {
-              const idx = t.indexOf(q);
-              if (idx >= 0) score = 400 - Math.min(idx, 300); // contains, earlier is better
-            }
+            const norm = t.replace(/[\-–—_:()\[\]{}!?,.]/g, ' ').replace(/\s+/g, ' ').trim();
 
-            // Penalize titles with early numbers/suffixes (e.g., "1.11", "Season 2", etc.)
-            const earlyChunk = t.slice(0, Math.min(t.length, 8));
-            if (/\d/.test(earlyChunk)) {
-              score -= 60; // push numbered variants down vs base title
-            }
-            // Slightly prefer shorter, cleaner titles when scores are close
-            score -= Math.min(t.length, 120) * 0.5; // shorter is better by small margin
+            let score = 0;
+            // Very strong boost: normalized exact match
+            if (norm === q) score += 1400;
+
+            // Prefix and contains
+            if (t.startsWith(q) || norm.startsWith(q)) score += 800; // base prefix boost
+            const idx = t.indexOf(q);
+            if (idx >= 0) score += Math.max(0, 450 - Math.min(idx, 300));
+
+            // Prefer single-word/short base titles (e.g., "евангелион") over variants
+            const words = norm.split(' ');
+            if (words.length === 1 && words[0].startsWith(q)) score += 300;
+
+            // Penalize cross-overs and collaborations (" x ", "×")
+            if (/(\sx\s|×)/.test(t)) score -= 200;
+
+            // Penalize early numbers / version markers (e.g., "1.11", "3.0", "2.22")
+            const earlyChunk = t.slice(0, 10);
+            if (/\d/.test(earlyChunk)) score -= 120;
+
+            // Penalize heavy suffixes like season/movie parts appearing early
+            if (/(season|movie|film|part|ova|tv|обнов|версия|фильм|часть|сезон)/i.test(earlyChunk)) score -= 80;
+
+            // Prefer shorter titles slightly
+            score -= Math.min(norm.length, 120) * 0.3;
             return score;
           }
 
@@ -333,7 +344,10 @@
 
           scored.sort((a, b) => {
             if (b._score !== a._score) return b._score - a._score;
-            // if scores equal, prefer shorter title
+            // if scores equal, prefer single word then shorter title
+            const wa = (a.title || '').split(/\s+/).length;
+            const wb = (b.title || '').split(/\s+/).length;
+            if (wa !== wb) return wa - wb;
             const la = (a.title || '').length;
             const lb = (b.title || '').length;
             if (la !== lb) return la - lb;
