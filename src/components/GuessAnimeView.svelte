@@ -291,15 +291,41 @@
     }
     userSuggestTimer = setTimeout(async () => {
       try {
-        const response = await fetch(`https://shikimori.one/api/animes?search=${encodeURIComponent(userAnswer.trim())}&limit=10&order=popularity`);
+        const response = await fetch(`https://shikimori.one/api/animes?search=${encodeURIComponent(userAnswer.trim())}&limit=20&order=popularity`);
         const data = await response.json();
-        
+
         if (data && data.length > 0) {
-          userSuggestions = data.map(anime => ({
-            title: anime.russian || anime.name,
-            titleAlt: anime.name !== anime.russian ? anime.name : null
-          }));
-        showUserSuggestions = true;
+          const q = String(userAnswer || '').toLowerCase().trim();
+
+          function relevanceScore(title) {
+            if (!title) return 0;
+            const t = String(title).toLowerCase();
+            if (t === q) return 1000;             // exact match first
+            if (t.startsWith(q)) return 700;      // then prefix matches
+            const idx = t.indexOf(q);
+            if (idx >= 0) return 400 - Math.min(idx, 300); // contains, earlier is better
+            return 0;
+          }
+
+          const scored = data.map((anime, idx) => {
+            const main = anime.russian || anime.name || '';
+            const alt = anime.name && anime.name !== anime.russian ? anime.name : '';
+            const score = Math.max(relevanceScore(main), relevanceScore(alt));
+            return { 
+              title: main,
+              titleAlt: alt || null,
+              _score: score,
+              _idx: idx // preserve API popularity order for ties
+            };
+          });
+
+          scored.sort((a, b) => {
+            if (b._score !== a._score) return b._score - a._score;
+            return a._idx - b._idx;
+          });
+
+          userSuggestions = scored.slice(0, 10).map(({ title, titleAlt }) => ({ title, titleAlt }));
+          showUserSuggestions = true;
         } else {
           userSuggestions = [];
           showUserSuggestions = false;
@@ -1068,8 +1094,8 @@
     left: 0;
     right: 120px;
     margin-bottom: 8px;
-    background: var(--surface-primary, rgba(255, 255, 255, 0.1));
-    backdrop-filter: blur(16px) saturate(180%);
+    background: var(--surface-primary, rgba(255, 255, 255, 0.22)); /* less transparent */
+    backdrop-filter: blur(18px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
     border: 1px solid var(--divider-color, rgba(255, 255, 255, 0.2));
     border-radius: 12px;
