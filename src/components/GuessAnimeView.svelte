@@ -964,8 +964,8 @@
   .answer-input {
     flex: 1;
     padding: 14px 16px;
-    /* Always look like focused */
-    background: rgba(255, 255, 255, 0.08);
+    /* Transparent background as requested */
+    background: transparent;
     border: 2px solid var(--accent-primary, #9ecaff);
     border-radius: 8px;
     color: #ffffff !important; /* Force white text for high contrast */
@@ -979,7 +979,7 @@
   .answer-input:focus {
     outline: none;
     border-color: var(--accent-primary, #9ecaff);
-    background: rgba(255, 255, 255, 0.10);
+    background: transparent; /* keep transparent on focus */
     box-shadow: 0 0 0 3px rgba(158, 202, 255, 0.18);
   }
   
@@ -994,8 +994,8 @@
   .answer-input:-internal-autofill-selected {
     -webkit-text-fill-color: #ffffff;
     transition: background-color 5000s ease-in-out 0s;
-    box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.05) inset;
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 0px 1000px rgba(0, 0, 0, 0) inset; /* no white fill */
+    border: 2px solid var(--accent-primary, #9ecaff);
   }
   
   .answer-input.answer-correct {
