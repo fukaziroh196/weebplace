@@ -967,7 +967,9 @@
     background: rgba(255, 255, 255, 0.05);
     border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px;
-    color: #ffffff; /* Make typed text clearly visible */
+    color: #ffffff !important; /* Force white text for high contrast */
+    -webkit-text-fill-color: #ffffff; /* Safari/Chrome */
+    caret-color: #ffffff;
     font-size: clamp(0.875rem, 2.5vw, 1rem);
     transition: all 0.3s;
     min-width: 0;
@@ -980,7 +982,18 @@
   }
   
   .answer-input::placeholder {
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  /* Autofill fixes */
+  .answer-input:-webkit-autofill,
+  .answer-input:-webkit-autofill:hover,
+  .answer-input:-webkit-autofill:focus,
+  .answer-input:-internal-autofill-selected {
+    -webkit-text-fill-color: #ffffff;
+    transition: background-color 5000s ease-in-out 0s;
+    box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.05) inset;
+    border: 2px solid rgba(255, 255, 255, 0.2);
   }
   
   .answer-input.answer-correct {
