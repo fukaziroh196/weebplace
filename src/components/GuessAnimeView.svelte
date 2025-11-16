@@ -1094,12 +1094,11 @@
     left: 0;
     right: 120px;
     margin-bottom: 8px;
-    background: var(--surface-primary, rgba(255, 255, 255, 0.22)); /* less transparent */
-    backdrop-filter: blur(18px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
-    border: 1px solid var(--divider-color, rgba(255, 255, 255, 0.2));
+    /* Solid non-transparent background */
+    background: rgba(20, 24, 32, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 12px;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 16px 28px rgba(0, 0, 0, 0.45);
     overflow: hidden;
     max-height: 300px;
     overflow-y: auto;
@@ -1115,9 +1114,7 @@
     transition: background 0.2s;
   }
   
-  .suggestion-item:hover {
-    background: var(--surface-card, rgba(255, 255, 255, 0.12));
-  }
+  .suggestion-item:hover { background: rgba(255, 255, 255, 0.06); }
   
   .suggestion-image {
     width: 40px;
@@ -1132,7 +1129,7 @@
   }
   
   .suggestion-title {
-    color: var(--text-primary, #f5f6ff);
+    color: #f5f6ff;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -1140,7 +1137,7 @@
   }
   
   .suggestion-subtitle {
-    color: var(--text-tertiary, rgba(245, 246, 255, 0.65));
+    color: rgba(245, 246, 255, 0.65);
     font-size: 0.875rem;
     white-space: nowrap;
     overflow: hidden;
