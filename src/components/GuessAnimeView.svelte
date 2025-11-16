@@ -967,7 +967,7 @@
     background: rgba(255, 255, 255, 0.05);
     border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px;
-    color: white;
+    color: #ffffff; /* Make typed text clearly visible */
     font-size: clamp(0.875rem, 2.5vw, 1rem);
     transition: all 0.3s;
     min-width: 0;
@@ -1042,18 +1042,20 @@
   
   .suggestions-dropdown {
     position: absolute;
-    top: 100%;
+    bottom: 100%; /* show above the input */
     left: 0;
     right: 120px;
-    margin-top: 8px;
-    background: var(--panel);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 8px;
+    background: var(--surface-primary, rgba(255, 255, 255, 0.1));
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid var(--divider-color, rgba(255, 255, 255, 0.2));
     border-radius: 12px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
     overflow: hidden;
     max-height: 300px;
     overflow-y: auto;
-    z-index: 50;
+    z-index: 100; /* above other elements */
   }
   
   .suggestion-item {
@@ -1066,7 +1068,7 @@
   }
   
   .suggestion-item:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--surface-card, rgba(255, 255, 255, 0.12));
   }
   
   .suggestion-image {
@@ -1082,7 +1084,7 @@
   }
   
   .suggestion-title {
-    color: var(--text);
+    color: var(--text-primary, #f5f6ff);
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -1090,7 +1092,7 @@
   }
   
   .suggestion-subtitle {
-    color: var(--muted);
+    color: var(--text-tertiary, rgba(245, 246, 255, 0.65));
     font-size: 0.875rem;
     white-space: nowrap;
     overflow: hidden;
@@ -1098,7 +1100,7 @@
   }
   
   .suggestion-score {
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--text-secondary, rgba(245, 246, 255, 0.85));
     font-size: 0.875rem;
   }
   
