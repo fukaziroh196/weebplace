@@ -361,8 +361,8 @@ body.theme-dark input[type="text"]::placeholder { color: rgba(91,117,83,.5); }
 
 :global(.admin-news-panel),
 :global(.global-stats-panel) {
-  min-width: 240px;
-  max-width: 300px;
+  min-width: 200px;
+  max-width: 260px;
 }
 
 :global(.leaderboard-panel) {
