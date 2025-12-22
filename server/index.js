@@ -9,15 +9,87 @@ const jwt = require('jsonwebtoken');
 const AdmZip = require('adm-zip');
 const sharp = require('sharp');
 const { v4: uuidv4 } = require('uuid');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const compression = require('compression');
+const morgan = require('morgan');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-key-change-in-production';
+const NODE_ENV = process.env.NODE_ENV || 'development';
+const JWT_SECRET = process.env.JWT_SECRET;
 
-// Middleware
-app.use(cors());
-app.use(express.json({ limit: '10mb' })); // Увеличиваем лимит для больших data URL аватаров
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+// Security: JWT_SECRET обязателен в продакшене
+if (!JWT_SECRET && NODE_ENV === 'production') {
+  console.error('❌ ERROR: JWT_SECRET is required in production!');
+  console.error('Set JWT_SECRET in .env file or environment variables');
+  process.exit(1);
+}
+
+if (!JWT_SECRET) {
+  console.warn('⚠️  WARNING: Using default JWT_SECRET. This is insecure for production!');
+}
+
+const SECRET = JWT_SECRET || 'your-super-secret-key-change-in-production';
+
+// ============ SECURITY MIDDLEWARE ============
+// Helmet для безопасности заголовков
+app.use(helmet({
+  contentSecurityPolicy: false, // Отключаем для API
+  crossOriginEmbedderPolicy: false
+}));
+
+// Compression для уменьшения размера ответов
+app.use(compression());
+
+// Логирование запросов
+if (NODE_ENV === 'production') {
+  app.use(morgan('combined'));
+} else {
+  app.use(morgan('dev'));
+}
+
+// Rate limiting для защиты от DDoS
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 минут
+  max: 100, // максимум 100 запросов с одного IP
+  message: { error: 'Too many requests from this IP, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 минут
+  max: 5, // максимум 5 попыток входа/регистрации
+  message: { error: 'Too many authentication attempts, please try again later.' },
+  skipSuccessfulRequests: true,
+});
+
+const uploadLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 час
+  max: 20, // максимум 20 загрузок в час
+  message: { error: 'Too many uploads, please try again later.' },
+});
+
+// CORS настройка
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || '*', // В продакшене укажите конкретный домен
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+
+// Body parser с увеличенным лимитом для загрузки файлов
+app.use(express.json({ limit: '50mb' })); // Увеличено для больших файлов
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Применяем rate limiting
+app.use('/api/', apiLimiter);
+app.use('/api/register', authLimiter);
+app.use('/api/login', authLimiter);
+app.use('/api/anime-guesses', uploadLimiter);
+app.use('/api/packs', uploadLimiter);
 // Статические файлы - только для чтения, без выполнения
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
   setHeaders: (res, filePath) => {
@@ -306,7 +378,7 @@ function authenticateToken(req, res, next) {
     return res.status(401).json({ error: 'No token provided' });
   }
 
-  jwt.verify(token, JWT_SECRET, (err, user) => {
+  jwt.verify(token, SECRET, (err, user) => {
     if (err) {
       return res.status(403).json({ error: 'Invalid token' });
     }
@@ -351,7 +423,7 @@ app.post('/api/register', async (req, res) => {
           return res.status(500).json({ error: err.message });
         }
 
-        const token = jwt.sign({ id: userId, username, isAdmin: false }, JWT_SECRET);
+        const token = jwt.sign({ id: userId, username, isAdmin: false }, SECRET);
         res.json({ user: { id: userId, username, isAdmin: false }, token });
       }
     );
@@ -380,7 +452,7 @@ app.post('/api/login', (req, res) => {
 
     const token = jwt.sign(
       { id: user.id, username: user.username, isAdmin: !!user.is_admin },
-      JWT_SECRET
+      SECRET
     );
 
     res.json({
@@ -1686,8 +1758,87 @@ app.get('/api/battle-results', (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`API available at http://localhost:${PORT}/api`);
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: NODE_ENV
+  });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not found' });
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('[ERROR]', err);
+  
+  // Multer errors
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ error: 'File too large' });
+    }
+    return res.status(400).json({ error: err.message });
+  }
+  
+  // Default error
+  res.status(err.status || 500).json({ 
+    error: NODE_ENV === 'production' ? 'Internal server error' : err.message 
+  });
+});
+
+// Graceful shutdown
+let server;
+
+function gracefulShutdown(signal) {
+  console.log(`\n${signal} received. Starting graceful shutdown...`);
+  
+  server.close(() => {
+    console.log('HTTP server closed.');
+    
+    // Закрываем базу данных
+    db.close((err) => {
+      if (err) {
+        console.error('Error closing database:', err);
+        process.exit(1);
+      } else {
+        console.log('Database closed.');
+        process.exit(0);
+      }
+    });
+  });
+  
+  // Принудительное завершение через 10 секунд
+  setTimeout(() => {
+    console.error('Forced shutdown after timeout');
+    process.exit(1);
+  }, 10000);
+}
+
+// Запуск сервера
+server = app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`📡 API available at http://localhost:${PORT}/api`);
+  console.log(`🏥 Health check: http://localhost:${PORT}/health`);
+  console.log(`🌍 Environment: ${NODE_ENV}`);
+});
+
+// Обработка сигналов для graceful shutdown
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// Обработка необработанных ошибок
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+  gracefulShutdown('uncaughtException');
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  // Не завершаем процесс, только логируем
 });
 
