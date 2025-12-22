@@ -1405,10 +1405,10 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .global-stats-panel {
-    width: clamp(240px, 26vw, 320px);
+    width: clamp(220px, 24vw, 290px);
     flex-shrink: 0;
     flex-grow: 0;
-    margin-left: clamp(7rem, 13.5vw, 24.5rem);
+    margin-left: clamp(6rem, 12vw, 20rem);
     background: var(--news-panel-gradient);
     border-radius: 1.625rem;
     padding: 1.25rem;
