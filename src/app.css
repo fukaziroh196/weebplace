@@ -278,3 +278,113 @@ body.theme-dark input[type="text"]::placeholder { color: rgba(91,117,83,.5); }
 .text-pink-700 { color: #1d4ed8 !important; } /* blue-700 */
 /* Ring override used in a few buttons */
 .focus\:ring-pink-500\/60:focus { --tw-ring-color: rgba(59, 130, 246, 0.6) !important; }
+
+/* === RESPONSIVE LAYOUT OVERRIDES === */
+:global(html) {
+  font-size: clamp(14px, 1vw, 16px);
+}
+
+:global(body),
+:global(body.theme-dark),
+:global(body.theme-light) {
+  display: block !important;
+  min-height: 100vh !important;
+  min-width: 100vw !important;
+  margin: 0;
+}
+
+:global(#app) {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  background: inherit;
+}
+
+:global(.glass) {
+  width: 100% !important;
+  max-width: 1360px !important;
+  height: auto !important;
+  min-height: 100vh !important;
+  margin: 0 auto !important;
+  border-radius: 24px !important;
+  padding: clamp(18px, 3vw, 32px) clamp(14px, 2.5vw, 28px) !important;
+  box-sizing: border-box;
+}
+
+:global(.app-container) {
+  width: 100%;
+  max-width: 1360px;
+  margin: 0 auto;
+}
+
+:global(.content-scroll) {
+  padding: clamp(14px, 2.2vw, 28px) !important;
+}
+
+:global(.animeguess-page) {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: clamp(12px, 2vw, 24px) clamp(14px, 3vw, 32px) clamp(16px, 3vw, 32px);
+  box-sizing: border-box;
+}
+
+:global(.page-layout) {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  gap: clamp(12px, 2vw, 24px);
+}
+
+:global(.hero-header) {
+  max-width: 1280px;
+  margin: 0 auto clamp(12px, 2vw, 18px);
+  gap: clamp(12px, 2vw, 24px);
+}
+
+:global(.hero-footer) {
+  max-width: 1280px;
+  width: 100%;
+  margin: clamp(8px, 1vw, 12px) auto 0;
+}
+
+:global(.mode-cards) {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+  gap: clamp(12px, 2vw, 20px) !important;
+  padding-left: 0 !important;
+}
+
+:global(.mode-card) {
+  min-height: 240px;
+  height: 100%;
+}
+
+:global(.admin-news-panel),
+:global(.global-stats-panel) {
+  min-width: 260px;
+  max-width: 320px;
+}
+
+:global(.leaderboard-panel) {
+  width: 100%;
+  max-width: 360px;
+}
+
+@media (max-width: 1200px) {
+  :global(.leaderboard-panel),
+  :global(.admin-news-panel),
+  :global(.global-stats-panel) {
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+:global(.admin-news-panel),
+:global(.global-stats-panel),
+:global(.leaderboard-card) {
+  padding: clamp(14px, 2vw, 20px) !important;
+}
+
+:global(.main-layout) {
+  justify-content: center;
+}
