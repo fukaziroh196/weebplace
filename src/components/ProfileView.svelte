@@ -1,5 +1,6 @@
 <script>
   import { currentUser, login, register, setCurrentUserAvatar, clearCurrentUserAvatar } from '../stores/authApi';
+  import { userStats, loadUserStats } from '../stores/stats';
   import { favorites, comments, addComment, removeFromFavorites, users, friends, friendRequestsIncoming, friendRequestsOutgoing } from '../stores/auth';
   import { sendFriendRequest, acceptFriendRequest, declineFriendRequest, removeFriend, refreshFriendState } from '../stores/auth';
   import { profileTab } from '../stores/ui';
@@ -12,6 +13,44 @@
   let commentText = '';
   let showCropper = false;
   let tempImage = '';
+
+  // Мини-отображение достижений (иконки + кнопка "Все достижения")
+  const allAchievementsMini = [
+    { id: 'first_guess', icon: '🎯', title: 'Первый шаг', rarity: 'common' },
+    { id: 'perfect_day', icon: '✨', title: 'Идеальный день', rarity: 'rare' },
+    { id: 'streak_7', icon: '🔥', title: 'Неделя силы', rarity: 'rare' },
+    { id: 'streak_30', icon: '👑', title: 'Легенда месяца', rarity: 'epic' },
+    { id: 'no_hints', icon: '🧠', title: 'Мастер угадывания', rarity: 'common' },
+    { id: 'first_try', icon: '⚡', title: 'С первого взгляда', rarity: 'rare' },
+    { id: 'score_1000', icon: '💎', title: 'Тысячник', rarity: 'common' },
+    { id: 'score_10000', icon: '💠', title: 'Мастер очков', rarity: 'epic' },
+    { id: 'perfect_week', icon: '⭐', title: 'Неделя без ошибок', rarity: 'epic' },
+    { id: 'opening_master', icon: '🎵', title: 'Мастер опенингов', rarity: 'rare' },
+    { id: 'character_master', icon: '🎭', title: 'Знаток персонажей', rarity: 'rare' },
+    { id: 'battle_king', icon: '⚔️', title: 'Король битв', rarity: 'epic' }
+  ];
+  let unlockedMini = [];
+
+  $: {
+    if ($userStats?.data) {
+      const stats = $userStats.data;
+      const arr = [];
+      if (stats.totalGuesses > 0) arr.push('first_guess');
+      if (stats.totalScore > 0) arr.push('no_hints');
+      if (stats.totalScore >= 1000) arr.push('score_1000');
+      if (stats.totalScore >= 10000) arr.push('score_10000');
+      if (stats.currentStreak >= 7) arr.push('streak_7');
+      if (stats.currentStreak >= 30) arr.push('streak_30');
+      unlockedMini = arr;
+    } else {
+      unlockedMini = [];
+    }
+  }
+
+  const unlockedIcons = () =>
+    allAchievementsMini.filter((a) => unlockedMini.includes(a.id)).slice(0, 10);
+
+  loadUserStats();
 
   async function submit() {
     error = '';
@@ -94,6 +133,23 @@
       <div>
         <div class="profile-username">{$currentUser.username}</div>
         <div class="profile-joined-date">С нами с {$currentUser.createdAt ? new Date($currentUser.createdAt).toLocaleDateString('ru-RU') : 'недавно'}</div>
+      </div>
+    </div>
+
+    <!-- Мини-блок достижений справа -->
+    <div class="ach-mini">
+      <div class="ach-mini-head">
+        <span class="ach-mini-title">Достижения</span>
+        <button class="ach-mini-btn" on:click={() => profileTab.set('achievements')}>Все достижения</button>
+      </div>
+      <div class="ach-mini-row">
+        {#if unlockedIcons().length}
+          {#each unlockedIcons() as a (a.id)}
+            <span class="ach-mini-icon" title={a.title}>{a.icon}</span>
+          {/each}
+        {:else}
+          <span class="ach-mini-empty">Нет данных</span>
+        {/if}
       </div>
     </div>
 
@@ -222,6 +278,68 @@
     font-weight: 900;
     color: var(--text-primary, #f5f6ff);
     margin-bottom: 1.5rem;
+  }
+
+  /* Mini achievements */
+  .ach-mini {
+    margin: 1rem 0 2rem;
+    padding: 0.9rem 1rem;
+    background: var(--surface-primary, rgba(255,255,255,0.08));
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    backdrop-filter: blur(18px) saturate(150%);
+  }
+  .ach-mini-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .ach-mini-title {
+    color: var(--text-primary, #f5f6ff);
+    font-weight: 800;
+    letter-spacing: 0.02em;
+  }
+  .ach-mini-btn {
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.12);
+    color: var(--text-primary, #f5f6ff);
+    padding: 0.35rem 0.75rem;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+  .ach-mini-btn:hover {
+    background: rgba(255,255,255,0.18);
+    transform: translateY(-1px);
+  }
+  .ach-mini-row {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+  }
+  .ach-mini-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .ach-mini-empty {
+    color: var(--text-tertiary, rgba(245, 246, 255, 0.65));
+    font-size: 0.9rem;
   }
 
   /* Auth section */
