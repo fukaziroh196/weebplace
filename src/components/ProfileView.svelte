@@ -15,6 +15,7 @@
   let tempImage = '';
   let friendName = '';
   let friendMsg = '';
+  let showFriendsModal = false;
 
   // Мини-отображение достижений (иконки + кнопка "Все достижения")
   const allAchievementsMini = [
@@ -84,6 +85,10 @@
   function declineRequest(id) {
     declineFriendRequest(id);
     refreshFriendState();
+  }
+
+  function closeFriendsModal() {
+    showFriendsModal = false;
   }
 
   async function submit() {
@@ -199,6 +204,11 @@
         on:click={() => profileTab.set('achievements')}>
         🏆 Достижения
       </button>
+      <button 
+        class="profile-tab friends-tab"
+        on:click={() => showFriendsModal = true}>
+        👥 Друзья
+      </button>
     </div>
 
     {#if showCropper}
@@ -241,78 +251,9 @@
         <div class="space-y-6">
           <div>
             <h2 class="section-title">Друзья</h2>
-
-            <div class="friends-section">
-              <div class="friends-left glass-panel">
-                {#if $friends.length}
-                  {#each $friends as fid}
-                    <div class="friend-item">
-                      <div class="friend-name">{@html ($users.find(u=>u.id===fid)?.username || fid)}</div>
-                      <button class="friend-remove-btn" on:click={() => removeFriend(fid)}>Удалить</button>
-                    </div>
-                  {/each}
-                {:else}
-                  <div class="empty-state">Пока нет друзей</div>
-                {/if}
-              </div>
-
-              <div class="friends-right">
-                <!-- Поиск и отправка заявки -->
-                <div class="glass-panel">
-                  <div class="friend-request-row">
-                    <input
-                      class="comment-input"
-                      placeholder="Введите имя пользователя"
-                      bind:value={friendName}
-                      on:keydown={(e) => { if (e.key === 'Enter') handleSendFriendRequest(); }}
-                    />
-                    <button class="comment-submit" on:click={handleSendFriendRequest}>Добавить</button>
-                  </div>
-                  {#if friendMsg}
-                    <div class="friend-msg">{friendMsg}</div>
-                  {/if}
-                </div>
-
-                <!-- Входящие / Исходящие заявки -->
-                <div class="friend-requests">
-                  <div class="friend-req-section">
-                    <div class="friend-req-title">Входящие заявки</div>
-                    {#if $friendRequestsIncoming.length}
-                      <div class="friend-req-list">
-                        {#each $friendRequestsIncoming as req (req.fromId)}
-                          <div class="friend-req-item">
-                            <span>{@html ($users.find(u => u.id === req.fromId)?.username || req.fromId)}</span>
-                            <div class="friend-req-actions">
-                              <button class="friend-accept" on:click={() => acceptRequest(req.fromId)}>Принять</button>
-                              <button class="friend-decline" on:click={() => declineRequest(req.fromId)}>Отклонить</button>
-                            </div>
-                          </div>
-                        {/each}
-                      </div>
-                    {:else}
-                      <div class="empty-state">Нет входящих заявок</div>
-                    {/if}
-                  </div>
-
-                  <div class="friend-req-section">
-                    <div class="friend-req-title">Исходящие заявки</div>
-                    {#if $friendRequestsOutgoing.length}
-                      <div class="friend-req-list">
-                        {#each $friendRequestsOutgoing as req (req.toId)}
-                          <div class="friend-req-item">
-                            <span>{@html ($users.find(u => u.id === req.toId)?.username || req.toId)}</span>
-                            <div class="friend-req-actions">
-                              <span class="friend-pending">Ожидает</span>
-                            </div>
-                          </div>
-                        {/each}
-                      </div>
-                    {:else}
-                      <div class="empty-state">Нет исходящих заявок</div>
-                    {/if}
-                  </div>
-                </div>
-              </div>
+            <div class="glass-panel">
+              <p class="friend-inline-hint">Управляйте друзьями через всплывающее меню.</p>
+              <button class="comment-submit" on:click={() => showFriendsModal = true}>Открыть друзей</button>
             </div>
           </div>
 
@@ -362,6 +303,93 @@
         </div>
       </div>
     {/if}
+
+{#if showFriendsModal}
+  <div class="modal-backdrop" on:click={closeFriendsModal}></div>
+  <div class="modal-panel">
+    <div class="modal-header">
+      <div class="modal-title">Друзья</div>
+      <button class="modal-close" on:click={closeFriendsModal}>×</button>
+    </div>
+
+    <div class="friends-section modal-grid">
+      <div class="friends-left glass-panel">
+        <div class="friend-req-title">Список друзей</div>
+        {#if $friends.length}
+          <div class="friend-req-list">
+            {#each $friends as fid}
+              <div class="friend-req-item">
+                <span>{@html ($users.find(u=>u.id===fid)?.username || fid)}</span>
+                <div class="friend-req-actions">
+                  <button class="friend-decline" on:click={() => removeFriend(fid)}>Удалить</button>
+                </div>
+              </div>
+            {/each}
+          </div>
+        {:else}
+          <div class="empty-state">Пока нет друзей</div>
+        {/if}
+      </div>
+
+      <div class="friends-right">
+        <div class="glass-panel">
+          <div class="friend-req-title">Добавить друга</div>
+          <div class="friend-request-row">
+            <input
+              class="comment-input"
+              placeholder="Введите имя пользователя"
+              bind:value={friendName}
+              on:keydown={(e) => { if (e.key === 'Enter') handleSendFriendRequest(); }}
+            />
+            <button class="comment-submit" on:click={handleSendFriendRequest}>Добавить</button>
+          </div>
+          {#if friendMsg}
+            <div class="friend-msg">{friendMsg}</div>
+          {/if}
+        </div>
+
+        <div class="friend-requests">
+          <div class="friend-req-section">
+            <div class="friend-req-title">Входящие заявки</div>
+            {#if $friendRequestsIncoming.length}
+              <div class="friend-req-list">
+                {#each $friendRequestsIncoming as req (req.fromId)}
+                  <div class="friend-req-item">
+                    <span>{@html ($users.find(u => u.id === req.fromId)?.username || req.fromId)}</span>
+                    <div class="friend-req-actions">
+                      <button class="friend-accept" on:click={() => acceptRequest(req.fromId)}>Принять</button>
+                      <button class="friend-decline" on:click={() => declineRequest(req.fromId)}>Отклонить</button>
+                    </div>
+                  </div>
+                {/each}
+              </div>
+            {:else}
+              <div class="empty-state">Нет входящих заявок</div>
+            {/if}
+          </div>
+
+          <div class="friend-req-section">
+            <div class="friend-req-title">Исходящие заявки</div>
+            {#if $friendRequestsOutgoing.length}
+              <div class="friend-req-list">
+                {#each $friendRequestsOutgoing as req (req.toId)}
+                  <div class="friend-req-item">
+                    <span>{@html ($users.find(u => u.id === req.toId)?.username || req.toId)}</span>
+                    <div class="friend-req-actions">
+                      <span class="friend-pending">Ожидает</span>
+                    </div>
+                  </div>
+                {/each}
+              </div>
+            {:else}
+              <div class="empty-state">Нет исходящих заявок</div>
+            {/if}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{/if}
   </div>
 {/if}
 
@@ -771,6 +799,72 @@
     font-size: 0.9rem;
   }
 
+  /* Modal */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(6px);
+    z-index: 900;
+  }
+  .modal-panel {
+    position: fixed;
+    inset: 0;
+    max-width: 1100px;
+    width: 92%;
+    margin: auto;
+    height: auto;
+    max-height: 90vh;
+    background: var(--surface-primary, rgba(20, 22, 30, 0.92));
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 1.5rem;
+    z-index: 901;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.2rem;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.35);
+  }
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .modal-title {
+    color: var(--text-primary, #f5f6ff);
+    font-weight: 800;
+    font-size: 1.3rem;
+  }
+  .modal-close {
+    background: rgba(255,255,255,0.12);
+    color: var(--text-primary, #f5f6ff);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 0.75rem;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+  .modal-grid {
+    grid-template-columns: 1.1fr 1fr;
+    max-height: 70vh;
+    overflow: hidden;
+  }
+  @media (max-width: 960px) {
+    .modal-panel {
+      width: 96%;
+      max-height: 92vh;
+    }
+    .modal-grid {
+      grid-template-columns: 1fr;
+      max-height: none;
+    }
+  }
+  .friend-inline-hint {
+    color: var(--text-tertiary, rgba(245, 246, 255, 0.65));
+    font-size: 0.9rem;
+  }
   /* Friends */
   .friend-item {
     display: flex;
