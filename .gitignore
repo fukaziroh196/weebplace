@@ -37,9 +37,13 @@ server/uploads/*
 !server/uploads/.gitkeep
 server/node_modules/
 
-# Tauri
-src-tauri/target/
-src-tauri/gen/
+# Tauri (desktop build removed)
+src-tauri/
+Cargo.lock
+Cargo.toml
+
+# Vite cache
+.vite/
 
 # Misc
 *.local
