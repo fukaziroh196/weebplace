@@ -242,75 +242,78 @@
           <div>
             <h2 class="section-title">Друзья</h2>
 
-            <!-- Поиск и отправка заявки -->
-            <div class="glass-panel">
-              <div class="friend-request-row">
-                <input
-                  class="comment-input"
-                  placeholder="Введите имя пользователя"
-                  bind:value={friendName}
-                  on:keydown={(e) => { if (e.key === 'Enter') handleSendFriendRequest(); }}
-                />
-                <button class="comment-submit" on:click={handleSendFriendRequest}>Добавить</button>
-              </div>
-              {#if friendMsg}
-                <div class="friend-msg">{friendMsg}</div>
-              {/if}
-            </div>
-
-            <!-- Входящие / Исходящие заявки -->
-            <div class="friend-requests">
-              <div class="friend-req-section">
-                <div class="friend-req-title">Входящие заявки</div>
-                {#if $friendRequestsIncoming.length}
-                  <div class="friend-req-list">
-                    {#each $friendRequestsIncoming as req (req.fromId)}
-                      <div class="friend-req-item">
-                        <span>{@html ($users.find(u => u.id === req.fromId)?.username || req.fromId)}</span>
-                        <div class="friend-req-actions">
-                          <button class="friend-accept" on:click={() => acceptRequest(req.fromId)}>Принять</button>
-                          <button class="friend-decline" on:click={() => declineRequest(req.fromId)}>Отклонить</button>
-                        </div>
-                      </div>
-                    {/each}
-                  </div>
+            <div class="friends-section">
+              <div class="friends-left glass-panel">
+                {#if $friends.length}
+                  {#each $friends as fid}
+                    <div class="friend-item">
+                      <div class="friend-name">{@html ($users.find(u=>u.id===fid)?.username || fid)}</div>
+                      <button class="friend-remove-btn" on:click={() => removeFriend(fid)}>Удалить</button>
+                    </div>
+                  {/each}
                 {:else}
-                  <div class="empty-state">Нет входящих заявок</div>
+                  <div class="empty-state">Пока нет друзей</div>
                 {/if}
               </div>
 
-              <div class="friend-req-section">
-                <div class="friend-req-title">Исходящие заявки</div>
-                {#if $friendRequestsOutgoing.length}
-                  <div class="friend-req-list">
-                    {#each $friendRequestsOutgoing as req (req.toId)}
-                      <div class="friend-req-item">
-                        <span>{@html ($users.find(u => u.id === req.toId)?.username || req.toId)}</span>
-                        <div class="friend-req-actions">
-                          <span class="friend-pending">Ожидает</span>
-                        </div>
-                      </div>
-                    {/each}
+              <div class="friends-right">
+                <!-- Поиск и отправка заявки -->
+                <div class="glass-panel">
+                  <div class="friend-request-row">
+                    <input
+                      class="comment-input"
+                      placeholder="Введите имя пользователя"
+                      bind:value={friendName}
+                      on:keydown={(e) => { if (e.key === 'Enter') handleSendFriendRequest(); }}
+                    />
+                    <button class="comment-submit" on:click={handleSendFriendRequest}>Добавить</button>
                   </div>
-                {:else}
-                  <div class="empty-state">Нет исходящих заявок</div>
-                {/if}
+                  {#if friendMsg}
+                    <div class="friend-msg">{friendMsg}</div>
+                  {/if}
+                </div>
+
+                <!-- Входящие / Исходящие заявки -->
+                <div class="friend-requests">
+                  <div class="friend-req-section">
+                    <div class="friend-req-title">Входящие заявки</div>
+                    {#if $friendRequestsIncoming.length}
+                      <div class="friend-req-list">
+                        {#each $friendRequestsIncoming as req (req.fromId)}
+                          <div class="friend-req-item">
+                            <span>{@html ($users.find(u => u.id === req.fromId)?.username || req.fromId)}</span>
+                            <div class="friend-req-actions">
+                              <button class="friend-accept" on:click={() => acceptRequest(req.fromId)}>Принять</button>
+                              <button class="friend-decline" on:click={() => declineRequest(req.fromId)}>Отклонить</button>
+                            </div>
+                          </div>
+                        {/each}
+                      </div>
+                    {:else}
+                      <div class="empty-state">Нет входящих заявок</div>
+                    {/if}
+                  </div>
+
+                  <div class="friend-req-section">
+                    <div class="friend-req-title">Исходящие заявки</div>
+                    {#if $friendRequestsOutgoing.length}
+                      <div class="friend-req-list">
+                        {#each $friendRequestsOutgoing as req (req.toId)}
+                          <div class="friend-req-item">
+                            <span>{@html ($users.find(u => u.id === req.toId)?.username || req.toId)}</span>
+                            <div class="friend-req-actions">
+                              <span class="friend-pending">Ожидает</span>
+                            </div>
+                          </div>
+                        {/each}
+                      </div>
+                    {:else}
+                      <div class="empty-state">Нет исходящих заявок</div>
+                    {/if}
+                  </div>
+                </div>
               </div>
             </div>
-
-            <div class="glass-panel">
-              {#if $friends.length}
-                {#each $friends as fid}
-                  <div class="friend-item">
-                    <div class="friend-name">{@html ($users.find(u=>u.id===fid)?.username || fid)}</div>
-                    <button class="friend-remove-btn" on:click={() => removeFriend(fid)}>Удалить</button>
-                  </div>
-                {/each}
-              {:else}
-                <div class="empty-state">Пока нет друзей</div>
-              {/if}
-            </div>
-            <!-- Блок заявок в друзья перенесён в меню сообщений -->
           </div>
 
           <div>
@@ -673,6 +676,27 @@
     font-size: 0.875rem;
     text-align: center;
     padding: 1rem;
+  }
+
+  /* Friends layout */
+  .friends-section {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 1rem;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .friends-section {
+      grid-template-columns: 1fr;
+    }
+  }
+  .friends-left {
+    min-height: 100%;
+  }
+  .friends-right {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
   }
 
   /* Friend requests */
