@@ -13,6 +13,8 @@
   let commentText = '';
   let showCropper = false;
   let tempImage = '';
+  let friendName = '';
+  let friendMsg = '';
 
   // Мини-отображение достижений (иконки + кнопка "Все достижения")
   const allAchievementsMini = [
@@ -51,6 +53,38 @@
     allAchievementsMini.filter((a) => unlockedMini.includes(a.id)).slice(0, 10);
 
   loadUserStats();
+
+  function resolveUserByName(name) {
+    const query = (name || '').trim().toLowerCase();
+    if (!query) return null;
+    return ($users || []).find((u) => u.username?.toLowerCase() === query) || null;
+  }
+
+  function handleSendFriendRequest() {
+    friendMsg = '';
+    const target = resolveUserByName(friendName);
+    if (!target) {
+      friendMsg = 'Пользователь не найден';
+      return;
+    }
+    try {
+      sendFriendRequest(target.id);
+      friendMsg = 'Заявка отправлена';
+      refreshFriendState();
+    } catch (e) {
+      friendMsg = e?.message || 'Ошибка';
+    }
+  }
+
+  function acceptRequest(id) {
+    acceptFriendRequest(id);
+    refreshFriendState();
+  }
+
+  function declineRequest(id) {
+    declineFriendRequest(id);
+    refreshFriendState();
+  }
 
   async function submit() {
     error = '';
@@ -207,6 +241,63 @@
         <div class="space-y-6">
           <div>
             <h2 class="section-title">Друзья</h2>
+
+            <!-- Поиск и отправка заявки -->
+            <div class="glass-panel">
+              <div class="friend-request-row">
+                <input
+                  class="comment-input"
+                  placeholder="Введите имя пользователя"
+                  bind:value={friendName}
+                  on:keydown={(e) => { if (e.key === 'Enter') handleSendFriendRequest(); }}
+                />
+                <button class="comment-submit" on:click={handleSendFriendRequest}>Добавить</button>
+              </div>
+              {#if friendMsg}
+                <div class="friend-msg">{friendMsg}</div>
+              {/if}
+            </div>
+
+            <!-- Входящие / Исходящие заявки -->
+            <div class="friend-requests">
+              <div class="friend-req-section">
+                <div class="friend-req-title">Входящие заявки</div>
+                {#if $friendRequestsIncoming.length}
+                  <div class="friend-req-list">
+                    {#each $friendRequestsIncoming as req (req.fromId)}
+                      <div class="friend-req-item">
+                        <span>{@html ($users.find(u => u.id === req.fromId)?.username || req.fromId)}</span>
+                        <div class="friend-req-actions">
+                          <button class="friend-accept" on:click={() => acceptRequest(req.fromId)}>Принять</button>
+                          <button class="friend-decline" on:click={() => declineRequest(req.fromId)}>Отклонить</button>
+                        </div>
+                      </div>
+                    {/each}
+                  </div>
+                {:else}
+                  <div class="empty-state">Нет входящих заявок</div>
+                {/if}
+              </div>
+
+              <div class="friend-req-section">
+                <div class="friend-req-title">Исходящие заявки</div>
+                {#if $friendRequestsOutgoing.length}
+                  <div class="friend-req-list">
+                    {#each $friendRequestsOutgoing as req (req.toId)}
+                      <div class="friend-req-item">
+                        <span>{@html ($users.find(u => u.id === req.toId)?.username || req.toId)}</span>
+                        <div class="friend-req-actions">
+                          <span class="friend-pending">Ожидает</span>
+                        </div>
+                      </div>
+                    {/each}
+                  </div>
+                {:else}
+                  <div class="empty-state">Нет исходящих заявок</div>
+                {/if}
+              </div>
+            </div>
+
             <div class="glass-panel">
               {#if $friends.length}
                 {#each $friends as fid}
@@ -582,6 +673,78 @@
     font-size: 0.875rem;
     text-align: center;
     padding: 1rem;
+  }
+
+  /* Friend requests */
+  .friend-request-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+  }
+  .friend-msg {
+    margin-top: 0.35rem;
+    font-size: 0.85rem;
+    color: var(--text-tertiary, rgba(245, 246, 255, 0.7));
+  }
+  .friend-requests {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 0.75rem;
+    margin: 0.75rem 0 1.25rem;
+  }
+  .friend-req-section {
+    background: var(--surface-primary, rgba(255, 255, 255, 0.08));
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 1rem;
+    padding: 0.9rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .friend-req-title {
+    font-weight: 700;
+    color: var(--text-primary, #f5f6ff);
+    font-size: 0.95rem;
+  }
+  .friend-req-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .friend-req-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    padding: 0.65rem 0.75rem;
+  }
+  .friend-req-actions {
+    display: flex;
+    gap: 0.4rem;
+  }
+  .friend-accept {
+    background: var(--accent-primary, #9ecaff);
+    color: #0b1020;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.35rem 0.7rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .friend-decline {
+    background: rgba(255,255,255,0.12);
+    color: var(--text-primary, #f5f6ff);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 0.5rem;
+    padding: 0.35rem 0.7rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .friend-pending {
+    color: var(--text-tertiary, rgba(245, 246, 255, 0.65));
+    font-size: 0.9rem;
   }
 
   /* Friends */
