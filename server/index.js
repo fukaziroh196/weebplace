@@ -4,7 +4,6 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcryptjs');
-const sqlite3 = require('sqlite3').verbose();
 const jwt = require('jsonwebtoken');
 const AdmZip = require('adm-zip');
 const sharp = require('sharp');
@@ -13,6 +12,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const morgan = require('morgan');
+const { db } = require('./db');
 const { cache, get: cacheGet, set: cacheSet, flushAll: cacheFlushAll } = require('./cache');
 const registerLeaderboardRoutes = require('./routes/leaderboard');
 const registerStatsRoutes = require('./routes/stats');
@@ -243,200 +243,7 @@ function deleteOldAvatar(avatarUrl) {
   }
 }
 
-// Инициализация базы данных
-const dbPath = path.join(__dirname, 'database.sqlite');
-const db = new sqlite3.Database(dbPath);
-
-// Создание таблиц
-db.serialize(() => {
-  // Таблица пользователей
-  db.run(`CREATE TABLE IF NOT EXISTS users (
-    id TEXT PRIMARY KEY,
-    username TEXT UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL,
-    created_at INTEGER NOT NULL,
-    is_admin INTEGER DEFAULT 0,
-    avatar_url TEXT
-  )`);
-
-  // Таблица для игры "Угадай аниме"
-  db.run(`CREATE TABLE IF NOT EXISTS anime_guesses (
-    id TEXT PRIMARY KEY,
-    user_id TEXT,
-    image_url TEXT NOT NULL,
-    title TEXT NOT NULL,
-    anime_id TEXT NOT NULL,
-    source_id TEXT,
-    quiz_date TEXT,
-    hint1_image TEXT,
-    hint2_image TEXT,
-    created_at INTEGER NOT NULL,
-    guessed_by TEXT,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-  )`);
-
-  // Migration: ensure quiz_date column exists
-  db.get(`PRAGMA table_info(anime_guesses)`, (err, row) => {
-    // no-op; we'll try to add column blindly, ignore error if exists
-    db.run(`ALTER TABLE anime_guesses ADD COLUMN quiz_date TEXT`, (e) => { /* ignore */ });
-  });
-  
-  // Migration: ensure hint columns exist
-  db.run(`ALTER TABLE anime_guesses ADD COLUMN hint1_image TEXT`, (e) => { /* ignore duplicate column */ });
-  db.run(`ALTER TABLE anime_guesses ADD COLUMN hint2_image TEXT`, (e) => { /* ignore duplicate column */ });
-
-  // Таблица для очков пользователей
-  db.run(`CREATE TABLE IF NOT EXISTS user_scores (
-    id TEXT PRIMARY KEY,
-    user_id TEXT NOT NULL,
-    quiz_type TEXT NOT NULL,
-    score INTEGER NOT NULL,
-    quiz_date TEXT NOT NULL,
-    created_at INTEGER NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-  )`);
-
-  // Таблица для новостей проекта
-  db.run(`CREATE TABLE IF NOT EXISTS project_news (
-    id TEXT PRIMARY KEY,
-    user_id TEXT NOT NULL,
-    text TEXT NOT NULL,
-    created_at INTEGER NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-  )`);
-
-// Таблица для баттл паков
-db.run(`CREATE TABLE IF NOT EXISTS battle_packs (
-  id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
-  description TEXT,
-  user_id TEXT NOT NULL,
-  created_at INTEGER NOT NULL,
-  FOREIGN KEY (user_id) REFERENCES users(id)
-)`);
-
-// Таблица для аниме в баттл паках
-db.run(`CREATE TABLE IF NOT EXISTS anime_battles (
-  id TEXT PRIMARY KEY,
-  pack_id TEXT NOT NULL,
-  user_id TEXT NOT NULL,
-  title TEXT NOT NULL,
-  image_url TEXT NOT NULL,
-  anime_id TEXT NOT NULL,
-  source_id TEXT,
-  created_at INTEGER NOT NULL,
-  FOREIGN KEY (pack_id) REFERENCES battle_packs(id),
-  FOREIGN KEY (user_id) REFERENCES users(id)
-)`);
-
-  // Таблица для результатов баттлов
-  db.run(`CREATE TABLE IF NOT EXISTS battle_results (
-    id TEXT PRIMARY KEY,
-    user_id TEXT NOT NULL,
-    anime_id TEXT NOT NULL,
-    wins INTEGER DEFAULT 0,
-    losses INTEGER DEFAULT 0,
-    points INTEGER DEFAULT 0,
-    quiz_date TEXT NOT NULL,
-    created_at INTEGER NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-  )`);
-
-  // Таблица для библиотек пользователей
-  db.run(`CREATE TABLE IF NOT EXISTS user_libraries (
-    user_id TEXT,
-    data_type TEXT,
-    data_content TEXT,
-    PRIMARY KEY (user_id, data_type),
-    FOREIGN KEY (user_id) REFERENCES users(id)
-  )`);
-
-  // Таблица для опенингов
-  db.run(`CREATE TABLE IF NOT EXISTS openings (
-    id TEXT PRIMARY KEY,
-    title TEXT NOT NULL,
-    youtube_url TEXT NOT NULL,
-    start_time INTEGER DEFAULT 0,
-    end_time INTEGER DEFAULT 20,
-    quiz_date TEXT NOT NULL,
-    created_at INTEGER NOT NULL,
-    created_by TEXT,
-    FOREIGN KEY (created_by) REFERENCES users(id)
-  )`);
-  
-  // Migration: ensure quiz_date column exists in openings table
-  db.get(`PRAGMA table_info(openings)`, (err) => {
-    if (err) {
-      console.error('[Migration] Error checking openings table:', err);
-      return;
-    }
-    // Try to add quiz_date column if it doesn't exist
-    db.run(`ALTER TABLE openings ADD COLUMN quiz_date TEXT`, (alterErr) => {
-      if (alterErr && !alterErr.message.includes('duplicate column')) {
-        console.error('[Migration] Error adding quiz_date to openings:', alterErr);
-      } else if (!alterErr) {
-        console.log('[Migration] Added quiz_date column to openings table');
-      }
-    });
-  });
-
-  // Таблица для угаданных квизов (решает race condition)
-  db.run(`CREATE TABLE IF NOT EXISTS quiz_guesses (
-    quiz_id TEXT NOT NULL,
-    user_id TEXT NOT NULL,
-    guessed_at INTEGER NOT NULL,
-    PRIMARY KEY (quiz_id, user_id),
-    FOREIGN KEY (quiz_id) REFERENCES anime_guesses(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-  )`);
-
-  // ============ ИНДЕКСЫ ДЛЯ ОПТИМИЗАЦИИ ============
-  console.log('[DB] Creating indexes for performance...');
-  
-  // Индексы для anime_guesses
-  db.run(`CREATE INDEX IF NOT EXISTS idx_anime_guesses_quiz_date ON anime_guesses(quiz_date)`, (err) => {
-    if (err && !err.message.includes('already exists')) console.error('[DB] Index error:', err);
-  });
-  db.run(`CREATE INDEX IF NOT EXISTS idx_anime_guesses_user_id ON anime_guesses(user_id)`, (err) => {
-    if (err && !err.message.includes('already exists')) console.error('[DB] Index error:', err);
-  });
-  
-  // Индексы для user_scores
-  db.run(`CREATE INDEX IF NOT EXISTS idx_user_scores_user_id ON user_scores(user_id)`, (err) => {
-    if (err && !err.message.includes('already exists')) console.error('[DB] Index error:', err);
-  });
-  db.run(`CREATE INDEX IF NOT EXISTS idx_user_scores_quiz_date ON user_scores(quiz_date)`, (err) => {
-    if (err && !err.message.includes('already exists')) console.error('[DB] Index error:', err);
-  });
-  db.run(`CREATE INDEX IF NOT EXISTS idx_user_scores_quiz_type ON user_scores(quiz_type)`, (err) => {
-    if (err && !err.message.includes('already exists')) console.error('[DB] Index error:', err);
-  });
-  db.run(`CREATE INDEX IF NOT EXISTS idx_user_scores_user_type_date ON user_scores(user_id, quiz_type, quiz_date)`, (err) => {
-    if (err && !err.message.includes('already exists')) console.error('[DB] Index error:', err);
-  });
-  
-  // Индексы для battle_results
-  db.run(`CREATE INDEX IF NOT EXISTS idx_battle_results_user_date ON battle_results(user_id, quiz_date)`, (err) => {
-    if (err && !err.message.includes('already exists')) console.error('[DB] Index error:', err);
-  });
-  
-  // Индексы для openings
-  db.run(`CREATE INDEX IF NOT EXISTS idx_openings_quiz_date ON openings(quiz_date)`, (err) => {
-    if (err && !err.message.includes('already exists')) console.error('[DB] Index error:', err);
-  });
-  
-  // Индексы для project_news
-  db.run(`CREATE INDEX IF NOT EXISTS idx_project_news_created_at ON project_news(created_at DESC)`, (err) => {
-    if (err && !err.message.includes('already exists')) console.error('[DB] Index error:', err);
-  });
-  
-  // Индекс для quiz_guesses (уже есть PRIMARY KEY, но добавим для user_id)
-  db.run(`CREATE INDEX IF NOT EXISTS idx_quiz_guesses_user_id ON quiz_guesses(user_id)`, (err) => {
-    if (err && !err.message.includes('already exists')) console.error('[DB] Index error:', err);
-  });
-  
-  console.log('[DB] Indexes created successfully');
-});
+const { db } = require('./db');
 
 // Middleware для проверки JWT
 function authenticateToken(req, res, next) {
