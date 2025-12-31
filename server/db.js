@@ -105,6 +105,19 @@ db.serialize(() => {
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`);
 
+  // Таблица для уведомлений
+  db.run(`CREATE TABLE IF NOT EXISTS notifications (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    type TEXT NOT NULL,
+    title TEXT NOT NULL,
+    message TEXT,
+    payload TEXT,
+    read INTEGER DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )`);
+
   // Таблица для опенингов
   db.run(`CREATE TABLE IF NOT EXISTS openings (
     id TEXT PRIMARY KEY,
@@ -152,6 +165,7 @@ db.serialize(() => {
   db.run(`CREATE INDEX IF NOT EXISTS idx_openings_quiz_date ON openings(quiz_date)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_project_news_created_at ON project_news(created_at DESC)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_quiz_guesses_user_id ON quiz_guesses(user_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_notifications_user_read ON notifications(user_id, read, created_at DESC)`);
 });
 
 module.exports = { db, dbPath };

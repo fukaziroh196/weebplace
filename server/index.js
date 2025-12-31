@@ -25,6 +25,7 @@ const registerBattleRoutes = require('./routes/battles');
 const registerOpeningsRoutes = require('./routes/openings');
 const registerPacksRoutes = require('./routes/packs');
 const registerUsersRoutes = require('./routes/users');
+const registerNotificationsRoutes = require('./routes/notifications');
 const { body, param, query, validationResult } = require('express-validator');
 
 const app = express();
@@ -303,6 +304,7 @@ registerBattleRoutes(app, { db, authenticateToken, requireAdmin, upload, handleV
 registerOpeningsRoutes(app, { db, authenticateToken, requireAdmin, handleValidationErrors, invalidateCache, cacheGet, cacheSet });
 registerPacksRoutes(app, { db, authenticateToken, requireAdmin, upload, uploadsDir, handleValidationErrors, invalidateCache });
 registerUsersRoutes(app, { db, handleValidationErrors });
+registerNotificationsRoutes(app, { db, authenticateToken, handleValidationErrors });
 
 // ============ API ENDPOINTS ============
 
