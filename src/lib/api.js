@@ -171,6 +171,42 @@ export const notificationsApi = {
   }
 };
 
+// Friends API
+export const friendsApi = {
+  async state() {
+    return await apiRequest('/friends/state');
+  },
+  async send(username) {
+    return await apiRequest('/friends/request', {
+      method: 'POST',
+      body: JSON.stringify({ username })
+    });
+  },
+  async respond(requestId, action) {
+    return await apiRequest('/friends/respond', {
+      method: 'POST',
+      body: JSON.stringify({ requestId, action })
+    });
+  },
+  async remove(userId) {
+    return await apiRequest('/friends/remove', {
+      method: 'POST',
+      body: JSON.stringify({ userId })
+    });
+  }
+};
+
+// Users API (поиск)
+export const usersApi = {
+  async search(query, limit = 20) {
+    const params = new URLSearchParams();
+    if (query) params.set('q', query);
+    if (limit) params.set('limit', String(limit));
+    const suffix = params.toString() ? `?${params.toString()}` : '';
+    return await apiRequest(`/users/search${suffix}`);
+  }
+};
+
 // Stats API
 export const stats = {
   async me() {

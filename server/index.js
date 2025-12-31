@@ -26,6 +26,7 @@ const registerOpeningsRoutes = require('./routes/openings');
 const registerPacksRoutes = require('./routes/packs');
 const registerUsersRoutes = require('./routes/users');
 const registerNotificationsRoutes = require('./routes/notifications');
+const registerFriendsRoutes = require('./routes/friends');
 const { body, param, query, validationResult } = require('express-validator');
 
 const app = express();
@@ -305,6 +306,7 @@ registerOpeningsRoutes(app, { db, authenticateToken, requireAdmin, handleValidat
 registerPacksRoutes(app, { db, authenticateToken, requireAdmin, upload, uploadsDir, handleValidationErrors, invalidateCache });
 registerUsersRoutes(app, { db, handleValidationErrors });
 registerNotificationsRoutes(app, { db, authenticateToken, handleValidationErrors });
+registerFriendsRoutes(app, { db, authenticateToken, handleValidationErrors });
 
 // ============ API ENDPOINTS ============
 

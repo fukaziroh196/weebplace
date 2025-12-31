@@ -1,8 +1,23 @@
 <script>
-  import { currentUser, login, register, setCurrentUserAvatar, clearCurrentUserAvatar } from '../stores/authApi';
+  import {
+    currentUser,
+    login,
+    register,
+    setCurrentUserAvatar,
+    clearCurrentUserAvatar,
+    sendFriendRequest,
+    acceptFriendRequest,
+    declineFriendRequest,
+    removeFriend,
+    refreshFriendState,
+    searchUsers,
+    friends,
+    friendProfiles,
+    friendRequestsIncoming,
+    friendRequestsOutgoing
+  } from '../stores/authApi';
+  import { favorites, comments, addComment, removeFromFavorites } from '../stores/auth';
   import { userStats, loadUserStats } from '../stores/stats';
-  import { favorites, comments, addComment, removeFromFavorites, users, friends, friendRequestsIncoming, friendRequestsOutgoing } from '../stores/auth';
-  import { sendFriendRequest, acceptFriendRequest, declineFriendRequest, removeFriend, refreshFriendState } from '../stores/auth';
   import { profileTab } from '../stores/ui';
   import AvatarCropper from './AvatarCropper.svelte';
   import AchievementsView from './AchievementsView.svelte';
@@ -55,36 +70,30 @@
 
   loadUserStats();
 
-  function resolveUserByName(name) {
-    const query = (name || '').trim().toLowerCase();
-    if (!query) return null;
-    return ($users || []).find((u) => u.username?.toLowerCase() === query) || null;
-  }
-
-  function handleSendFriendRequest() {
+  async function handleSendFriendRequest() {
     friendMsg = '';
-    const target = resolveUserByName(friendName);
-    if (!target) {
-      friendMsg = 'Пользователь не найден';
-      return;
-    }
     try {
-      sendFriendRequest(target.id);
+      const candidates = await searchUsers(friendName);
+      if (!candidates?.length) {
+        friendMsg = 'Пользователь не найден';
+        return;
+      }
+      await sendFriendRequest(friendName);
       friendMsg = 'Заявка отправлена';
-      refreshFriendState();
+      await refreshFriendState();
     } catch (e) {
       friendMsg = e?.message || 'Ошибка';
     }
   }
 
-  function acceptRequest(id) {
-    acceptFriendRequest(id);
-    refreshFriendState();
+  async function acceptRequest(requestId) {
+    await acceptFriendRequest(requestId);
+    await refreshFriendState();
   }
 
-  function declineRequest(id) {
-    declineFriendRequest(id);
-    refreshFriendState();
+  async function declineRequest(requestId) {
+    await declineFriendRequest(requestId);
+    await refreshFriendState();
   }
 
   function closeFriendsModal() {
@@ -315,13 +324,13 @@
     <div class="friends-section modal-grid">
       <div class="friends-left glass-panel">
         <div class="friend-req-title">Список друзей</div>
-        {#if $friends.length}
+        {#if $friendProfiles.length}
           <div class="friend-req-list">
-            {#each $friends as fid}
+            {#each $friendProfiles as f (f.id)}
               <div class="friend-req-item">
-                <span>{@html ($users.find(u=>u.id===fid)?.username || fid)}</span>
+                <span>{f.username}</span>
                 <div class="friend-req-actions">
-                  <button class="friend-decline" on:click={() => removeFriend(fid)}>Удалить</button>
+                  <button class="friend-decline" on:click={() => removeFriend(f.id)}>Удалить</button>
                 </div>
               </div>
             {/each}
@@ -353,12 +362,12 @@
             <div class="friend-req-title">Входящие заявки</div>
             {#if $friendRequestsIncoming.length}
               <div class="friend-req-list">
-                {#each $friendRequestsIncoming as req (req.fromId)}
+                {#each $friendRequestsIncoming as req (req.id)}
                   <div class="friend-req-item">
-                    <span>{@html ($users.find(u => u.id === req.fromId)?.username || req.fromId)}</span>
+                    <span>{req.username || req.fromId}</span>
                     <div class="friend-req-actions">
-                      <button class="friend-accept" on:click={() => acceptRequest(req.fromId)}>Принять</button>
-                      <button class="friend-decline" on:click={() => declineRequest(req.fromId)}>Отклонить</button>
+                      <button class="friend-accept" on:click={() => acceptRequest(req.id)}>Принять</button>
+                      <button class="friend-decline" on:click={() => declineRequest(req.id)}>Отклонить</button>
                     </div>
                   </div>
                 {/each}
@@ -372,9 +381,9 @@
             <div class="friend-req-title">Исходящие заявки</div>
             {#if $friendRequestsOutgoing.length}
               <div class="friend-req-list">
-                {#each $friendRequestsOutgoing as req (req.toId)}
+                {#each $friendRequestsOutgoing as req (req.id)}
                   <div class="friend-req-item">
-                    <span>{@html ($users.find(u => u.id === req.toId)?.username || req.toId)}</span>
+                    <span>{req.username || req.toId}</span>
                     <div class="friend-req-actions">
                       <span class="friend-pending">Ожидает</span>
                     </div>

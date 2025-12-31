@@ -105,6 +105,26 @@ db.serialize(() => {
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`);
 
+  // Таблицы для друзей и заявок
+  db.run(`CREATE TABLE IF NOT EXISTS friend_requests (
+    id TEXT PRIMARY KEY,
+    from_user_id TEXT NOT NULL,
+    to_user_id TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending', -- pending | accepted | declined
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY (from_user_id) REFERENCES users(id),
+    FOREIGN KEY (to_user_id) REFERENCES users(id)
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS friendships (
+    user_id TEXT NOT NULL,
+    friend_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (user_id, friend_id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (friend_id) REFERENCES users(id)
+  )`);
+
   // Таблица для уведомлений
   db.run(`CREATE TABLE IF NOT EXISTS notifications (
     id TEXT PRIMARY KEY,
@@ -166,6 +186,9 @@ db.serialize(() => {
   db.run(`CREATE INDEX IF NOT EXISTS idx_project_news_created_at ON project_news(created_at DESC)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_quiz_guesses_user_id ON quiz_guesses(user_id)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_notifications_user_read ON notifications(user_id, read, created_at DESC)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_friend_requests_to_status ON friend_requests(to_user_id, status, created_at DESC)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_friend_requests_from_status ON friend_requests(from_user_id, status, created_at DESC)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_friendships_user ON friendships(user_id)`);
 });
 
 module.exports = { db, dbPath };

@@ -1,5 +1,5 @@
 import { writable, get } from 'svelte/store';
-import { auth, library as libraryApi } from '../lib/api';
+import { auth, library as libraryApi, friendsApi, usersApi } from '../lib/api';
 import { loadUnreadNotifications, clearNotificationsStore } from './notifications';
 
 // Current user store
@@ -14,6 +14,7 @@ export const dropped = writable([]);
 export const ratings = writable({});
 export const notInterested = writable([]);
 export const friends = writable([]);
+export const friendProfiles = writable([]);
 export const friendRequestsIncoming = writable([]);
 export const friendRequestsOutgoing = writable([]);
 export const comments = writable([]);
@@ -25,6 +26,7 @@ export async function loadCurrentUser() {
     const user = await auth.getMe();
     currentUser.set(user);
     await loadUserLibrary();
+    await refreshFriendState();
     await loadUnreadNotifications().catch(() => {});
     return user;
   } catch (error) {
@@ -68,6 +70,7 @@ export async function register(username, password) {
     const result = await auth.register(username, password);
     currentUser.set(result.user);
     await loadUserLibrary();
+    await refreshFriendState();
     await loadUnreadNotifications().catch(() => {});
     return result.user;
   } catch (error) {
@@ -81,6 +84,7 @@ export async function login(username, password) {
     const result = await auth.login(username, password);
     currentUser.set(result.user);
     await loadUserLibrary();
+    await refreshFriendState();
     await loadUnreadNotifications().catch(() => {});
     return result.user;
   } catch (error) {
@@ -99,10 +103,56 @@ export function logout() {
   ratings.set({});
   notInterested.set([]);
   friends.set([]);
+  friendProfiles.set([]);
   friendRequestsIncoming.set([]);
   friendRequestsOutgoing.set([]);
   comments.set([]);
   clearNotificationsStore();
+}
+
+// ---------- Friends ----------
+export async function refreshFriendState() {
+  try {
+    const state = await friendsApi.state();
+    const list = state.friends || [];
+    friendProfiles.set(list);
+    friends.set(list.map((f) => f.id));
+    friendRequestsIncoming.set(state.incoming || []);
+    friendRequestsOutgoing.set(state.outgoing || []);
+  } catch (error) {
+    console.error('Failed to load friends:', error);
+    friends.set([]);
+    friendProfiles.set([]);
+    friendRequestsIncoming.set([]);
+    friendRequestsOutgoing.set([]);
+  }
+}
+
+export async function sendFriendRequest(username) {
+  const name = (username || '').trim();
+  if (!name) throw new Error('Введите имя пользователя');
+  await friendsApi.send(name);
+  await refreshFriendState();
+}
+
+export async function acceptFriendRequest(requestId) {
+  await friendsApi.respond(requestId, 'accept');
+  await refreshFriendState();
+}
+
+export async function declineFriendRequest(requestId) {
+  await friendsApi.respond(requestId, 'decline');
+  await refreshFriendState();
+}
+
+export async function removeFriend(userId) {
+  await friendsApi.remove(userId);
+  await refreshFriendState();
+}
+
+export async function searchUsers(query) {
+  if (!query) return [];
+  return await usersApi.search(query);
 }
 
 // Watch for changes and auto-save to API
