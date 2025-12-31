@@ -2359,6 +2359,100 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     }
   }
 
+  /* Notifications alignment next to profile */
+  .profile-nav-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .notification-wrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  .notification-button {
+    min-width: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.35rem 0.75rem;
+  }
+
+  .notifications-dropdown {
+    min-width: 15rem;
+  }
+
+  .notifications-header {
+    padding: 0.6rem 0.8rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+  }
+
+  .notifications-empty {
+    padding: 0.8rem;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+  }
+
+  .notifications-list {
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem 0.4rem 0.8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .notification-item {
+    padding: 0.5rem 0.55rem;
+    border-radius: 0.85rem;
+    background: var(--surface-secondary);
+    box-shadow: inset 0 0 0 1px var(--divider-color);
+  }
+
+  .notification-title {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .notification-message {
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .notification-meta {
+    color: var(--text-tertiary);
+    font-size: 0.75rem;
+  }
+
+  .notif-dot {
+    position: absolute;
+    top: -0.3rem;
+    right: -0.35rem;
+    border-radius: 999px;
+  }
+
+  .notif-dot-count {
+    background: #ff3b82;
+    color: #fff;
+    font-size: 0.7rem;
+    padding: 0.1rem 0.4rem;
+    min-width: 1.25rem;
+    text-align: center;
+    font-weight: 800;
+    box-shadow: 0 0.35rem 0.9rem rgba(255, 59, 130, 0.35);
+  }
+
+  .notif-dot-faded {
+    width: 0.5rem;
+    height: 0.5rem;
+    background: rgba(255, 255, 255, 0.55);
+  }
+
   /* Маленькие мобильные устройства (до 480px) */
   @media (max-width: 480px) {
     :global(html) {
