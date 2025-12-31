@@ -18,6 +18,8 @@ const registerLeaderboardRoutes = require('./routes/leaderboard');
 const registerStatsRoutes = require('./routes/stats');
 const registerNewsRoutes = require('./routes/news');
 const registerAnimeGuessesRoutes = require('./routes/animeGuesses');
+const registerScoresRoutes = require('./routes/scores');
+const registerLibraryRoutes = require('./routes/library');
 const { body, param, query, validationResult } = require('express-validator');
 
 const app = express();
@@ -484,6 +486,8 @@ registerLeaderboardRoutes(app, { db, cacheGet, cacheSet });
 registerStatsRoutes(app, { db, cacheGet, cacheSet });
 registerNewsRoutes(app, { db, authenticateToken, requireAdmin, handleValidationErrors });
 registerAnimeGuessesRoutes(app, { db });
+registerScoresRoutes(app, { db, authenticateToken, handleValidationErrors, invalidateCache });
+registerLibraryRoutes(app, { db, authenticateToken, handleValidationErrors });
 
 // ============ API ENDPOINTS ============
 
@@ -1202,63 +1206,6 @@ app.post('/api/anime-guesses/:id/check', authenticateToken, [
   });
 });
 
-// Сохранение библиотеки пользователя
-app.post('/api/library', authenticateToken, (req, res) => {
-  const { dataType, data } = req.body;
-  const userId = req.user.id;
-
-  if (!dataType) {
-    return res.status(400).json({ error: 'dataType is required' });
-  }
-
-  db.run(
-    `INSERT INTO user_libraries (user_id, data_type, data_content) 
-     VALUES (?, ?, ?)
-     ON CONFLICT(user_id, data_type) DO UPDATE SET data_content = ?`,
-    [userId, dataType, JSON.stringify(data), JSON.stringify(data)],
-    function(err) {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-
-      res.json({ success: true });
-    }
-  );
-});
-
-// Получение библиотеки пользователя
-app.get('/api/library', authenticateToken, [
-  query('type')
-    .optional()
-    .isIn(['watched', 'favorites', 'wishlist', 'dropped', 'ratings', 'notInterested', 'friends', 'friendRequestsIncoming', 'friendRequestsOutgoing', 'comments', 'notifications'])
-    .withMessage('Invalid dataType'),
-  handleValidationErrors
-], (req, res) => {
-  const userId = req.user.id;
-  const dataType = req.query.type;
-
-  let query = 'SELECT data_type, data_content FROM user_libraries WHERE user_id = ?';
-  let params = [userId];
-
-  if (dataType) {
-    query += ' AND data_type = ?';
-    params.push(dataType);
-  }
-
-  db.all(query, params, (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-
-    const library = {};
-    rows.forEach(row => {
-      library[row.data_type] = JSON.parse(row.data_content || '[]');
-    });
-
-    res.json(library);
-  });
-});
-
 // ==================== OPENINGS ENDPOINTS ====================
 
 // GET /api/openings - Получить опенинги (по дате или все)
@@ -1354,32 +1301,6 @@ app.delete('/api/openings/:id', authenticateToken, requireAdmin, (req, res) => {
 
     res.json({ success: true, deleted: this.changes });
   });
-});
-
-// Submit quiz score
-app.post('/api/scores', authenticateToken, (req, res) => {
-  const { quizType, score, date } = req.body;
-  
-  if (!quizType || typeof score !== 'number' || !date) {
-    return res.status(400).json({ error: 'quizType, score, and date are required' });
-  }
-  
-  const scoreId = `score_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-  
-  db.run(
-    'INSERT INTO user_scores (id, user_id, quiz_type, score, quiz_date, created_at) VALUES (?, ?, ?, ?, ?, ?)',
-    [scoreId, req.user.id, quizType, score, date, Date.now()],
-    function(err) {
-      if (err) {
-        console.error('[POST /api/scores] Error:', err);
-        return res.status(500).json({ error: err.message });
-      }
-      
-      console.log(`[POST /api/scores] Score submitted: ${score} points for ${quizType} by ${req.user.username}`);
-      invalidateCache();
-      res.json({ success: true, scoreId });
-    }
-  );
 });
 
 // ==================== BATTLE ENDPOINTS ====================
