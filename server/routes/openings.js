@@ -1,12 +1,15 @@
 const { body, param, query } = require('express-validator');
 
-module.exports = function registerOpeningsRoutes(app, { db, authenticateToken, requireAdmin, handleValidationErrors, invalidateCache }) {
+module.exports = function registerOpeningsRoutes(app, { db, authenticateToken, requireAdmin, handleValidationErrors, invalidateCache, cacheGet, cacheSet }) {
   // GET /api/openings - Получить опенинги (по дате или все)
   app.get('/api/openings', [
     query('date').optional().isLength({ max: 20 }),
     handleValidationErrors
   ], (req, res) => {
     const { date } = req.query;
+    const cacheKey = `openings:${date || 'all'}`;
+    const cached = cacheGet(cacheKey);
+    if (cached) return res.json(cached);
     
     let queryStr = 'SELECT id, title, youtube_url, start_time, end_time, quiz_date, created_at FROM openings';
     let params = [];
@@ -23,6 +26,7 @@ module.exports = function registerOpeningsRoutes(app, { db, authenticateToken, r
         console.error('[GET /api/openings] Error:', err);
         return res.status(500).json({ error: err.message });
       }
+      cacheSet(cacheKey, rows || [], 300); // 5 минут
       res.json(rows || []);
     });
   });

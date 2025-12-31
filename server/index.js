@@ -298,8 +298,8 @@ registerAnimeGuessesRoutes(app, { db });
 registerScoresRoutes(app, { db, authenticateToken, handleValidationErrors, invalidateCache });
 registerLibraryRoutes(app, { db, authenticateToken, handleValidationErrors });
 registerAuthRoutes(app, { db, bcrypt, jwt, SECRET, authenticateToken, avatarUpload, processAvatarImage, deleteOldAvatar, handleValidationErrors });
-registerBattleRoutes(app, { db, authenticateToken, requireAdmin, upload, handleValidationErrors, invalidateCache });
-registerOpeningsRoutes(app, { db, authenticateToken, requireAdmin, handleValidationErrors, invalidateCache });
+registerBattleRoutes(app, { db, authenticateToken, requireAdmin, upload, handleValidationErrors, invalidateCache, cacheGet, cacheSet });
+registerOpeningsRoutes(app, { db, authenticateToken, requireAdmin, handleValidationErrors, invalidateCache, cacheGet, cacheSet });
 registerPacksRoutes(app, { db, authenticateToken, requireAdmin, upload, uploadsDir, handleValidationErrors, invalidateCache });
 
 // ============ API ENDPOINTS ============

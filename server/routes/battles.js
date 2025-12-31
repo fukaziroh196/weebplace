@@ -1,6 +1,6 @@
 const { body, param, query } = require('express-validator');
 
-module.exports = function registerBattleRoutes(app, { db, authenticateToken, requireAdmin, upload, handleValidationErrors, invalidateCache }) {
+module.exports = function registerBattleRoutes(app, { db, authenticateToken, requireAdmin, upload, handleValidationErrors, invalidateCache, cacheGet, cacheSet }) {
   // GET /api/battle-packs - Получить список баттл паков
   app.get('/api/battle-packs', (req, res) => {
     db.all('SELECT id, name, description, created_at FROM battle_packs ORDER BY created_at DESC', [], (err, rows) => {
@@ -131,7 +131,7 @@ module.exports = function registerBattleRoutes(app, { db, authenticateToken, req
               }
               
               console.log(`[POST /api/battle-results] Results saved for ${req.user.username} on ${date}`);
-              invalidateCache();
+            invalidateCache();
               res.json({ success: true });
             }
           }
@@ -147,6 +147,9 @@ module.exports = function registerBattleRoutes(app, { db, authenticateToken, req
     handleValidationErrors
   ], (req, res) => {
     const { date, userId } = req.query;
+    const cacheKey = `battle-results:${date || 'na'}:${userId || 'na'}`;
+    const cached = cacheGet(cacheKey);
+    if (cached) return res.json(cached);
     
     let sql = `
       SELECT br.*, ab.title, ab.image_url as image 
@@ -177,6 +180,7 @@ module.exports = function registerBattleRoutes(app, { db, authenticateToken, req
         console.error('[GET /api/battle-results] Error:', err);
         return res.status(500).json({ error: err.message });
       }
+      cacheSet(cacheKey, rows || [], 120); // 2 минуты
       res.json(rows || []);
     });
   });
