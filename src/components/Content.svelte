@@ -419,7 +419,6 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                   <path d="M13.73 21a2 2 0 01-3.46 0"></path>
                 </svg>
               </span>
-              <span class="profile-nav-name">Уведомления</span>
               {#if $currentUser}
                 {#if $unreadCount > 0}
                   <span class="notif-dot notif-dot-count">{$unreadCount}</span>
