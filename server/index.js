@@ -13,6 +13,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const morgan = require('morgan');
+const { cache, get: cacheGet, set: cacheSet, flushAll: cacheFlushAll } = require('./cache');
 const { body, param, query, validationResult } = require('express-validator');
 
 const app = express();
@@ -456,6 +457,11 @@ function requireAdmin(req, res, next) {
   next();
 }
 
+// Кэширование: общая функция инвалидировать все кэши статистики/лидерборда
+function invalidateCache() {
+  cacheFlushAll();
+}
+
 // ============ ВАЛИДАЦИЯ ============
 // Middleware для обработки ошибок валидации
 const handleValidationErrors = (req, res, next) => {
@@ -743,30 +749,43 @@ app.get('/api/news', (req, res) => {
   let limit = parseInt(req.query.limit, 10);
   if (Number.isNaN(limit) || limit <= 0) limit = 12;
   limit = Math.min(Math.max(limit, 1), 50);
+  const page = Math.max(1, parseInt(req.query.page || '1', 10));
+  const offset = (page - 1) * limit;
 
-  db.all(
-    `SELECT n.id, n.text, n.created_at, n.user_id, u.username 
-     FROM project_news n 
-     LEFT JOIN users u ON u.id = n.user_id 
-     ORDER BY n.created_at DESC 
-     LIMIT ?`,
-    [limit],
-    (err, rows) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-      const items = (rows || []).map((row) => ({
-        id: row.id,
-        text: row.text,
-        createdAt: row.created_at,
-        author: {
-          id: row.user_id,
-          username: row.username || 'Администратор'
-        }
-      }));
-      res.json(items);
+  db.get('SELECT COUNT(*) as total FROM project_news', (countErr, countRow) => {
+    if (countErr) {
+      return res.status(500).json({ error: countErr.message });
     }
-  );
+    const total = countRow?.total || 0;
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+
+    db.all(
+      `SELECT n.id, n.text, n.created_at, n.user_id, u.username 
+       FROM project_news n 
+       LEFT JOIN users u ON u.id = n.user_id 
+       ORDER BY n.created_at DESC 
+       LIMIT ? OFFSET ?`,
+      [limit, offset],
+      (err, rows) => {
+        if (err) {
+          return res.status(500).json({ error: err.message });
+        }
+        const items = (rows || []).map((row) => ({
+          id: row.id,
+          text: row.text,
+          createdAt: row.created_at,
+          author: {
+            id: row.user_id,
+            username: row.username || 'Администратор'
+          }
+        }));
+        res.json({
+          items,
+          pagination: { page, limit, total, totalPages }
+        });
+      }
+    );
+  });
 });
 
 app.post('/api/news', authenticateToken, requireAdmin, (req, res) => {
@@ -950,6 +969,7 @@ app.post('/api/anime-guesses', authenticateToken, requireAdmin, upload.single('i
         return res.status(500).json({ error: err.message });
       }
 
+      invalidateCache();
       res.json({
         id: guessId,
         imageUrl,
@@ -1041,6 +1061,7 @@ app.post('/api/anime-guesses/batch', authenticateToken, requireAdmin, upload.sin
     // Remove uploaded zip to save space
     try { fs.unlinkSync(zipPath); } catch (_) {}
 
+    invalidateCache();
     res.json({ created, items: createdItems });
   } catch (e) {
     console.error(e);
@@ -1108,12 +1129,21 @@ app.get('/api/anime-guesses/batch/sample', (req, res) => {
 // Получить все картинки для "Угадай аниме"
 app.get('/api/anime-guesses', (req, res) => {
   const qDate = (req.query.date || '').trim();
-  const send = (err, guesses) => {
+  let limit = parseInt(req.query.limit || '50', 10);
+  if (Number.isNaN(limit) || limit <= 0) limit = 50;
+  limit = Math.min(Math.max(limit, 1), 200);
+  const page = Math.max(1, parseInt(req.query.page || '1', 10));
+  const offset = (page - 1) * limit;
+
+  const today = (() => { const t=new Date(); return `${t.getUTCFullYear()}-${String(t.getUTCMonth()+1).padStart(2,'0')}-${String(t.getUTCDate()).padStart(2,'0')}`; })();
+  const targetDate = qDate || today;
+
+  const send = (err, guesses, total, usedDate) => {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
 
-    const parsedGuesses = guesses.map(guess => ({
+    const parsedGuesses = (guesses || []).map(guess => ({
       id: guess.id,
       image: guess.image_url,
       title: guess.title,
@@ -1126,25 +1156,35 @@ app.get('/api/anime-guesses', (req, res) => {
       guessedBy: JSON.parse(guess.guessed_by || '[]')
     }));
 
-    res.json(parsedGuesses);
+    const totalPages = Math.max(1, Math.ceil((total || 0) / limit));
+
+    res.json({
+      items: parsedGuesses,
+      pagination: { page, limit, total: total || 0, totalPages },
+      quizDate: usedDate
+    });
   };
 
-  if (qDate) {
-    db.all('SELECT * FROM anime_guesses WHERE quiz_date = ? ORDER BY created_at DESC', [qDate], (err, rows) => send(err, rows));
-  } else {
-    // Prefer today's UTC date when not specified
-    const today = (() => { const t=new Date(); return `${t.getUTCFullYear()}-${String(t.getUTCMonth()+1).padStart(2,'0')}-${String(t.getUTCDate()).padStart(2,'0')}`; })();
-    db.all('SELECT * FROM anime_guesses WHERE quiz_date = ? ORDER BY created_at DESC', [today], (err, rows) => {
-      if (err) return send(err);
-      if (Array.isArray(rows) && rows.length) return send(null, rows);
-      // Fallback to latest non-empty date
-      db.get('SELECT quiz_date as d FROM anime_guesses WHERE quiz_date IS NOT NULL ORDER BY quiz_date DESC LIMIT 1', [], (e1, row) => {
-        const latest = row?.d || null;
-        if (!latest) return db.all('SELECT * FROM anime_guesses ORDER BY created_at DESC', [], (e2, rows2) => send(e2, rows2));
-        db.all('SELECT * FROM anime_guesses WHERE quiz_date = ? ORDER BY created_at DESC', [latest], (e3, rows3) => send(e3, rows3));
-      });
+  function fetchByDate(dateStr, fallbackAllowed = false) {
+    db.get('SELECT COUNT(*) as total FROM anime_guesses WHERE quiz_date = ?', [dateStr], (countErr, countRow) => {
+      if (countErr) return send(countErr);
+      const total = countRow?.total || 0;
+      if (total === 0 && fallbackAllowed) {
+        // Найти последнюю доступную дату
+        db.get('SELECT quiz_date FROM anime_guesses WHERE quiz_date IS NOT NULL ORDER BY quiz_date DESC LIMIT 1', (lastErr, lastRow) => {
+          if (lastErr) return send(lastErr);
+          const lastDate = lastRow?.quiz_date;
+          if (!lastDate) return send(null, [], 0, dateStr);
+          fetchByDate(lastDate, false);
+        });
+        return;
+      }
+
+      db.all('SELECT * FROM anime_guesses WHERE quiz_date = ? ORDER BY created_at DESC LIMIT ? OFFSET ?', [dateStr, limit, offset], (err, rows) => send(err, rows, total, dateStr));
     });
   }
+
+  fetchByDate(targetDate, !qDate);
 });
 
 // List available quiz dates (desc)
@@ -1274,6 +1314,7 @@ app.post('/api/packs', authenticateToken, requireAdmin, upload.fields([
                       return res.status(500).json({ error: `Commit failed: ${commitErr.message}` });
                     }
                     console.log(`[/api/packs] ✓✓✓ Successfully committed pack for ${quizDate} ✓✓✓`);
+                    invalidateCache();
                     res.json({ 
                       success: true,
                       created: createdItems.length, 
@@ -1296,6 +1337,12 @@ app.get('/api/leaderboard', (req, res) => {
   const limit = Math.max(1, Math.min(200, parseInt(req.query.limit || '50', 10)));
   const period = String(req.query.period || 'all'); // 'all' | 'week' | 'day'
   const dayParam = (req.query.date || '').trim();
+
+  const cacheKey = `leaderboard:${period}:${dayParam || 'na'}:${limit}`;
+  const cached = cacheGet(cacheKey);
+  if (cached) {
+    return res.json(cached);
+  }
 
   db.all('SELECT quiz_date, guessed_by FROM anime_guesses WHERE quiz_date IS NOT NULL', [], (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
@@ -1333,6 +1380,7 @@ app.get('/api/leaderboard', (req, res) => {
         if (e2) return res.status(500).json({ error: e2.message });
         const idToName = new Map((users || []).map(u => [u.id, u.username]));
         const top = results.slice(0, limit).map((r, idx) => ({ rank: idx + 1, userId: r.userId, username: idToName.get(r.userId) || 'user', guesses: r.guesses, metric: 'guesses', date: day }));
+        cacheSet(cacheKey, top, 60);
         res.json(top);
       });
       return;
@@ -1359,6 +1407,7 @@ app.get('/api/leaderboard', (req, res) => {
       if (e2) return res.status(500).json({ error: e2.message });
       const idToName = new Map((users || []).map(u => [u.id, u.username]));
       const top = results.slice(0, limit).map((r, idx) => ({ rank: idx + 1, userId: r.userId, username: idToName.get(r.userId) || 'user', days: r.days, metric: 'days' }));
+      cacheSet(cacheKey, top, 60);
       res.json(top);
     });
   });
@@ -1393,6 +1442,7 @@ app.delete('/api/anime-guesses/:id', authenticateToken, requireAdmin, [
         return res.status(500).json({ error: err.message });
       }
 
+      invalidateCache();
       res.json({ success: true });
     });
   });
@@ -1463,6 +1513,7 @@ app.post('/api/anime-guesses/:id/check', authenticateToken, [
             });
           }
           
+          invalidateCache();
           res.json({ correct: true, title: guess.title });
         }
       );
@@ -1531,6 +1582,10 @@ app.get('/api/library', authenticateToken, [
 
 // Глобальная статистика (самые угадываемые, быстрые игроки, последние режимы)
 app.get('/api/stats/global', async (req, res) => {
+  const cacheKey = 'stats:global';
+  const cached = cacheGet(cacheKey);
+  if (cached) return res.json(cached);
+
   const runQuery = (sql, params = []) =>
     new Promise((resolve, reject) => {
       db.all(sql, params, (err, rows) => {
@@ -1614,11 +1669,13 @@ app.get('/api/stats/global', async (req, res) => {
       plays: Number(row.plays) || 0
     }));
 
-    res.json({
+    const payload = {
       mostGuessedAnime,
       fastestPlayers,
       recentModes
-    });
+    };
+    cacheSet(cacheKey, payload, 300);
+    res.json(payload);
   } catch (error) {
     console.error('[stats/global] error:', error);
     res.status(500).json({ error: error.message || 'Не удалось загрузить статистику' });
@@ -1742,6 +1799,7 @@ app.post('/api/scores', authenticateToken, (req, res) => {
       }
       
       console.log(`[POST /api/scores] Score submitted: ${score} points for ${quizType} by ${req.user.username}`);
+      invalidateCache();
       res.json({ success: true, scoreId });
     }
   );
@@ -1866,6 +1924,7 @@ app.post('/api/battle-results', authenticateToken, (req, res) => {
             }
             
             console.log(`[POST /api/battle-results] Results saved for ${req.user.username} on ${date}`);
+            invalidateCache();
             res.json({ success: true });
           }
         }
