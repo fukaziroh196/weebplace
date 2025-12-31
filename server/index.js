@@ -243,8 +243,6 @@ function deleteOldAvatar(avatarUrl) {
   }
 }
 
-const { db } = require('./db');
-
 // Middleware для проверки JWT
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
