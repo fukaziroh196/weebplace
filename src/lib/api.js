@@ -154,6 +154,23 @@ export const auth = {
   },
 };
 
+// Notifications API
+export const notificationsApi = {
+  async list({ status = 'unread', limit = 50 } = {}) {
+    const search = new URLSearchParams();
+    if (status) search.set('status', status);
+    if (limit) search.set('limit', String(limit));
+    const suffix = search.toString() ? `?${search.toString()}` : '';
+    return await apiRequest(`/notifications${suffix}`);
+  },
+  async markRead(id) {
+    return await apiRequest(`/notifications/${encodeURIComponent(id)}/read`, { method: 'POST' });
+  },
+  async markAllRead() {
+    return await apiRequest('/notifications/read-all', { method: 'POST' });
+  }
+};
+
 // Stats API
 export const stats = {
   async me() {

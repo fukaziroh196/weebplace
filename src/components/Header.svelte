@@ -3,7 +3,8 @@
   import { clickOutside } from '../lib/clickOutside';
   import { goToSearch, goHome, goToDetails, goToMessages, goToProfile } from '../stores/ui';
   import UserMenu from './UserMenu.svelte';
-  import { currentUser, notifications } from '../stores/authApi';
+  import { currentUser } from '../stores/authApi';
+  import { notifications, unreadCount, loadUnreadNotifications, markAllNotificationsRead } from '../stores/notifications';
   import { unreadTotal } from '../stores/messages';
   import { theme, toggleTheme } from '../stores/theme';
   
@@ -16,7 +17,13 @@
 
   let suggestTimer;
   let showNotifications = false;
-  function toggleNotifications() { showNotifications = !showNotifications; }
+  async function toggleNotifications() { 
+    showNotifications = !showNotifications; 
+    if (showNotifications && $currentUser) {
+      await loadUnreadNotifications();
+      await markAllNotificationsRead();
+    }
+  }
   function onInput(e) {
     searchQuery = e.currentTarget.value;
     clearTimeout(suggestTimer);
@@ -118,8 +125,8 @@
           <path d="M18 8a6 6 0 10-12 0c0 7-3 8-3 8h18s-3-1-3-8"></path>
           <path d="M13.73 21a2 2 0 01-3.46 0"></path>
         </svg>
-        {#if $currentUser && $notifications.length}
-          <span class="absolute -top-1 -right-1 bg-pink-600 text-white text-xs rounded-full px-1.5 py-0.5">{$notifications.length}</span>
+        {#if $currentUser && $unreadCount > 0}
+          <span class="absolute -top-1 -right-1 bg-pink-600 text-white text-xs rounded-full px-1.5 py-0.5">{$unreadCount}</span>
         {/if}
       </button>
       {#if showNotifications}

@@ -1,5 +1,6 @@
 import { writable, get } from 'svelte/store';
 import { auth, library as libraryApi } from '../lib/api';
+import { loadUnreadNotifications, clearNotificationsStore } from './notifications';
 
 // Current user store
 export const currentUser = writable(null);
@@ -24,6 +25,7 @@ export async function loadCurrentUser() {
     const user = await auth.getMe();
     currentUser.set(user);
     await loadUserLibrary();
+    await loadUnreadNotifications().catch(() => {});
     return user;
   } catch (error) {
     currentUser.set(null);
@@ -66,6 +68,7 @@ export async function register(username, password) {
     const result = await auth.register(username, password);
     currentUser.set(result.user);
     await loadUserLibrary();
+    await loadUnreadNotifications().catch(() => {});
     return result.user;
   } catch (error) {
     throw error;
@@ -78,6 +81,7 @@ export async function login(username, password) {
     const result = await auth.login(username, password);
     currentUser.set(result.user);
     await loadUserLibrary();
+    await loadUnreadNotifications().catch(() => {});
     return result.user;
   } catch (error) {
     throw error;
@@ -98,7 +102,7 @@ export function logout() {
   friendRequestsIncoming.set([]);
   friendRequestsOutgoing.set([]);
   comments.set([]);
-  notifications.set([]);
+  clearNotificationsStore();
 }
 
 // Watch for changes and auto-save to API
