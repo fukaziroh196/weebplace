@@ -13,6 +13,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const morgan = require('morgan');
+const { body, param, query, validationResult } = require('express-validator');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -367,6 +368,63 @@ db.run(`CREATE TABLE IF NOT EXISTS anime_battles (
       }
     });
   });
+
+  // Таблица для угаданных квизов (решает race condition)
+  db.run(`CREATE TABLE IF NOT EXISTS quiz_guesses (
+    quiz_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    guessed_at INTEGER NOT NULL,
+    PRIMARY KEY (quiz_id, user_id),
+    FOREIGN KEY (quiz_id) REFERENCES anime_guesses(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  )`);
+
+  // ============ ИНДЕКСЫ ДЛЯ ОПТИМИЗАЦИИ ============
+  console.log('[DB] Creating indexes for performance...');
+  
+  // Индексы для anime_guesses
+  db.run(`CREATE INDEX IF NOT EXISTS idx_anime_guesses_quiz_date ON anime_guesses(quiz_date)`, (err) => {
+    if (err && !err.message.includes('already exists')) console.error('[DB] Index error:', err);
+  });
+  db.run(`CREATE INDEX IF NOT EXISTS idx_anime_guesses_user_id ON anime_guesses(user_id)`, (err) => {
+    if (err && !err.message.includes('already exists')) console.error('[DB] Index error:', err);
+  });
+  
+  // Индексы для user_scores
+  db.run(`CREATE INDEX IF NOT EXISTS idx_user_scores_user_id ON user_scores(user_id)`, (err) => {
+    if (err && !err.message.includes('already exists')) console.error('[DB] Index error:', err);
+  });
+  db.run(`CREATE INDEX IF NOT EXISTS idx_user_scores_quiz_date ON user_scores(quiz_date)`, (err) => {
+    if (err && !err.message.includes('already exists')) console.error('[DB] Index error:', err);
+  });
+  db.run(`CREATE INDEX IF NOT EXISTS idx_user_scores_quiz_type ON user_scores(quiz_type)`, (err) => {
+    if (err && !err.message.includes('already exists')) console.error('[DB] Index error:', err);
+  });
+  db.run(`CREATE INDEX IF NOT EXISTS idx_user_scores_user_type_date ON user_scores(user_id, quiz_type, quiz_date)`, (err) => {
+    if (err && !err.message.includes('already exists')) console.error('[DB] Index error:', err);
+  });
+  
+  // Индексы для battle_results
+  db.run(`CREATE INDEX IF NOT EXISTS idx_battle_results_user_date ON battle_results(user_id, quiz_date)`, (err) => {
+    if (err && !err.message.includes('already exists')) console.error('[DB] Index error:', err);
+  });
+  
+  // Индексы для openings
+  db.run(`CREATE INDEX IF NOT EXISTS idx_openings_quiz_date ON openings(quiz_date)`, (err) => {
+    if (err && !err.message.includes('already exists')) console.error('[DB] Index error:', err);
+  });
+  
+  // Индексы для project_news
+  db.run(`CREATE INDEX IF NOT EXISTS idx_project_news_created_at ON project_news(created_at DESC)`, (err) => {
+    if (err && !err.message.includes('already exists')) console.error('[DB] Index error:', err);
+  });
+  
+  // Индекс для quiz_guesses (уже есть PRIMARY KEY, но добавим для user_id)
+  db.run(`CREATE INDEX IF NOT EXISTS idx_quiz_guesses_user_id ON quiz_guesses(user_id)`, (err) => {
+    if (err && !err.message.includes('already exists')) console.error('[DB] Index error:', err);
+  });
+  
+  console.log('[DB] Indexes created successfully');
 });
 
 // Middleware для проверки JWT
@@ -398,15 +456,42 @@ function requireAdmin(req, res, next) {
   next();
 }
 
+// ============ ВАЛИДАЦИЯ ============
+// Middleware для обработки ошибок валидации
+const handleValidationErrors = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ 
+      error: 'Validation failed',
+      details: errors.array()
+    });
+  }
+  next();
+};
+
 // ============ API ENDPOINTS ============
 
 // Регистрация
-app.post('/api/register', async (req, res) => {
+app.post('/api/register', [
+  body('username')
+    .trim()
+    .isLength({ min: 3, max: 20 })
+    .withMessage('Username must be between 3 and 20 characters')
+    .matches(/^[a-zA-Z0-9_]+$/)
+    .withMessage('Username can only contain letters, numbers, and underscores')
+    .escape(),
+  body('password')
+    .isLength({ min: 4, max: 100 })
+    .withMessage('Password must be between 4 and 100 characters')
+    .custom((value) => {
+      if (value.includes(' ')) {
+        throw new Error('Password cannot contain spaces');
+      }
+      return true;
+    }),
+  handleValidationErrors
+], async (req, res) => {
   const { username, password } = req.body;
-
-  if (!username || !password || password.length < 4) {
-    return res.status(400).json({ error: 'Username and password (min 4 chars) required' });
-  }
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -433,7 +518,17 @@ app.post('/api/register', async (req, res) => {
 });
 
 // Логин
-app.post('/api/login', (req, res) => {
+app.post('/api/login', [
+  body('username')
+    .trim()
+    .notEmpty()
+    .withMessage('Username is required')
+    .escape(),
+  body('password')
+    .notEmpty()
+    .withMessage('Password is required'),
+  handleValidationErrors
+], (req, res) => {
   const { username, password } = req.body;
 
   db.get('SELECT * FROM users WHERE username = ?', [username], async (err, user) => {
@@ -728,21 +823,23 @@ app.post('/api/news', authenticateToken, requireAdmin, (req, res) => {
   );
 });
 
-app.patch('/api/news/:id', authenticateToken, requireAdmin, (req, res) => {
+app.patch('/api/news/:id', authenticateToken, requireAdmin, [
+  param('id')
+    .trim()
+    .notEmpty()
+    .withMessage('ID новости обязателен')
+    .escape(),
+  body('text')
+    .trim()
+    .notEmpty()
+    .withMessage('Текст новости не может быть пустым')
+    .isLength({ max: 280 })
+    .withMessage('Новость слишком длинная (максимум 280 символов)')
+    .escape(),
+  handleValidationErrors
+], (req, res) => {
   const id = (req.params?.id || '').trim();
   const text = (req.body?.text || '').trim();
-
-  if (!id) {
-    return res.status(400).json({ error: 'ID новости обязателен' });
-  }
-
-  if (!text) {
-    return res.status(400).json({ error: 'Текст новости не может быть пустым' });
-  }
-
-  if (text.length > 280) {
-    return res.status(400).json({ error: 'Новость слишком длинная (максимум 280 символов)' });
-  }
 
   db.run(
     'UPDATE project_news SET text = ?, created_at = ? WHERE id = ?',
@@ -790,12 +887,15 @@ app.patch('/api/news/:id', authenticateToken, requireAdmin, (req, res) => {
   );
 });
 
-app.delete('/api/news/:id', authenticateToken, requireAdmin, (req, res) => {
+app.delete('/api/news/:id', authenticateToken, requireAdmin, [
+  param('id')
+    .trim()
+    .notEmpty()
+    .withMessage('ID новости обязателен')
+    .escape(),
+  handleValidationErrors
+], (req, res) => {
   const id = (req.params?.id || '').trim();
-
-  if (!id) {
-    return res.status(400).json({ error: 'ID новости обязателен' });
-  }
 
   db.run(
     'DELETE FROM project_news WHERE id = ?',
@@ -1265,7 +1365,14 @@ app.get('/api/leaderboard', (req, res) => {
 });
 
 // Удалить картинку (только админ)
-app.delete('/api/anime-guesses/:id', authenticateToken, requireAdmin, (req, res) => {
+app.delete('/api/anime-guesses/:id', authenticateToken, requireAdmin, [
+  param('id')
+    .trim()
+    .notEmpty()
+    .withMessage('Quiz ID is required')
+    .escape(),
+  handleValidationErrors
+], (req, res) => {
   const { id } = req.params;
 
   // Сначала получим информацию о файле
@@ -1294,31 +1401,71 @@ app.delete('/api/anime-guesses/:id', authenticateToken, requireAdmin, (req, res)
 // Отдельный endpoint для подсказок больше не нужен - они загружаются с паком
 
 // Проверить ответ в игре
-app.post('/api/anime-guesses/:id/check', authenticateToken, (req, res) => {
+app.post('/api/anime-guesses/:id/check', authenticateToken, [
+  param('id')
+    .trim()
+    .notEmpty()
+    .withMessage('Quiz ID is required')
+    .escape(),
+  body('answer')
+    .trim()
+    .notEmpty()
+    .withMessage('Answer is required')
+    .isLength({ max: 200 })
+    .withMessage('Answer is too long')
+    .escape(),
+  handleValidationErrors
+], (req, res) => {
   const { id } = req.params;
   const { answer } = req.body;
 
   db.get('SELECT * FROM anime_guesses WHERE id = ?', [id], (err, guess) => {
-    if (err || !guess) {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    if (!guess) {
       return res.status(404).json({ error: 'Guess not found' });
     }
 
     const correct = answer.toLowerCase().trim() === guess.title.toLowerCase().trim();
     
     if (correct) {
-      // Добавить пользователя в список угадавших
-      const guessedBy = JSON.parse(guess.guessed_by || '[]');
-      if (!guessedBy.includes(req.user.id)) {
-        guessedBy.push(req.user.id);
-        
-        db.run('UPDATE anime_guesses SET guessed_by = ? WHERE id = ?', [JSON.stringify(guessedBy), id], (err) => {
-          if (err) {
-            return res.status(500).json({ error: err.message });
+      // Использование новой таблицы quiz_guesses для предотвращения race condition
+      // INSERT OR IGNORE гарантирует атомарность - если запись уже есть, она просто игнорируется
+      db.run(
+        'INSERT OR IGNORE INTO quiz_guesses (quiz_id, user_id, guessed_at) VALUES (?, ?, ?)',
+        [id, req.user.id, Date.now()],
+        function(insertErr) {
+          if (insertErr) {
+            console.error('[quiz check] Error inserting guess:', insertErr);
+            return res.status(500).json({ error: 'Failed to save guess' });
           }
-        });
-      }
-
-      res.json({ correct: true, title: guess.title });
+          
+          // Также обновляем старую таблицу для обратной совместимости (можно будет убрать позже)
+          // Но делаем это только если INSERT был успешным (this.changes > 0 означает что запись была добавлена)
+          if (this.changes > 0) {
+            db.get('SELECT guessed_by FROM anime_guesses WHERE id = ?', [id], (getErr, row) => {
+              if (!getErr && row) {
+                try {
+                  const guessedBy = JSON.parse(row.guessed_by || '[]');
+                  if (!guessedBy.includes(req.user.id)) {
+                    guessedBy.push(req.user.id);
+                    db.run('UPDATE anime_guesses SET guessed_by = ? WHERE id = ?', 
+                      [JSON.stringify(guessedBy), id], 
+                      (updateErr) => {
+                        if (updateErr) console.error('[quiz check] Error updating guessed_by:', updateErr);
+                      });
+                  }
+                } catch (parseErr) {
+                  console.error('[quiz check] Error parsing guessed_by:', parseErr);
+                }
+              }
+            });
+          }
+          
+          res.json({ correct: true, title: guess.title });
+        }
+      );
     } else {
       res.json({ correct: false });
     }
@@ -1350,7 +1497,13 @@ app.post('/api/library', authenticateToken, (req, res) => {
 });
 
 // Получение библиотеки пользователя
-app.get('/api/library', authenticateToken, (req, res) => {
+app.get('/api/library', authenticateToken, [
+  query('type')
+    .optional()
+    .isIn(['watched', 'favorites', 'wishlist', 'dropped', 'ratings', 'notInterested', 'friends', 'friendRequestsIncoming', 'friendRequestsOutgoing', 'comments', 'notifications'])
+    .withMessage('Invalid dataType'),
+  handleValidationErrors
+], (req, res) => {
   const userId = req.user.id;
   const dataType = req.query.type;
 

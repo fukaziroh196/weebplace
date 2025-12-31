@@ -386,10 +386,10 @@
             {/if}
           </div>
         </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-{/if}
+    {/if}
   </div>
 {/if}
 
