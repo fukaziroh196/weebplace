@@ -125,8 +125,13 @@
           <path d="M18 8a6 6 0 10-12 0c0 7-3 8-3 8h18s-3-1-3-8"></path>
           <path d="M13.73 21a2 2 0 01-3.46 0"></path>
         </svg>
-        {#if $currentUser && $unreadCount > 0}
-          <span class="absolute -top-1 -right-1 bg-pink-600 text-white text-xs rounded-full px-1.5 py-0.5">{$unreadCount}</span>
+        {#if $currentUser}
+          {#if $unreadCount > 0}
+            <span class="absolute -top-1 -right-1 bg-pink-600 text-white text-xs rounded-full px-1.5 py-0.5">{$unreadCount}</span>
+          {:else}
+            <!-- точка, чтобы колокольчик всегда был заметен -->
+            <span class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-white/50"></span>
+          {/if}
         {/if}
       </button>
       {#if showNotifications}
