@@ -20,6 +20,7 @@
   import { currentUser } from '../stores/authApi';
   import ProfileMenu from './ProfileMenu.svelte';
   import { newsFeed, loadNews, publishNews, updateNews, deleteNews } from '../stores/news';
+  import { notifications, unreadCount, loadUnreadNotifications, markAllNotificationsRead } from '../stores/notifications';
 
   // Quizzes-first app: remove anime viewing and banners; home shows quiz menu.
   
@@ -28,10 +29,13 @@
 let showReplay = false;
 let showProfileMenu = false;
 let showThemeMenu = false;
+let showNotifications = false;
 let profileButtonEl;
 let profileDropdownEl;
 let themeButtonEl;
 let themeDropdownEl;
+let notificationsButtonEl;
+let notificationsDropdownEl;
 
 const THEME_STORAGE_KEY = 'animeguessTheme';
 let theme = 'glass';
@@ -208,6 +212,14 @@ function toggleThemeMenu() {
 function closeThemeMenu() {
   showThemeMenu = false;
 }
+
+async function toggleNotifications() {
+  showNotifications = !showNotifications;
+  if (showNotifications && $currentUser) {
+    await loadUnreadNotifications();
+    await markAllNotificationsRead();
+  }
+}
   
 function handleClickOutside(event) {
   const target = event.target;
@@ -223,6 +235,13 @@ function handleClickOutside(event) {
     const onThemeButton = themeButtonEl && themeButtonEl.contains(target);
     if (!insideThemeDropdown && !onThemeButton) {
       showThemeMenu = false;
+    }
+  }
+  if (showNotifications) {
+    const insideN = notificationsDropdownEl && notificationsDropdownEl.contains(target);
+    const onN = notificationsButtonEl && notificationsButtonEl.contains(target);
+    if (!insideN && !onN) {
+      showNotifications = false;
     }
   }
   }
@@ -384,6 +403,52 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
           {/if}
         </div> -->
         <div class="profile-nav-wrapper">
+          <div class="notification-wrapper">
+            <button
+              class="profile-nav-button notification-button"
+              type="button"
+              bind:this={notificationsButtonEl}
+              on:click={toggleNotifications}
+              aria-haspopup="true"
+              aria-expanded={showNotifications}
+              aria-label="Уведомления"
+            >
+              <span class="profile-nav-avatar">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M18 8a6 6 0 10-12 0c0 7-3 8-3 8h18s-3-1-3-8"></path>
+                  <path d="M13.73 21a2 2 0 01-3.46 0"></path>
+                </svg>
+              </span>
+              <span class="profile-nav-name">Уведомления</span>
+              {#if $currentUser}
+                {#if $unreadCount > 0}
+                  <span class="notif-dot notif-dot-count">{$unreadCount}</span>
+                {:else}
+                  <span class="notif-dot notif-dot-faded"></span>
+                {/if}
+              {/if}
+            </button>
+            {#if showNotifications}
+              <div class="profile-dropdown notifications-dropdown" bind:this={notificationsDropdownEl}>
+                <div class="notifications-header">Уведомления</div>
+                {#if $notifications.length === 0}
+                  <div class="notifications-empty">Пока нет уведомлений</div>
+                {:else}
+                  <ul class="notifications-list">
+                    {#each $notifications as n (n.id)}
+                      <li class="notification-item">
+                        <div class="notification-title">{n.title}</div>
+                        {#if n.message}
+                          <div class="notification-message">{n.message}</div>
+                        {/if}
+                        <div class="notification-meta">{new Date(n.createdAt).toLocaleString()}</div>
+                      </li>
+                    {/each}
+                  </ul>
+                {/if}
+              </div>
+            {/if}
+          </div>
           <button
             class="profile-nav-button"
             type="button"
