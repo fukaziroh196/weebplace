@@ -14,6 +14,10 @@ const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const morgan = require('morgan');
 const { cache, get: cacheGet, set: cacheSet, flushAll: cacheFlushAll } = require('./cache');
+const registerLeaderboardRoutes = require('./routes/leaderboard');
+const registerStatsRoutes = require('./routes/stats');
+const registerNewsRoutes = require('./routes/news');
+const registerAnimeGuessesRoutes = require('./routes/animeGuesses');
 const { body, param, query, validationResult } = require('express-validator');
 
 const app = express();
@@ -475,6 +479,12 @@ const handleValidationErrors = (req, res, next) => {
   next();
 };
 
+// Подключение вынесенных роутов
+registerLeaderboardRoutes(app, { db, cacheGet, cacheSet });
+registerStatsRoutes(app, { db, cacheGet, cacheSet });
+registerNewsRoutes(app, { db, authenticateToken, requireAdmin, handleValidationErrors });
+registerAnimeGuessesRoutes(app, { db });
+
 // ============ API ENDPOINTS ============
 
 // Регистрация
@@ -744,195 +754,6 @@ app.get('/api/stats/me', authenticateToken, (req, res) => {
   });
 });
 
-// Новости проекта
-app.get('/api/news', (req, res) => {
-  let limit = parseInt(req.query.limit, 10);
-  if (Number.isNaN(limit) || limit <= 0) limit = 12;
-  limit = Math.min(Math.max(limit, 1), 50);
-  const page = Math.max(1, parseInt(req.query.page || '1', 10));
-  const offset = (page - 1) * limit;
-
-  db.get('SELECT COUNT(*) as total FROM project_news', (countErr, countRow) => {
-    if (countErr) {
-      return res.status(500).json({ error: countErr.message });
-    }
-    const total = countRow?.total || 0;
-    const totalPages = Math.max(1, Math.ceil(total / limit));
-
-    db.all(
-      `SELECT n.id, n.text, n.created_at, n.user_id, u.username 
-       FROM project_news n 
-       LEFT JOIN users u ON u.id = n.user_id 
-       ORDER BY n.created_at DESC 
-       LIMIT ? OFFSET ?`,
-      [limit, offset],
-      (err, rows) => {
-        if (err) {
-          return res.status(500).json({ error: err.message });
-        }
-        const items = (rows || []).map((row) => ({
-          id: row.id,
-          text: row.text,
-          createdAt: row.created_at,
-          author: {
-            id: row.user_id,
-            username: row.username || 'Администратор'
-          }
-        }));
-        res.json({
-          items,
-          pagination: { page, limit, total, totalPages }
-        });
-      }
-    );
-  });
-});
-
-app.post('/api/news', authenticateToken, requireAdmin, (req, res) => {
-  const text = (req.body?.text || '').trim();
-  if (!text) {
-    return res.status(400).json({ error: 'Текст новости не может быть пустым' });
-  }
-  if (text.length > 280) {
-    return res.status(400).json({ error: 'Новость слишком длинная (максимум 280 символов)' });
-  }
-
-  const id = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
-  const createdAt = Date.now();
-
-  db.run(
-    'INSERT INTO project_news (id, user_id, text, created_at) VALUES (?, ?, ?, ?)',
-    [id, req.user.id, text, createdAt],
-    (err) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-
-      db.get(
-        `SELECT n.id, n.text, n.created_at, n.user_id, u.username 
-         FROM project_news n 
-         LEFT JOIN users u ON u.id = n.user_id 
-         WHERE n.id = ?`,
-        [id],
-        (selectErr, row) => {
-          if (selectErr || !row) {
-            return res.status(200).json({
-              id,
-              text,
-              createdAt,
-              author: {
-                id: req.user.id,
-                username: req.user.username || 'Администратор'
-              }
-            });
-          }
-
-          res.json({
-            id: row.id,
-            text: row.text,
-            createdAt: row.created_at,
-            author: {
-              id: row.user_id,
-              username: row.username || 'Администратор'
-            }
-          });
-        }
-      );
-    }
-  );
-});
-
-app.patch('/api/news/:id', authenticateToken, requireAdmin, [
-  param('id')
-    .trim()
-    .notEmpty()
-    .withMessage('ID новости обязателен')
-    .escape(),
-  body('text')
-    .trim()
-    .notEmpty()
-    .withMessage('Текст новости не может быть пустым')
-    .isLength({ max: 280 })
-    .withMessage('Новость слишком длинная (максимум 280 символов)')
-    .escape(),
-  handleValidationErrors
-], (req, res) => {
-  const id = (req.params?.id || '').trim();
-  const text = (req.body?.text || '').trim();
-
-  db.run(
-    'UPDATE project_news SET text = ?, created_at = ? WHERE id = ?',
-    [text, Date.now(), id],
-    function(err) {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-
-      if (this.changes === 0) {
-        return res.status(404).json({ error: 'Новость не найдена' });
-      }
-
-      db.get(
-        `SELECT n.id, n.text, n.created_at, n.user_id, u.username 
-         FROM project_news n 
-         LEFT JOIN users u ON u.id = n.user_id 
-         WHERE n.id = ?`,
-        [id],
-        (selectErr, row) => {
-          if (selectErr || !row) {
-            return res.status(200).json({
-              id,
-              text,
-              createdAt: Date.now(),
-              author: {
-                id: req.user.id,
-                username: req.user.username || 'Администратор'
-              }
-            });
-          }
-
-          res.json({
-            id: row.id,
-            text: row.text,
-            createdAt: row.created_at,
-            author: {
-              id: row.user_id,
-              username: row.username || 'Администратор'
-            }
-          });
-        }
-      );
-    }
-  );
-});
-
-app.delete('/api/news/:id', authenticateToken, requireAdmin, [
-  param('id')
-    .trim()
-    .notEmpty()
-    .withMessage('ID новости обязателен')
-    .escape(),
-  handleValidationErrors
-], (req, res) => {
-  const id = (req.params?.id || '').trim();
-
-  db.run(
-    'DELETE FROM project_news WHERE id = ?',
-    [id],
-    function(err) {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-
-      if (this.changes === 0) {
-        return res.status(404).json({ error: 'Новость не найдена' });
-      }
-
-      res.json({ success: true });
-    }
-  );
-});
-
 // Загрузка картинки для "Угадай аниме" (только админ)
 app.post('/api/anime-guesses', authenticateToken, requireAdmin, upload.single('image'), (req, res) => {
   const { title, animeId, sourceId } = req.body;
@@ -1126,67 +947,6 @@ app.get('/api/anime-guesses/batch/sample', (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
-// Получить все картинки для "Угадай аниме"
-app.get('/api/anime-guesses', (req, res) => {
-  const qDate = (req.query.date || '').trim();
-  let limit = parseInt(req.query.limit || '50', 10);
-  if (Number.isNaN(limit) || limit <= 0) limit = 50;
-  limit = Math.min(Math.max(limit, 1), 200);
-  const page = Math.max(1, parseInt(req.query.page || '1', 10));
-  const offset = (page - 1) * limit;
-
-  const today = (() => { const t=new Date(); return `${t.getUTCFullYear()}-${String(t.getUTCMonth()+1).padStart(2,'0')}-${String(t.getUTCDate()).padStart(2,'0')}`; })();
-  const targetDate = qDate || today;
-
-  const send = (err, guesses, total, usedDate) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-
-    const parsedGuesses = (guesses || []).map(guess => ({
-      id: guess.id,
-      image: guess.image_url,
-      title: guess.title,
-      animeId: guess.anime_id,
-      sourceId: guess.source_id,
-      quizDate: guess.quiz_date,
-      hint1_image: guess.hint1_image,
-      hint2_image: guess.hint2_image,
-      createdAt: guess.created_at,
-      guessedBy: JSON.parse(guess.guessed_by || '[]')
-    }));
-
-    const totalPages = Math.max(1, Math.ceil((total || 0) / limit));
-
-    res.json({
-      items: parsedGuesses,
-      pagination: { page, limit, total: total || 0, totalPages },
-      quizDate: usedDate
-    });
-  };
-
-  function fetchByDate(dateStr, fallbackAllowed = false) {
-    db.get('SELECT COUNT(*) as total FROM anime_guesses WHERE quiz_date = ?', [dateStr], (countErr, countRow) => {
-      if (countErr) return send(countErr);
-      const total = countRow?.total || 0;
-      if (total === 0 && fallbackAllowed) {
-        // Найти последнюю доступную дату
-        db.get('SELECT quiz_date FROM anime_guesses WHERE quiz_date IS NOT NULL ORDER BY quiz_date DESC LIMIT 1', (lastErr, lastRow) => {
-          if (lastErr) return send(lastErr);
-          const lastDate = lastRow?.quiz_date;
-          if (!lastDate) return send(null, [], 0, dateStr);
-          fetchByDate(lastDate, false);
-        });
-        return;
-      }
-
-      db.all('SELECT * FROM anime_guesses WHERE quiz_date = ? ORDER BY created_at DESC LIMIT ? OFFSET ?', [dateStr, limit, offset], (err, rows) => send(err, rows, total, dateStr));
-    });
-  }
-
-  fetchByDate(targetDate, !qDate);
-});
-
 // List available quiz dates (desc)
 app.get('/api/anime-guesses/dates', (req, res) => {
   db.all('SELECT DISTINCT quiz_date as date FROM anime_guesses WHERE quiz_date IS NOT NULL ORDER BY quiz_date DESC', [], (err, rows) => {
@@ -1328,87 +1088,6 @@ app.post('/api/packs', authenticateToken, requireAdmin, upload.fields([
           );
         });
       });
-    });
-  });
-});
-
-// Leaderboard: count distinct quiz dates where user guessed at least one image
-app.get('/api/leaderboard', (req, res) => {
-  const limit = Math.max(1, Math.min(200, parseInt(req.query.limit || '50', 10)));
-  const period = String(req.query.period || 'all'); // 'all' | 'week' | 'day'
-  const dayParam = (req.query.date || '').trim();
-
-  const cacheKey = `leaderboard:${period}:${dayParam || 'na'}:${limit}`;
-  const cached = cacheGet(cacheKey);
-  if (cached) {
-    return res.json(cached);
-  }
-
-  db.all('SELECT quiz_date, guessed_by FROM anime_guesses WHERE quiz_date IS NOT NULL', [], (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
-
-    // Determine latest date if needed
-    const allDates = Array.from(new Set((rows || []).map(r => r.quiz_date).filter(Boolean))).sort();
-    const latest = allDates[allDates.length - 1] || null;
-
-    const inWeekRange = (d, end) => {
-      try {
-        const endDate = new Date(end + 'T00:00:00Z');
-        const startDate = new Date(endDate);
-        startDate.setUTCDate(startDate.getUTCDate() - 6);
-        const cur = new Date(d + 'T00:00:00Z');
-        return cur >= startDate && cur <= endDate;
-      } catch (_) { return false; }
-    };
-
-    if (period === 'day') {
-      const day = dayParam || latest;
-      const userIdToGuesses = new Map();
-      for (const r of rows || []) {
-        if (r.quiz_date !== day) continue;
-        let users = [];
-        try { users = JSON.parse(r.guessed_by || '[]'); } catch (_) { users = []; }
-        if (!Array.isArray(users)) continue;
-        for (const uid of users) {
-          if (!uid) continue;
-          userIdToGuesses.set(uid, (userIdToGuesses.get(uid) || 0) + 1);
-        }
-      }
-      const results = Array.from(userIdToGuesses.entries()).map(([userId, guesses]) => ({ userId, guesses }));
-      results.sort((a, b) => b.guesses - a.guesses);
-      db.all('SELECT id, username FROM users', [], (e2, users) => {
-        if (e2) return res.status(500).json({ error: e2.message });
-        const idToName = new Map((users || []).map(u => [u.id, u.username]));
-        const top = results.slice(0, limit).map((r, idx) => ({ rank: idx + 1, userId: r.userId, username: idToName.get(r.userId) || 'user', guesses: r.guesses, metric: 'guesses', date: day }));
-        cacheSet(cacheKey, top, 60);
-        res.json(top);
-      });
-      return;
-    }
-
-    // week or all
-    const userIdToDates = new Map();
-    for (const r of rows || []) {
-      const d = r.quiz_date;
-      if (!d) continue;
-      if (period === 'week' && latest && !inWeekRange(d, latest)) continue;
-      let users = [];
-      try { users = JSON.parse(r.guessed_by || '[]'); } catch (_) { users = []; }
-      if (!Array.isArray(users)) continue;
-      for (const uid of users) {
-        if (!uid) continue;
-        if (!userIdToDates.has(uid)) userIdToDates.set(uid, new Set());
-        userIdToDates.get(uid).add(d);
-      }
-    }
-    const results = Array.from(userIdToDates.entries()).map(([userId, dates]) => ({ userId, days: (dates ? dates.size : 0) }));
-    results.sort((a, b) => b.days - a.days);
-    db.all('SELECT id, username FROM users', [], (e2, users) => {
-      if (e2) return res.status(500).json({ error: e2.message });
-      const idToName = new Map((users || []).map(u => [u.id, u.username]));
-      const top = results.slice(0, limit).map((r, idx) => ({ rank: idx + 1, userId: r.userId, username: idToName.get(r.userId) || 'user', days: r.days, metric: 'days' }));
-      cacheSet(cacheKey, top, 60);
-      res.json(top);
     });
   });
 });
@@ -1578,108 +1257,6 @@ app.get('/api/library', authenticateToken, [
 
     res.json(library);
   });
-});
-
-// Глобальная статистика (самые угадываемые, быстрые игроки, последние режимы)
-app.get('/api/stats/global', async (req, res) => {
-  const cacheKey = 'stats:global';
-  const cached = cacheGet(cacheKey);
-  if (cached) return res.json(cached);
-
-  const runQuery = (sql, params = []) =>
-    new Promise((resolve, reject) => {
-      db.all(sql, params, (err, rows) => {
-        if (err) {
-          if (err.code === 'SQLITE_ERROR') {
-            return resolve([]);
-          }
-          return reject(err);
-        }
-        resolve(rows || []);
-      });
-    });
-
-  try {
-    const guessRows = await runQuery(`SELECT title, guessed_by FROM anime_guesses`);
-    const popularMap = new Map();
-    const playerGuessCount = new Map();
-
-    (guessRows || []).forEach((row) => {
-      let users = [];
-      try {
-        users = JSON.parse(row.guessed_by || '[]');
-      } catch (_) {
-        users = [];
-      }
-      if (!Array.isArray(users)) users = [];
-      const guessesCount = users.length;
-      if (guessesCount > 0) {
-        popularMap.set(row.title, (popularMap.get(row.title) || 0) + guessesCount);
-        users.forEach((uid) => {
-          if (!uid) return;
-          playerGuessCount.set(uid, (playerGuessCount.get(uid) || 0) + 1);
-        });
-      }
-    });
-
-    const mostGuessedAnime = Array.from(popularMap.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
-      .map(([title, guesses]) => ({ title, guesses }));
-
-    const scoreRows = await runQuery(
-      `SELECT user_id, SUM(score) as total_score
-       FROM user_scores
-       GROUP BY user_id
-       ORDER BY total_score DESC
-       LIMIT 5`
-    );
-
-    const userRows = await runQuery(`SELECT id, username FROM users`);
-    const userMap = new Map(userRows.map((u) => [u.id, u.username]));
-
-    let fastestPlayers = (scoreRows || []).map((row) => ({
-      userId: row.user_id,
-      username: userMap.get(row.user_id) || 'Игрок',
-      score: Number(row.total_score) || 0
-    }));
-
-    // Fallback: if there were no scores, use guess counts to highlight active players
-    if (!fastestPlayers.length && playerGuessCount.size) {
-      fastestPlayers = Array.from(playerGuessCount.entries())
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5)
-        .map(([userId, count]) => ({
-          userId,
-          username: userMap.get(userId) || 'Игрок',
-          score: count
-        }));
-    }
-
-    const modeRows = await runQuery(
-      `SELECT quiz_type, COUNT(*) as plays
-       FROM user_scores
-       GROUP BY quiz_type
-       ORDER BY plays DESC
-       LIMIT 5`
-    );
-
-    const recentModes = (modeRows || []).map((row) => ({
-      mode: row.quiz_type,
-      plays: Number(row.plays) || 0
-    }));
-
-    const payload = {
-      mostGuessedAnime,
-      fastestPlayers,
-      recentModes
-    };
-    cacheSet(cacheKey, payload, 300);
-    res.json(payload);
-  } catch (error) {
-    console.error('[stats/global] error:', error);
-    res.status(500).json({ error: error.message || 'Не удалось загрузить статистику' });
-  }
 });
 
 // ==================== OPENINGS ENDPOINTS ====================
