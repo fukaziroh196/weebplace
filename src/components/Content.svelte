@@ -83,8 +83,21 @@ function selectTheme(nextTheme) {
   showThemeMenu = false;
 }
 
-const goToHome = () => activeView.set('home');
-const goToProfile = () => activeView.set('profile');
+function navigateTo(path) {
+  if (typeof window !== 'undefined' && window.history?.pushState && window.location.pathname !== path) {
+    window.history.pushState(null, '', path);
+  }
+}
+
+const goToHome = () => {
+  navigateTo('/');
+  activeView.set('home');
+};
+
+const goToProfile = () => {
+  navigateTo('/profile');
+  activeView.set('profile');
+};
 
 function syncViewFromLocation() {
   if (typeof window === 'undefined') return;
