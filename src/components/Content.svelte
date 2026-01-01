@@ -106,9 +106,25 @@ onMount(() => {
 
     // Прямой заход по /nickname открывает публичный профиль (если ник существует)
     const path = window.location.pathname || '/';
-    const knownRoutes = ['/profile', '/friends', '/tournaments'];
+    const knownRoutes = ['/profile', '/friends', '/tournaments', '/'];
     const isUserRoute = path.startsWith('/user/');
-    if (path && path !== '/' && !path.startsWith('/api') && !path.startsWith('/uploads') && !path.startsWith('/assets') && !knownRoutes.includes(path) && !isUserRoute) {
+    if (path === '/profile') {
+      activeView.set('profile');
+    } else if (path === '/friends') {
+      activeView.set('profile');
+      friendsModalOpen.set(true);
+    } else if (path === '/tournaments') {
+      activeView.set('tournaments');
+    } else if (isUserRoute) {
+      const slug = path.replace(/^\/?user\//, '').replace(/\/+$/, '');
+      if (slug) {
+        loadPublicUserByUsername(slug)
+          .then((u) => {
+            if (u?.id) goToPublicProfile(u.id);
+          })
+          .catch(() => {});
+      }
+    } else if (!path.startsWith('/api') && !path.startsWith('/uploads') && !path.startsWith('/assets') && !knownRoutes.includes(path)) {
       const slug = path.replace(/^\/+|\/+$/g, '');
       if (slug) {
         loadPublicUserByUsername(slug)
