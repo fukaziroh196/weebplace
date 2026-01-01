@@ -12,9 +12,13 @@
   const routes = {
     '/': HomeRoute,
     '/profile': ProfileRoute,
+    '/profile/*': ProfileRoute,
     '/friends': FriendsRoute,
+    '/friends/*': FriendsRoute,
     '/user/:nickname': UserRoute,
+    '/user/:nickname/*': UserRoute,
     '/tournaments': TournamentsRoute,
+    '/tournaments/*': TournamentsRoute,
     // fallback
     '*': HomeRoute
   };

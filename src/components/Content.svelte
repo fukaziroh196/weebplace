@@ -91,7 +91,9 @@ onMount(() => {
   if (typeof window !== 'undefined') {
     // Прямой заход по /nickname открывает публичный профиль (если ник существует)
     const path = window.location.pathname || '/';
-    if (path && path !== '/' && !path.startsWith('/api') && !path.startsWith('/uploads') && !path.startsWith('/assets')) {
+    const knownRoutes = ['/profile', '/friends', '/tournaments'];
+    const isUserRoute = path.startsWith('/user/');
+    if (path && path !== '/' && !path.startsWith('/api') && !path.startsWith('/uploads') && !path.startsWith('/assets') && !knownRoutes.includes(path) && !isUserRoute) {
       const slug = path.replace(/^\/+|\/+$/g, '');
       if (slug) {
         loadPublicUserByUsername(slug)
