@@ -86,9 +86,24 @@ function selectTheme(nextTheme) {
 const goToHome = () => activeView.set('home');
 const goToProfile = () => activeView.set('profile');
 
-// Hash-based deep link for profile: /#/profile
 onMount(() => {
   if (typeof window !== 'undefined') {
+    // Legacy hash links: convert to history URLs
+    const legacyHash = (window.location.hash || '').replace(/^#/, '');
+    if (legacyHash.startsWith('/profile')) {
+      window.history.replaceState(null, '', '/profile');
+      activeView.set('profile');
+    } else if (legacyHash.startsWith('/friends')) {
+      window.history.replaceState(null, '', '/friends');
+      activeView.set('profile');
+      friendsModalOpen.set(true);
+    } else if (legacyHash.startsWith('/user/')) {
+      const slug = legacyHash.replace(/^\/?user\//, '');
+      if (slug) {
+        window.history.replaceState(null, '', `/user/${slug}`);
+      }
+    }
+
     // Прямой заход по /nickname открывает публичный профиль (если ник существует)
     const path = window.location.pathname || '/';
     const knownRoutes = ['/profile', '/friends', '/tournaments'];
