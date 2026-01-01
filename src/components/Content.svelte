@@ -139,17 +139,6 @@ onMount(() => {
     if (initialHash === 'profile') {
       activeView.set('profile');
     }
-    const unsub = activeView.subscribe((view) => {
-      if (!window.history?.replaceState) return;
-      if (view === 'profile') {
-        if (window.location.hash !== '#/profile') {
-          window.history.replaceState(null, '', '#/profile');
-        }
-      } else if (window.location.hash) {
-        window.history.replaceState(null, '', window.location.pathname + window.location.search);
-      }
-    });
-    return () => unsub?.();
   }
 });
 
