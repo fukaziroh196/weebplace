@@ -1,13 +1,26 @@
 import { writable } from 'svelte/store';
 import { setQuizDate, availableQuizDates } from './quizzes';
 
+// Detect initial view from URL (client-side)
+const initialPath = typeof window !== 'undefined' ? window.location.pathname : '/';
+const initialView =
+  initialPath === '/profile'
+    ? 'profile'
+    : initialPath === '/friends'
+      ? 'profile'
+      : initialPath === '/tournaments'
+        ? 'tournaments'
+        : initialPath.startsWith('/user/')
+          ? 'publicProfile'
+          : 'home';
+
 // Possible values: 'home' | 'search' | 'details' | 'profile' | 'publicProfile' | 'admin' | 'lists' | 'messages' | 'catalog' | 'aniquiz' | 'guessAnime' | 'guessCharacter' | 'guessOpening' | 'adminQuiz' | 'tournaments'
-export const activeView = writable('home');
+export const activeView = writable(initialView);
 export const detailsItem = writable(null); // { id, __sourceId, title?, image?, description? }
 export const sidebarCollapsed = writable(false);
 export const profileTab = writable('info'); // 'info' | 'achievements'
 export const publicProfileUserId = writable(null);
-export const friendsModalOpen = writable(false);
+export const friendsModalOpen = writable(initialPath === '/friends');
 
 export function goToSearch() {
   activeView.set('search');
