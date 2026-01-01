@@ -86,59 +86,71 @@ function selectTheme(nextTheme) {
 const goToHome = () => activeView.set('home');
 const goToProfile = () => activeView.set('profile');
 
+function syncViewFromLocation() {
+  if (typeof window === 'undefined') return;
+
+  // Legacy hash to history
+  const legacyHash = (window.location.hash || '').replace(/^#/, '');
+  if (legacyHash.startsWith('/profile')) {
+    window.history.replaceState(null, '', '/profile');
+  } else if (legacyHash.startsWith('/friends')) {
+    window.history.replaceState(null, '', '/friends');
+  } else if (legacyHash.startsWith('/user/')) {
+    const slug = legacyHash.replace(/^\/?user\//, '');
+    if (slug) window.history.replaceState(null, '', `/user/${slug}`);
+  }
+
+  const path = window.location.pathname || '/';
+  const knownRoutes = ['/profile', '/friends', '/tournaments', '/'];
+  const isUserRoute = path.startsWith('/user/');
+
+  if (path === '/profile') {
+    activeView.set('profile');
+    return;
+  }
+  if (path === '/friends') {
+    activeView.set('profile');
+    friendsModalOpen.set(true);
+    return;
+  }
+  if (path === '/tournaments') {
+    activeView.set('tournaments');
+    return;
+  }
+  if (isUserRoute) {
+    const slug = path.replace(/^\/?user\//, '').replace(/\/+$/, '');
+    if (slug) {
+      loadPublicUserByUsername(slug)
+        .then((u) => {
+          if (u?.id) goToPublicProfile(u.id);
+        })
+        .catch(() => {});
+    }
+    return;
+  }
+  if (!path.startsWith('/api') && !path.startsWith('/uploads') && !path.startsWith('/assets') && !knownRoutes.includes(path)) {
+    const slug = path.replace(/^\/+|\/+$/g, '');
+    if (slug) {
+      loadPublicUserByUsername(slug)
+        .then((u) => {
+          if (u?.id) goToPublicProfile(u.id);
+        })
+        .catch(() => {});
+    }
+  }
+}
+
+// Первичная синхронизация
+if (typeof window !== 'undefined') {
+  syncViewFromLocation();
+}
+
 onMount(() => {
   if (typeof window !== 'undefined') {
-    // Legacy hash links: convert to history URLs
-    const legacyHash = (window.location.hash || '').replace(/^#/, '');
-    if (legacyHash.startsWith('/profile')) {
-      window.history.replaceState(null, '', '/profile');
-      activeView.set('profile');
-    } else if (legacyHash.startsWith('/friends')) {
-      window.history.replaceState(null, '', '/friends');
-      activeView.set('profile');
-      friendsModalOpen.set(true);
-    } else if (legacyHash.startsWith('/user/')) {
-      const slug = legacyHash.replace(/^\/?user\//, '');
-      if (slug) {
-        window.history.replaceState(null, '', `/user/${slug}`);
-      }
-    }
-
-    // Прямой заход по /nickname открывает публичный профиль (если ник существует)
-    const path = window.location.pathname || '/';
-    const knownRoutes = ['/profile', '/friends', '/tournaments', '/'];
-    const isUserRoute = path.startsWith('/user/');
-    if (path === '/profile') {
-      activeView.set('profile');
-    } else if (path === '/friends') {
-      activeView.set('profile');
-      friendsModalOpen.set(true);
-    } else if (path === '/tournaments') {
-      activeView.set('tournaments');
-    } else if (isUserRoute) {
-      const slug = path.replace(/^\/?user\//, '').replace(/\/+$/, '');
-      if (slug) {
-        loadPublicUserByUsername(slug)
-          .then((u) => {
-            if (u?.id) goToPublicProfile(u.id);
-          })
-          .catch(() => {});
-      }
-    } else if (!path.startsWith('/api') && !path.startsWith('/uploads') && !path.startsWith('/assets') && !knownRoutes.includes(path)) {
-      const slug = path.replace(/^\/+|\/+$/g, '');
-      if (slug) {
-        loadPublicUserByUsername(slug)
-          .then((u) => {
-            if (u?.id) goToPublicProfile(u.id);
-          })
-          .catch(() => {});
-      }
-    }
-
-    const initialHash = (window.location.hash || '').replace(/^#\/?/, '').toLowerCase();
-    if (initialHash === 'profile') {
-      activeView.set('profile');
-    }
+    syncViewFromLocation();
+    const onPopState = () => syncViewFromLocation();
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
   }
 });
 
