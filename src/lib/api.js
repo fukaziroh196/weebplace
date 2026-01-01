@@ -204,6 +204,10 @@ export const usersApi = {
     if (limit) params.set('limit', String(limit));
     const suffix = params.toString() ? `?${params.toString()}` : '';
     return await apiRequest(`/users/search${suffix}`);
+  },
+  async get(id) {
+    if (!id) throw new Error('User ID required');
+    return await apiRequest(`/users/${encodeURIComponent(id)}`);
   }
 };
 

@@ -18,7 +18,7 @@
   } from '../stores/authApi';
   import { favorites, comments, addComment, removeFromFavorites } from '../stores/auth';
   import { userStats, loadUserStats } from '../stores/stats';
-  import { profileTab } from '../stores/ui';
+  import { profileTab, goToPublicProfile } from '../stores/ui';
   import AvatarCropper from './AvatarCropper.svelte';
   import AchievementsView from './AchievementsView.svelte';
   let mode = 'login';
@@ -330,6 +330,7 @@
               <div class="friend-req-item">
                 <span>{f.username}</span>
                 <div class="friend-req-actions">
+                  <button class="friend-accept" on:click={() => { closeFriendsModal(); goToPublicProfile(f.id); }}>Открыть профиль</button>
                   <button class="friend-decline" on:click={() => removeFriend(f.id)}>Удалить</button>
                 </div>
               </div>

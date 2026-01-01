@@ -21,6 +21,8 @@
   import ProfileMenu from './ProfileMenu.svelte';
   import { newsFeed, loadNews, publishNews, updateNews, deleteNews } from '../stores/news';
   import { notifications, unreadCount, loadUnreadNotifications, markAllNotificationsRead } from '../stores/notifications';
+  import { publicProfileUserId } from '../stores/ui';
+  import PublicProfileView from './PublicProfileView.svelte';
 
   // Quizzes-first app: remove anime viewing and banners; home shows quiz menu.
   
@@ -693,6 +695,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
           </main>
         {:else if $activeView === 'profile'}
           <ProfileView />
+        {:else if $activeView === 'publicProfile'}
+          <PublicProfileView />
         {:else if $activeView === 'lists'}
           <ListsView />
         {:else if $activeView === 'messages'}
