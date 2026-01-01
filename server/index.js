@@ -308,6 +308,16 @@ registerUsersRoutes(app, { db, handleValidationErrors });
 registerNotificationsRoutes(app, { db, authenticateToken, handleValidationErrors });
 registerFriendsRoutes(app, { db, authenticateToken, handleValidationErrors });
 
+// ======== SPA STATIC FALLBACK (if built frontend exists) ========
+const clientDistPath = path.join(__dirname, '..', 'dist');
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath, { index: false }));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) return next();
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+}
+
 // ============ API ENDPOINTS ============
 
 // Статистика пользователя: уникальные дни, текущее/лучшее комбо, распределение по датам
