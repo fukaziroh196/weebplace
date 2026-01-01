@@ -82,6 +82,27 @@ function selectTheme(nextTheme) {
 const goToHome = () => activeView.set('home');
 const goToProfile = () => activeView.set('profile');
 
+// Hash-based deep link for profile: /#/profile
+onMount(() => {
+  if (typeof window !== 'undefined') {
+    const initialHash = (window.location.hash || '').replace(/^#\/?/, '').toLowerCase();
+    if (initialHash === 'profile') {
+      activeView.set('profile');
+    }
+    const unsub = activeView.subscribe((view) => {
+      if (!window.history?.replaceState) return;
+      if (view === 'profile') {
+        if (window.location.hash !== '#/profile') {
+          window.history.replaceState(null, '', '#/profile');
+        }
+      } else if (window.location.hash) {
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+    });
+    return () => unsub?.();
+  }
+});
+
 const baseMenuItems = [];
 
 $: isAdmin = $currentUser?.role === 'admin' || $currentUser?.is_admin === 1 || $currentUser?.isAdmin === true;
