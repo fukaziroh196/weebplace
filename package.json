@@ -7,7 +7,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "hls.js": "^1.5.8"
+    "hls.js": "^1.5.8",
+    "svelte-spa-router": "^3.3.0"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.0.0",

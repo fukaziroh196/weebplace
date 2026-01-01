@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import { searchResults, isSearching } from '../stores/sources';
-  import { activeView } from '../stores/ui';
+  import { activeView, goToPublicProfile } from '../stores/ui';
   import { gameState } from '../stores/gameState';
   import ProfileView from './ProfileView.svelte';
   import AdminPanel from './AdminPanel.svelte';
@@ -13,6 +13,7 @@
   import GuessOpeningView from './GuessOpeningView.svelte';
   import BattlePackSelector from './BattlePackSelector.svelte';
   import AdminQuizPanel from './AdminQuizPanel.svelte';
+  import TournamentsView from './TournamentsView.svelte';
   import { availableQuizDates, refreshQuizDates } from '../stores/quizzes';
   import { userStats, loadUserStats, loadGlobalStats, globalStats } from '../stores/stats';
   import { leaderboard, leaderboardPeriod, refreshLeaderboard } from '../stores/leaderboard';
@@ -21,6 +22,7 @@
   import ProfileMenu from './ProfileMenu.svelte';
   import { newsFeed, loadNews, publishNews, updateNews, deleteNews } from '../stores/news';
   import { notifications, unreadCount, loadUnreadNotifications, markAllNotificationsRead } from '../stores/notifications';
+  import { loadPublicUserByUsername } from '../stores/users';
   import { publicProfileUserId } from '../stores/ui';
   import PublicProfileView from './PublicProfileView.svelte';
 
@@ -87,6 +89,19 @@ const goToProfile = () => activeView.set('profile');
 // Hash-based deep link for profile: /#/profile
 onMount(() => {
   if (typeof window !== 'undefined') {
+    // Прямой заход по /nickname открывает публичный профиль (если ник существует)
+    const path = window.location.pathname || '/';
+    if (path && path !== '/' && !path.startsWith('/api') && !path.startsWith('/uploads') && !path.startsWith('/assets')) {
+      const slug = path.replace(/^\/+|\/+$/g, '');
+      if (slug) {
+        loadPublicUserByUsername(slug)
+          .then((u) => {
+            if (u?.id) goToPublicProfile(u.id);
+          })
+          .catch(() => {});
+      }
+    }
+
     const initialHash = (window.location.hash || '').replace(/^#\/?/, '').toLowerCase();
     if (initialHash === 'profile') {
       activeView.set('profile');
@@ -711,6 +726,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
           <GuessOpeningView />
         {:else if $activeView === 'guessBattle'}
           <BattlePackSelector />
+        {:else if $activeView === 'tournaments'}
+          <TournamentsView />
         {:else if $activeView === 'adminQuiz'}
           <AdminQuizPanel />
         {:else if $activeView === 'admin'}

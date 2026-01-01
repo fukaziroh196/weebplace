@@ -30,6 +30,28 @@ module.exports = function registerUsersRoutes(app, { db, handleValidationErrors 
     );
   });
 
+  // Профиль по username (регистронезависимо)
+  app.get('/api/users/by-username/:username', [
+    param('username')
+      .trim()
+      .isLength({ min: 2, max: 50 })
+      .withMessage('username must be 2-50 chars'),
+    handleValidationErrors
+  ], (req, res) => {
+    const username = (req.params.username || '').trim();
+    db.get(
+      `SELECT id, username, avatar_url AS avatarUrl, created_at AS createdAt, is_admin AS isAdmin
+       FROM users
+       WHERE username = ? COLLATE NOCASE`,
+      [username],
+      (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!row) return res.status(404).json({ error: 'User not found' });
+        res.json(row);
+      }
+    );
+  });
+
   // Публичный профиль пользователя (минимальные данные)
   app.get('/api/users/:id', [
     param('id').trim().notEmpty().withMessage('User ID is required'),

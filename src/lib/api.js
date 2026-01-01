@@ -208,6 +208,11 @@ export const usersApi = {
   async get(id) {
     if (!id) throw new Error('User ID required');
     return await apiRequest(`/users/${encodeURIComponent(id)}`);
+  },
+  async getByUsername(username) {
+    const name = (username || '').trim();
+    if (!name) throw new Error('Username required');
+    return await apiRequest(`/users/by-username/${encodeURIComponent(name)}`);
   }
 };
 

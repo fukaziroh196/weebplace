@@ -1,8 +1,23 @@
 <script>
-  import Content from './components/Content.svelte';
+  import Router from 'svelte-spa-router';
+  import HomeRoute from './routes/HomeRoute.svelte';
+  import ProfileRoute from './routes/ProfileRoute.svelte';
+  import FriendsRoute from './routes/FriendsRoute.svelte';
+  import UserRoute from './routes/UserRoute.svelte';
+  import TournamentsRoute from './routes/TournamentsRoute.svelte';
 
   let showTop = false;
   let scrollEl;
+
+  const routes = {
+    '/': HomeRoute,
+    '/profile': ProfileRoute,
+    '/friends': FriendsRoute,
+    '/user/:nickname': UserRoute,
+    '/tournaments': TournamentsRoute,
+    // fallback
+    '*': HomeRoute
+  };
 </script>
 
 <div class="app-container">
@@ -19,7 +34,7 @@
     <!-- Content область -->
     <div class="content-container">
       <div class="content-scroll" bind:this={scrollEl}>
-        <Content />
+        <Router {routes} useHash={false} />
       </div>
     </div>
   </div>

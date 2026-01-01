@@ -18,7 +18,7 @@
   } from '../stores/authApi';
   import { favorites, comments, addComment, removeFromFavorites } from '../stores/auth';
   import { userStats, loadUserStats } from '../stores/stats';
-  import { profileTab, goToPublicProfile } from '../stores/ui';
+  import { profileTab, goToPublicProfile, friendsModalOpen } from '../stores/ui';
   import AvatarCropper from './AvatarCropper.svelte';
   import AchievementsView from './AchievementsView.svelte';
   let mode = 'login';
@@ -31,6 +31,7 @@
   let friendName = '';
   let friendMsg = '';
   let showFriendsModal = false;
+  $: showFriendsModal = $friendsModalOpen;
 
   // Мини-отображение достижений (иконки + кнопка "Все достижения")
   const allAchievementsMini = [
@@ -97,7 +98,7 @@
   }
 
   function closeFriendsModal() {
-    showFriendsModal = false;
+    friendsModalOpen.set(false);
   }
 
   async function submit() {
@@ -215,7 +216,7 @@
       </button>
       <button 
         class="profile-tab friends-tab"
-        on:click={() => showFriendsModal = true}>
+        on:click={() => friendsModalOpen.set(true)}>
         👥 Друзья
       </button>
     </div>
@@ -262,7 +263,7 @@
             <h2 class="section-title">Друзья</h2>
             <div class="glass-panel">
               <p class="friend-inline-hint">Управляйте друзьями через всплывающее меню.</p>
-              <button class="comment-submit" on:click={() => showFriendsModal = true}>Открыть друзей</button>
+              <button class="comment-submit" on:click={() => friendsModalOpen.set(true)}>Открыть друзей</button>
             </div>
           </div>
 
