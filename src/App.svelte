@@ -15,10 +15,13 @@
     '/profile/*': ProfileRoute,
     '/friends': FriendsRoute,
     '/friends/*': FriendsRoute,
-    '/user/:nickname': UserRoute,
-    '/user/:nickname/*': UserRoute,
     '/tournaments': TournamentsRoute,
     '/tournaments/*': TournamentsRoute,
+    // Старый формат /user/nickname (для обратной совместимости)
+    '/user/:nickname': UserRoute,
+    '/user/:nickname/*': UserRoute,
+    // Короткий формат /{nickname} - должен быть последним перед fallback
+    '/:nickname': UserRoute,
     // fallback
     '*': HomeRoute
   };

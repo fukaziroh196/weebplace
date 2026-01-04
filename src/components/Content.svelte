@@ -144,27 +144,43 @@ function syncViewFromLocation() {
     activeView.set('tournaments');
     return;
   }
+  // Поддержка старого формата /user/nickname (редирект на новый)
   if (isUserRoute) {
     const slug = path.replace(/^\/?user\//, '').replace(/\/+$/, '');
     if (slug) {
       loadPublicUserByUsername(slug)
         .then((u) => {
-          if (u?.id) goToPublicProfile(u.id);
+          if (u?.id) {
+            goToPublicProfile(u.id, u.username || slug);
+          }
         })
-        .catch(() => {});
+        .catch(() => {
+          activeView.set('home');
+        });
     }
     return;
   }
+  
+  // Короткий формат /{username} - любой путь который не зарезервирован
   if (!path.startsWith('/api') && !path.startsWith('/uploads') && !path.startsWith('/assets') && !knownRoutes.includes(path)) {
     const slug = path.replace(/^\/+|\/+$/g, '');
     if (slug) {
       loadPublicUserByUsername(slug)
         .then((u) => {
-          if (u?.id) goToPublicProfile(u.id);
+          if (u?.id) {
+            goToPublicProfile(u.id, u.username || slug);
+          }
         })
-        .catch(() => {});
+        .catch(() => {
+          // Пользователь не найден - показываем главную
+          activeView.set('home');
+        });
+      return;
     }
   }
+  
+  // Fallback на главную
+  activeView.set('home');
 }
 
 // Первичная синхронизация

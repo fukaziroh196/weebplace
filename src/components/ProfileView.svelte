@@ -331,7 +331,7 @@
               <div class="friend-req-item">
                 <span>{f.username}</span>
                 <div class="friend-req-actions">
-                  <button class="friend-accept" on:click={() => { closeFriendsModal(); goToPublicProfile(f.id); }}>Открыть профиль</button>
+                  <button class="friend-accept" on:click={() => { closeFriendsModal(); goToPublicProfile(f.id, f.username); }}>Открыть профиль</button>
                   <button class="friend-decline" on:click={() => removeFriend(f.id)}>Удалить</button>
                 </div>
               </div>
