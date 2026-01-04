@@ -126,6 +126,11 @@ function syncViewFromLocation() {
   const knownRoutes = ['/profile', '/friends', '/tournaments', '/'];
   const isUserRoute = path.startsWith('/user/');
 
+  // Главная страница
+  if (path === '/') {
+    activeView.set('home');
+    return;
+  }
   if (path === '/profile') {
     activeView.set('profile');
     return;

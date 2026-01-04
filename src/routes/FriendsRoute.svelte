@@ -1,12 +1,6 @@
 <script>
-  import { onMount } from 'svelte';
   import Content from '../components/Content.svelte';
-  import { activeView, friendsModalOpen } from '../stores/ui';
-
-  onMount(() => {
-    activeView.set('profile');
-    friendsModalOpen.set(true);
-  });
+  // activeView и friendsModalOpen устанавливаются в Content.svelte через syncViewFromLocation
 </script>
 
 <Content />
