@@ -99,6 +99,15 @@ const goToProfile = () => {
   activeView.set('profile');
 };
 
+function normalizePath(p) {
+  if (!p) return '/';
+  try {
+    return p.replace(/\/+$/, '') || '/';
+  } catch (_) {
+    return '/';
+  }
+}
+
 function syncViewFromLocation() {
   if (typeof window === 'undefined') return;
 
@@ -113,7 +122,7 @@ function syncViewFromLocation() {
     if (slug) window.history.replaceState(null, '', `/user/${slug}`);
   }
 
-  const path = window.location.pathname || '/';
+  const path = normalizePath(window.location.pathname || '/');
   const knownRoutes = ['/profile', '/friends', '/tournaments', '/'];
   const isUserRoute = path.startsWith('/user/');
 

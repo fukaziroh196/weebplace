@@ -2,7 +2,16 @@ import { writable } from 'svelte/store';
 import { setQuizDate, availableQuizDates } from './quizzes';
 
 // Detect initial view from URL (client-side)
-const initialPath = typeof window !== 'undefined' ? window.location.pathname : '/';
+const normalizePath = (p) => {
+  if (!p) return '/';
+  try {
+    // drop trailing slashes, keep root
+    return p.replace(/\/+$/, '') || '/';
+  } catch (_) {
+    return '/';
+  }
+};
+const initialPath = typeof window !== 'undefined' ? normalizePath(window.location.pathname) : '/';
 const initialView =
   initialPath === '/profile'
     ? 'profile'
