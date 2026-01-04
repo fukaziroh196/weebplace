@@ -4,6 +4,24 @@ import { svelte } from '@sveltejs/vite-plugin-svelte';
 export default {
   plugins: [
     svelte(),
+    // SPA fallback - redirect all non-file requests to index.html
+    {
+      name: 'spa-fallback',
+      configureServer(server) {
+        return () => {
+          server.middlewares.use((req, res, next) => {
+            const url = req.url || '';
+            // Skip files with extensions, API routes, and proxy
+            if (url.includes('.') || url.startsWith('/api') || url.startsWith('/proxy')) {
+              return next();
+            }
+            // Rewrite to index.html for SPA routing
+            req.url = '/index.html';
+            next();
+          });
+        };
+      }
+    },
     // Lightweight dev-only proxy to bypass CORS when running in the browser
     {
       name: 'dev-proxy',
