@@ -465,7 +465,16 @@
   .profile-page {
     min-height: 100%;
     padding: 0;
+    margin: -20px;
+    margin-bottom: 0;
     color: var(--text-primary, #f5f6ff);
+  }
+
+  @media (max-width: 768px) {
+    .profile-page {
+      margin: -12px;
+      margin-bottom: 0;
+    }
   }
 
   /* Состояния */
