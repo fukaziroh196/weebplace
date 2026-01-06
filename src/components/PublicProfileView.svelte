@@ -526,21 +526,19 @@
     margin-left: 0.75rem;
   }
 
-  /* 2K экраны */
+  /* 2K экраны (2560x1440) - масштабируем как 1080p */
   @media (min-width: 2000px) {
-    .profile-layout {
-      max-width: 1100px;
-      grid-template-columns: 300px 1fr;
-      gap: 1.5rem;
+    .profile-page {
+      transform: scale(1.33);
+      transform-origin: top left;
     }
   }
 
-  /* 4K экраны */
+  /* 4K экраны (3840x2160) */
   @media (min-width: 3000px) {
-    .profile-layout {
-      max-width: 1400px;
-      grid-template-columns: 350px 1fr;
-      gap: 2rem;
+    .profile-page {
+      transform: scale(2);
+      transform-origin: top left;
     }
   }
 
