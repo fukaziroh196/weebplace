@@ -588,7 +588,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     </header>
 
     <div class="page-layout">
-      <div class="page-main">
+      <div class="page-main" class:full-width={$activeView === 'publicProfile' || $activeView === 'profile'}>
         {#if $activeView === 'home' || $activeView === 'aniquiz'}
           <main class="hero-main">
             <div class="dashboard-row">
@@ -1183,6 +1183,11 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     gap: 0.75rem;
     overflow: visible;
     margin: 0 auto;
+  }
+
+  .page-main.full-width {
+    max-width: 100%;
+    margin: 0;
   }
 
   .leaderboard-panel {
