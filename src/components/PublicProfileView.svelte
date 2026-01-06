@@ -563,10 +563,10 @@
   /* Layout */
   .profile-layout {
     display: grid;
-    grid-template-columns: 320px 1fr;
+    grid-template-columns: 300px 1fr;
     gap: 1.5rem;
-    max-width: 1400px;
-    margin: 0 auto;
+    max-width: 1200px;
+    margin: 0;
   }
 
   /* Сайдбар */
