@@ -1,10 +1,10 @@
 <script>
   import { currentUser, login, register, logout } from '../stores/authApi';
-  import { goToProfile, goToAchievements, goToAdminQuiz } from '../stores/ui';
+  import { goToPublicProfile, goToAchievements, goToAdminQuiz } from '../stores/ui';
   
   export let isAdmin = false;
   let mode = 'login'; // 'login' | 'register'
-  let username = '';
+  let usernameInput = '';
   let password = '';
   let error = '';
   let loading = false;
@@ -14,11 +14,11 @@
     loading = true;
     try {
       if (mode === 'login') {
-        await login(username, password);
+        await login(usernameInput, password);
       } else {
-        await register(username, password);
+        await register(usernameInput, password);
       }
-      username = '';
+      usernameInput = '';
       password = '';
     } catch (e) {
       error = e?.message || 'Ошибка';
@@ -32,7 +32,10 @@
   }
 
   function handleProfileClick() {
-    goToProfile();
+    // Переход в свой профиль по короткому URL /{username}
+    if ($currentUser?.id && $currentUser?.username) {
+      goToPublicProfile($currentUser.id, $currentUser.username);
+    }
     window.dispatchEvent(new CustomEvent('closeProfileMenu'));
   }
 
@@ -125,7 +128,7 @@
         <input 
           type="text" 
           id="username" 
-          bind:value={username} 
+          bind:value={usernameInput} 
           placeholder="Введите имя" 
           required
           disabled={loading}
