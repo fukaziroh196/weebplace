@@ -523,12 +523,12 @@
     grid-template-columns: 260px 1fr;
     gap: 1.25rem;
     max-width: 950px;
-    margin-left: clamp(1rem, 5vw, 4rem);
+    margin-left: clamp(0.5rem, 2vw, 1.5rem);
   }
 
   @media (max-width: 1200px) {
     .profile-layout {
-      margin-left: clamp(0.5rem, 3vw, 2rem);
+      margin-left: clamp(0.25rem, 1.5vw, 1rem);
       max-width: 900px;
     }
   }
