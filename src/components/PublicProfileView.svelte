@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { publicProfileUserId, goHome, goToPublicProfile } from '../stores/ui';
+  import { publicProfileUserId, goToPublicProfile } from '../stores/ui';
   import { publicUser, publicUserLoading, publicUserError, loadPublicUser, clearPublicUser } from '../stores/users';
   import { currentUser, friends, friendProfiles, refreshFriendState } from '../stores/authApi';
   import { sendFriendRequest, removeFriend, friendRequestsOutgoing } from '../stores/authApi';
@@ -109,16 +109,6 @@
 </script>
 
 <div class="profile-page">
-  <!-- Навигация -->
-  <nav class="profile-nav">
-    <button class="back-button" on:click={() => goHome()}>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M19 12H5M12 19l-7-7 7-7"/>
-      </svg>
-      <span>На главную</span>
-    </button>
-  </nav>
-
   {#if $publicUserLoading}
     <div class="loading-state">
       <div class="loading-spinner"></div>
@@ -129,7 +119,6 @@
       <div class="error-icon">😕</div>
       <h2>Пользователь не найден</h2>
       <p>{$publicUserError}</p>
-      <button class="primary-button" on:click={() => goHome()}>На главную</button>
     </div>
   {:else if !$publicUser}
     <div class="empty-state">
@@ -479,37 +468,6 @@
     color: var(--text-primary, #f5f6ff);
   }
 
-  /* Навигация */
-  .profile-nav {
-    margin-bottom: 1.5rem;
-  }
-
-  .back-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.6rem 1.2rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 999px;
-    color: var(--text-primary, #f5f6ff);
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    backdrop-filter: blur(10px);
-  }
-
-  .back-button:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: translateX(-4px);
-  }
-
-  .back-button svg {
-    width: 18px;
-    height: 18px;
-  }
-
   /* Состояния */
   .loading-state, .error-state, .empty-state {
     display: flex;
@@ -547,17 +505,7 @@
 
   .error-state p, .empty-state p {
     color: var(--text-secondary);
-    margin: 0 0 1.5rem;
-  }
-
-  .primary-button {
-    padding: 0.75rem 1.5rem;
-    background: linear-gradient(135deg, #9ecaff 0%, #7eb8ff 100%);
-    border: none;
-    border-radius: 999px;
-    color: #1a1a2e;
-    font-weight: 700;
-    cursor: pointer;
+    margin: 0;
   }
 
   /* Layout */
@@ -565,8 +513,7 @@
     display: grid;
     grid-template-columns: 300px 1fr;
     gap: 1.5rem;
-    max-width: 1200px;
-    margin: 0;
+    max-width: 1100px;
   }
 
   /* Сайдбар */
