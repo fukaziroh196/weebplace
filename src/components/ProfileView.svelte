@@ -329,7 +329,7 @@
           <div class="friend-req-list">
             {#each $friendProfiles as f (f.id)}
               <div class="friend-req-item">
-                <span>{f.username}</span>
+                <button class="friend-username" on:click={() => { closeFriendsModal(); goToPublicProfile(f.id, f.username); }}>{f.username}</button>
                 <div class="friend-req-actions">
                   <button class="friend-accept" on:click={() => { closeFriendsModal(); goToPublicProfile(f.id, f.username); }}>Открыть профиль</button>
                   <button class="friend-decline" on:click={() => removeFriend(f.id)}>Удалить</button>
@@ -782,6 +782,20 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 0.75rem;
     padding: 0.65rem 0.75rem;
+  }
+  .friend-username {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text-primary, #f5f6ff);
+    font-size: inherit;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  .friend-username:hover {
+    color: var(--accent-primary-strong, #b3d6ff);
   }
   .friend-req-actions {
     display: flex;

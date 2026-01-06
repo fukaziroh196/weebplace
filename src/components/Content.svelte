@@ -853,7 +853,16 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                   <li class:top={index === 0}>
                     <div class="leaderboard-rank">{index + 1}</div>
                     <div class="leaderboard-info">
-                      <div class="leaderboard-name">{entry.name || entry.username || 'Игрок'}</div>
+                      <button 
+                        class="leaderboard-name clickable" 
+                        on:click={() => {
+                          const username = entry.username || entry.name;
+                          const userId = entry.id || entry.userId;
+                          if (username) goToPublicProfile(userId, username);
+                        }}
+                      >
+                        {entry.name || entry.username || 'Игрок'}
+                      </button>
                       <div class="leaderboard-metric">{formatLeaderboardMetric(entry)}</div>
                     </div>
                   </li>
@@ -1306,6 +1315,20 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     font-size: 0.875rem;
     overflow: hidden;
     text-overflow: ellipsis;
+    background: none;
+    border: none;
+    padding: 0;
+    text-align: left;
+    font-family: inherit;
+  }
+  
+  .leaderboard-name.clickable {
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  
+  .leaderboard-name.clickable:hover {
+    color: var(--accent-primary-strong);
     white-space: nowrap;
   }
 
