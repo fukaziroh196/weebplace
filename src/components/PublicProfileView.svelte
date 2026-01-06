@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { publicProfileUserId, goHome, goToPublicProfile } from '../stores/ui';
   import { publicUser, publicUserLoading, publicUserError, loadPublicUser, clearPublicUser } from '../stores/users';
-  import { currentUser, friends, friendProfiles, loadFriendProfiles } from '../stores/authApi';
+  import { currentUser, friends, friendProfiles, refreshFriendState } from '../stores/authApi';
   import { sendFriendRequest, removeFriend, friendRequestsOutgoing } from '../stores/authApi';
 
   let lastId = null;
@@ -19,8 +19,8 @@
 
   // Загружаем друзей если это наш профиль
   $: isMe = $currentUser?.id && $publicUser?.id && $currentUser.id === $publicUser.id;
-  $: if (isMe && $friends?.length) {
-    loadFriendProfiles();
+  $: if (isMe && $currentUser) {
+    refreshFriendState();
   }
 
   onMount(() => {
