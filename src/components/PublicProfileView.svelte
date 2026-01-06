@@ -523,6 +523,30 @@
     grid-template-columns: 260px 1fr;
     gap: 1.25rem;
     max-width: 950px;
+    margin-left: clamp(1rem, 5vw, 4rem);
+  }
+
+  @media (max-width: 1200px) {
+    .profile-layout {
+      margin-left: clamp(0.5rem, 3vw, 2rem);
+      max-width: 900px;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .profile-layout {
+      grid-template-columns: 1fr;
+      margin-left: 0;
+      max-width: 100%;
+      padding: 0 1rem;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .profile-layout {
+      padding: 0 0.5rem;
+      gap: 1rem;
+    }
   }
 
   /* Сайдбар */
