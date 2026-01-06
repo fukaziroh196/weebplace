@@ -25,7 +25,7 @@ const initialView =
           ? 'publicProfile'
           : !isReservedPath && initialPath !== '/'
             ? 'publicProfile' // Короткий формат /{username}
-            : 'home';
+          : 'home';
 
 // Possible values: 'home' | 'search' | 'details' | 'profile' | 'publicProfile' | 'admin' | 'lists' | 'messages' | 'catalog' | 'aniquiz' | 'guessAnime' | 'guessCharacter' | 'guessOpening' | 'adminQuiz' | 'tournaments'
 export const activeView = writable(initialView);
