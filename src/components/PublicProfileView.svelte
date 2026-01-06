@@ -520,8 +520,9 @@
   /* Layout */
   .profile-layout {
     display: grid;
-    grid-template-columns: 280px 1fr;
+    grid-template-columns: 260px 1fr;
     gap: 1.25rem;
+    max-width: 950px;
   }
 
   /* Сайдбар */
