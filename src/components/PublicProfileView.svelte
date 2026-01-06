@@ -464,7 +464,7 @@
 <style>
   .profile-page {
     min-height: 100%;
-    padding: 1rem clamp(1rem, 3vw, 2rem);
+    padding: 0;
     color: var(--text-primary, #f5f6ff);
   }
 
@@ -511,9 +511,8 @@
   /* Layout */
   .profile-layout {
     display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 1.5rem;
-    max-width: 1100px;
+    grid-template-columns: 280px 1fr;
+    gap: 1.25rem;
   }
 
   /* Сайдбар */
