@@ -523,12 +523,30 @@
     grid-template-columns: 260px 1fr;
     gap: 1.25rem;
     max-width: 950px;
-    margin-left: clamp(0.5rem, 2vw, 1.5rem);
+    margin-left: 0.25rem;
+  }
+
+  /* 2K экраны */
+  @media (min-width: 2000px) {
+    .profile-layout {
+      max-width: 1100px;
+      grid-template-columns: 300px 1fr;
+      gap: 1.5rem;
+    }
+  }
+
+  /* 4K экраны */
+  @media (min-width: 3000px) {
+    .profile-layout {
+      max-width: 1400px;
+      grid-template-columns: 350px 1fr;
+      gap: 2rem;
+    }
   }
 
   @media (max-width: 1200px) {
     .profile-layout {
-      margin-left: clamp(0.25rem, 1.5vw, 1rem);
+      margin-left: 0;
       max-width: 900px;
     }
   }
