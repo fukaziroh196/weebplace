@@ -10,7 +10,6 @@
   let lastId = null;
   let requestSending = false;
   let requestSent = false;
-  let activeTab = 'history';
   
   // Favorites state
   let userFavorites = [];
@@ -365,60 +364,86 @@
           </div>
         </div>
 
-        <!-- Избранное (всегда видно) -->
-        <div class="section-block">
-          <div class="section-header">
-            <h3 class="section-title">❤️ Избранные аниме</h3>
-            {#if isMe}
-              <button class="add-favorite-btn" on:click={() => showSearchModal = true}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-                Добавить
-              </button>
-            {/if}
-          </div>
-          {#if userFavorites.length > 0}
-            <div class="favorites-grid">
-              {#each userFavorites as fav (fav.id)}
-                <div class="favorite-card">
-                  <div class="favorite-image">
-                    {#if fav.imageUrl}
-                      <img src={fav.imageUrl} alt={fav.title} />
-                    {:else}
-                      <div class="favorite-placeholder">🎬</div>
-                    {/if}
-                    {#if fav.score}
-                      <div class="favorite-score">⭐ {fav.score}</div>
-                    {/if}
-                  </div>
-                  <div class="favorite-info">
-                    <div class="favorite-title">{fav.title}</div>
-                    {#if isMe}
-                      <button class="favorite-remove" on:click={() => handleRemoveFavorite(fav)}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <line x1="18" y1="6" x2="6" y2="18"></line>
-                          <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                      </button>
-                    {/if}
-                  </div>
-                </div>
-              {/each}
-            </div>
-          {:else}
-            <div class="empty-section">
+        <!-- Избранное и История рядом -->
+        <div class="two-column-section">
+          <!-- Избранное (слева) -->
+          <div class="section-block">
+            <div class="section-header">
+              <h3 class="section-title">❤️ Избранные аниме</h3>
               {#if isMe}
-                <p>Добавьте любимые аниме!</p>
-              {:else}
-                <p>Нет избранных аниме</p>
+                <button class="add-favorite-btn" on:click={() => showSearchModal = true}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  Добавить
+                </button>
               {/if}
             </div>
-          {/if}
+            {#if userFavorites.length > 0}
+              <div class="favorites-grid compact">
+                {#each userFavorites as fav (fav.id)}
+                  <div class="favorite-card">
+                    <div class="favorite-image">
+                      {#if fav.imageUrl}
+                        <img src={fav.imageUrl} alt={fav.title} />
+                      {:else}
+                        <div class="favorite-placeholder">🎬</div>
+                      {/if}
+                      {#if fav.score}
+                        <div class="favorite-score">⭐ {fav.score}</div>
+                      {/if}
+                    </div>
+                    <div class="favorite-info">
+                      <div class="favorite-title">{fav.title}</div>
+                      {#if isMe}
+                        <button class="favorite-remove" on:click={() => handleRemoveFavorite(fav)}>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
+                        </button>
+                      {/if}
+                    </div>
+                  </div>
+                {/each}
+              </div>
+            {:else}
+              <div class="empty-section">
+                {#if isMe}
+                  <p>Добавьте любимые аниме!</p>
+                {:else}
+                  <p>Нет избранных аниме</p>
+                {/if}
+              </div>
+            {/if}
+          </div>
+
+          <!-- История (справа) -->
+          <div class="section-block">
+            <h3 class="section-title">📜 История игр</h3>
+            <div class="history-list">
+              {#each gameHistory as game (game.id)}
+                <div class="history-item">
+                  <div class="history-mode">{game.mode}</div>
+                  <div class="history-result" class:win={game.result === 'Победа'} class:lose={game.result === 'Поражение'}>
+                    {game.result}
+                  </div>
+                  <div class="history-score">+{game.score}</div>
+                  <div class="history-date">{game.date}</div>
+                </div>
+              {/each}
+              {#if gameHistory.length === 0}
+                <div class="empty-history">
+                  <span>📝</span>
+                  <p>История игр пуста</p>
+                </div>
+              {/if}
+            </div>
+          </div>
         </div>
 
-        <!-- Достижения (всегда видны) -->
+        <!-- Достижения -->
         <div class="section-block">
           <h3 class="section-title">🏆 Достижения</h3>
           <div class="achievements-grid">
@@ -439,59 +464,10 @@
           </div>
         </div>
 
-        <!-- Табы только для Истории и Друзей -->
-        <div class="tabs-container">
-          <button 
-            class="tab-button" 
-            class:active={activeTab === 'history'}
-            on:click={() => activeTab = 'history'}
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-            История
-          </button>
-          {#if isMe}
-            <button 
-              class="tab-button" 
-              class:active={activeTab === 'friends'}
-              on:click={() => activeTab = 'friends'}
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-              </svg>
-              Друзья
-            </button>
-          {/if}
-        </div>
-
-        <!-- Контент табов -->
-        <div class="tab-content">
-          {#if activeTab === 'history'}
-            <div class="history-list">
-              {#each gameHistory as game (game.id)}
-                <div class="history-item">
-                  <div class="history-mode">{game.mode}</div>
-                  <div class="history-result" class:win={game.result === 'Победа'} class:lose={game.result === 'Поражение'}>
-                    {game.result}
-                  </div>
-                  <div class="history-score">+{game.score}</div>
-                  <div class="history-date">{game.date}</div>
-                </div>
-              {/each}
-              {#if gameHistory.length === 0}
-                <div class="empty-history">
-                  <span>📝</span>
-                  <p>История игр пуста</p>
-                </div>
-              {/if}
-            </div>
-
-          {:else if activeTab === 'friends' && isMe}
+        <!-- Друзья (только для своего профиля) -->
+        {#if isMe}
+          <div class="section-block">
+            <h3 class="section-title">👥 Друзья</h3>
             <div class="friends-grid">
               {#if $friendProfiles && $friendProfiles.length > 0}
                 {#each $friendProfiles as friend (friend.id)}
@@ -517,8 +493,8 @@
                 </div>
               {/if}
             </div>
-          {/if}
-        </div>
+          </div>
+        {/if}
       </main>
     </div>
 
@@ -985,6 +961,24 @@
     color: var(--text-secondary);
   }
 
+  /* Two Column Section */
+  .two-column-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .two-column-section .section-block {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 900px) {
+    .two-column-section {
+      grid-template-columns: 1fr;
+    }
+  }
+
   /* Section Blocks */
   .section-block {
     background: rgba(255, 255, 255, 0.04);
@@ -1379,6 +1373,11 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 1rem;
+  }
+
+  .favorites-grid.compact {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.75rem;
   }
 
   .favorite-card {
