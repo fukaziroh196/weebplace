@@ -235,9 +235,6 @@
                 {($publicUser.username?.[0] || 'U').toUpperCase()}
               </div>
             {/if}
-            {#if $publicUser.isAdmin || $publicUser.is_admin}
-              <div class="admin-crown">👑</div>
-            {/if}
           </div>
 
           <div class="user-details">
@@ -785,13 +782,6 @@
     font-size: 3rem;
     font-weight: 800;
     color: white;
-  }
-
-  .admin-crown {
-    position: absolute;
-    top: -8px;
-    right: -4px;
-    font-size: 1.5rem;
   }
 
   .user-details {

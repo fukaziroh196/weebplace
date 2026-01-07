@@ -1,9 +1,9 @@
 <script>
   import { onMount } from 'svelte';
+  import { get } from 'svelte/store';
   import { searchResults, isSearching } from '../stores/sources';
   import { activeView, goToPublicProfile } from '../stores/ui';
   import { gameState } from '../stores/gameState';
-  import ProfileView from './ProfileView.svelte';
   import AdminPanel from './AdminPanel.svelte';
   import ListsView from './ListsView.svelte';
   import MessagesView from './MessagesView.svelte';
@@ -96,7 +96,11 @@ const goToHome = () => {
 
 const goToProfile = () => {
   navigateTo('/profile');
-  activeView.set('profile');
+  // Используем PublicProfileView для своего профиля
+  if ($currentUser?.id) {
+    publicProfileUserId.set($currentUser.id);
+  }
+  activeView.set('publicProfile');
 };
 
 function normalizePath(p) {
@@ -132,11 +136,18 @@ function syncViewFromLocation() {
     return;
   }
   if (path === '/profile') {
-    activeView.set('profile');
+    // Используем PublicProfileView для своего профиля
+    if (get(currentUser)?.id) {
+      publicProfileUserId.set(get(currentUser).id);
+    }
+    activeView.set('publicProfile');
     return;
   }
   if (path === '/friends') {
-    activeView.set('profile');
+    if (get(currentUser)?.id) {
+      publicProfileUserId.set(get(currentUser).id);
+    }
+    activeView.set('publicProfile');
     friendsModalOpen.set(true);
     return;
   }
@@ -767,9 +778,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
               </section>
             </div>
           </main>
-        {:else if $activeView === 'profile'}
-          <ProfileView />
-        {:else if $activeView === 'publicProfile'}
+        {:else if $activeView === 'profile' || $activeView === 'publicProfile'}
           <PublicProfileView />
         {:else if $activeView === 'lists'}
           <ListsView />
