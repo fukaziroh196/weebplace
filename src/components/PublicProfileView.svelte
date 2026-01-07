@@ -497,16 +497,14 @@
       <!-- Правая колонка - История -->
       <aside class="profile-history-sidebar">
         <div class="section-block sticky">
-          <h3 class="section-title">📜 История игр</h3>
+          <h3 class="section-title">История игр</h3>
           <div class="history-list">
             {#if gameHistoryLoading}
               <div class="empty-history">
-                <span>⏳</span>
                 <p>Загрузка...</p>
               </div>
             {:else if gameHistory.length === 0}
               <div class="empty-history">
-                <span>📝</span>
                 <p>История игр пуста</p>
               </div>
             {:else}
