@@ -13,7 +13,7 @@ export async function loadFavorites() {
   favoritesError.set(null);
   
   try {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('api_token');
     if (!token) {
       favorites.set([]);
       return [];
@@ -54,7 +54,7 @@ export async function loadUserFavorites(userId) {
 
 // Добавить в избранное
 export async function addFavorite(anime) {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('api_token');
   if (!token) throw new Error('Не авторизован');
   
   const res = await fetch(`${API_BASE}/favorites`, {
@@ -86,7 +86,7 @@ export async function addFavorite(anime) {
 
 // Удалить из избранного по id записи
 export async function removeFavorite(id) {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('api_token');
   if (!token) throw new Error('Не авторизован');
   
   const res = await fetch(`${API_BASE}/favorites/${id}`, {
@@ -105,7 +105,7 @@ export async function removeFavorite(id) {
 
 // Удалить по anime_id
 export async function removeFavoriteByAnimeId(animeId) {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('api_token');
   if (!token) throw new Error('Не авторизован');
   
   const res = await fetch(`${API_BASE}/favorites/anime/${animeId}`, {
