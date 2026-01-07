@@ -26,6 +26,9 @@
     lastId = targetId;
     loadPublicUser(targetId);
     requestSent = false;
+    // Сбрасываем состояние избранного при смене пользователя
+    favoritesLoaded = false;
+    userFavorites = [];
   }
 
   // Загружаем друзей если это наш профиль
@@ -34,14 +37,15 @@
     refreshFriendState();
   }
 
-  // Загружаем избранное при смене пользователя
+  // Загружаем избранное при смене пользователя (после загрузки publicUser)
   $: if ($publicUser?.id && !favoritesLoaded) {
     favoritesLoaded = true;
-    loadProfileFavorites($publicUser.id);
+    const isMeNow = $currentUser?.id && $publicUser?.id && $currentUser.id === $publicUser.id;
+    loadProfileFavorites($publicUser.id, isMeNow);
   }
 
-  async function loadProfileFavorites(userId) {
-    if (isMe) {
+  async function loadProfileFavorites(userId, isMeCheck) {
+    if (isMeCheck) {
       await loadFavorites();
       userFavorites = $favorites;
     } else {
@@ -50,7 +54,7 @@
   }
 
   // Синхронизируем с store если это наш профиль
-  $: if (isMe) {
+  $: if (isMe && $favorites) {
     userFavorites = $favorites;
   }
 
