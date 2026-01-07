@@ -12,8 +12,6 @@ const normalizePath = (p) => {
   }
 };
 const initialPath = typeof window !== 'undefined' ? normalizePath(window.location.pathname) : '/';
-const reservedPaths = ['/', '/profile', '/friends', '/tournaments', '/api', '/uploads', '/assets'];
-const isReservedPath = reservedPaths.some(p => initialPath === p || initialPath.startsWith(p + '/'));
 const initialView =
   initialPath === '/profile'
     ? 'profile'
@@ -23,8 +21,6 @@ const initialView =
         ? 'tournaments'
         : initialPath.startsWith('/user/')
           ? 'publicProfile'
-          : !isReservedPath && initialPath !== '/'
-            ? 'publicProfile' // Короткий формат /{username}
           : 'home';
 
 // Possible values: 'home' | 'search' | 'details' | 'profile' | 'publicProfile' | 'admin' | 'lists' | 'messages' | 'catalog' | 'aniquiz' | 'guessAnime' | 'guessCharacter' | 'guessOpening' | 'adminQuiz' | 'tournaments'
@@ -103,9 +99,9 @@ export function goToProfile() {
 export function goToPublicProfile(userId, username) {
   publicProfileUserId.set(userId || null);
   activeView.set('publicProfile');
-  // Обновляем URL на короткий формат /{username}
+  // Обновляем URL на формат /user/{username}
   if (username && typeof window !== 'undefined' && window.history?.pushState) {
-    const targetPath = `/${username}`;
+    const targetPath = `/user/${username}`;
     if (window.location.pathname !== targetPath) {
       window.history.pushState(null, '', targetPath);
     }
