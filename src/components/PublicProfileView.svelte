@@ -88,7 +88,7 @@
     }
   }
 
-  function formatDate(dateStr) {
+  function formatDate(dateStr, full = false) {
     if (!dateStr) return '';
     try {
       const date = new Date(dateStr);
@@ -96,6 +96,17 @@
         // Если не валидная дата, возвращаем как есть
         return dateStr;
       }
+      
+      // Если нужна полная дата (для даты создания профиля)
+      if (full) {
+        return date.toLocaleDateString('ru-RU', { 
+          day: 'numeric', 
+          month: 'long', 
+          year: 'numeric' 
+        });
+      }
+      
+      // Для истории игр - короткий формат с "Сегодня"/"Вчера"
       const today = new Date();
       const yesterday = new Date(today);
       yesterday.setDate(yesterday.getDate() - 1);
@@ -217,16 +228,6 @@
 
   $: alreadyFriend = ($friends || []).includes($publicUser?.id);
   $: pendingRequest = ($friendRequestsOutgoing || []).some(r => r.toId === $publicUser?.id);
-  
-  function formatDate(dateStr) {
-    if (!dateStr) return '';
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('ru-RU', { 
-      day: 'numeric', 
-      month: 'long', 
-      year: 'numeric' 
-    });
-  }
 
   function getAvatarGradient(name) {
     const colors = [
@@ -312,7 +313,7 @@
                   <line x1="8" y1="2" x2="8" y2="6"></line>
                   <line x1="3" y1="10" x2="21" y2="10"></line>
                 </svg>
-                <span>С {formatDate($publicUser.createdAt)}</span>
+                <span>С {formatDate($publicUser.createdAt, true)}</span>
               </div>
             </div>
           </div>
