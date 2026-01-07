@@ -40,17 +40,30 @@
 </script>
 
 <div class="relative" use:clickOutside={{ enabled: true, callback: () => { showMenu = false; } }}>
-  <div class="w-14 h-14 rounded-full flex items-center justify-center cursor-pointer transition-colors select-none overflow-hidden avatar-frame { $currentUser?.avatarUrl ? '' : 'bg-pink-700 hover:bg-pink-600' }"
-       on:click={() => { showMenu = !showMenu; }}>
-    {#if $currentUser?.avatarUrl}
-      <img src={$currentUser.avatarUrl} alt="avatar" class="block w-full h-full object-cover" />
-    {:else}
-      <span class="text-white font-semibold text-2xl">{$currentUser ? $currentUser.username?.[0]?.toUpperCase() || 'U' : 'U'}</span>
-    {/if}
-    {#if $currentUser && $unreadTotal > 0}
-      <span class="absolute -top-1 -right-1 bg-pink-600 text-white text-xs rounded-full px-1.5 py-0.5">{$unreadTotal}</span>
-    {/if}
-  </div>
+  {#if $currentUser}
+    <button class="flex items-center gap-2 px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white cursor-pointer transition-all select-none backdrop-blur-sm"
+            on:click={() => { showMenu = !showMenu; }}>
+      <div class="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0" style={$currentUser?.avatarUrl ? '' : `background: ${getAvatarGradient($currentUser.username)}`}>
+        {#if $currentUser?.avatarUrl}
+          <img src={$currentUser.avatarUrl} alt="avatar" class="block w-full h-full object-cover" />
+        {:else}
+          <span class="text-white font-semibold text-sm">{$currentUser.username?.[0]?.toUpperCase() || 'U'}</span>
+        {/if}
+      </div>
+      <span class="font-medium text-sm whitespace-nowrap">{$currentUser.username}</span>
+      {#if $unreadTotal > 0}
+        <span class="absolute -top-1 -right-1 bg-pink-600 text-white text-xs rounded-full px-1.5 py-0.5">{$unreadTotal}</span>
+      {/if}
+    </button>
+  {:else}
+    <div class="w-14 h-14 rounded-full flex items-center justify-center cursor-pointer transition-colors select-none overflow-hidden avatar-frame bg-pink-700 hover:bg-pink-600"
+         on:click={() => { showMenu = !showMenu; }}>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+    </div>
+  {/if}
 
   {#if showMenu}
     <div class="absolute right-0 mt-2 rounded-xl overflow-hidden z-30 min-w-[220px] menu-surface p-2">
