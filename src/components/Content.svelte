@@ -2409,7 +2409,9 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       text-align: center;
       padding: 0.6rem 1rem;
       margin-bottom: 0.6rem;
+      margin-top: 1rem;
       gap: 0.75rem;
+      top: 1.5rem;
     }
 
     .hero-title {

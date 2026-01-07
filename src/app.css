@@ -163,6 +163,16 @@ body.theme-light input[type="text"] { }
 /* Light green minimalist theme */
 body.theme-dark { --bg:#B8C8A0; --panel:#D0DCBB; --panelStrong:#FFFFFF; --accent:#5B7553; --accent2:#6B8A62; --text:#2D3A27; --muted:#5A6A53; --extra:#8BA47F; }
 /* Light background with soft colors */
+/* Переопределяем фон для мобильных safe area - используем фон приложения вместо зеленого */
+@media (max-width: 768px) {
+  body.theme-dark { 
+    background: linear-gradient(180deg, rgba(4, 7, 15, 0.7), rgba(21, 6, 28, 0.85)), url('/backgrounds/backsak.jpg') !important;
+    background-size: cover !important;
+    background-attachment: fixed !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+  }
+}
 body.theme-dark { background: var(--bg) !important; color: var(--text) !important; }
 body.theme-dark .glass { background: var(--bg) !important; border:1px solid rgba(91,117,83,.1) !important; box-shadow: none !important; }
 body.theme-dark .workspace-frame { background: var(--panel) !important; border:1px solid rgba(91,117,83,.1) !important; box-shadow: 0 2px 8px rgba(91,117,83,.08) !important; }
@@ -291,6 +301,12 @@ body.theme-dark input[type="text"]::placeholder { color: rgba(91,117,83,.5); }
   min-height: 100vh !important;
   min-width: 100vw !important;
   margin: 0;
+  /* Фон для safe area на мобильных устройствах */
+  background: linear-gradient(180deg, rgba(4, 7, 15, 0.7), rgba(21, 6, 28, 0.85)), url('/backgrounds/backsak.jpg') !important;
+  background-size: cover !important;
+  background-attachment: fixed !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
 }
 
 :global(#app) {

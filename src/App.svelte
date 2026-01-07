@@ -60,6 +60,17 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    /* Safe area insets для iOS */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    /* Фон для safe area - используем тот же, что и у приложения */
+    background: linear-gradient(180deg, rgba(4, 7, 15, 0.7), rgba(21, 6, 28, 0.85)), url('/backgrounds/backsak.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-position: center;
   }
   
   .main-layout {
@@ -88,6 +99,11 @@
   @media (max-width: 768px) {
     .content-scroll {
       padding: 12px;
+    }
+    
+    .app-container {
+      /* Дополнительный отступ сверху на мобильных для safe area */
+      padding-top: calc(env(safe-area-inset-top) + 0.5rem);
     }
   }
   
