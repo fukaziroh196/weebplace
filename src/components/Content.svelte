@@ -2015,16 +2015,23 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     top: calc(100% + 0.7rem);
     right: 0;
     min-width: 16.25rem;
-    background: var(--panel-gradient-primary);
-    border-radius: 1.25rem;
-    box-shadow: var(--shadow-outer);
-    padding: 1rem;
+    background: rgba(30, 30, 45, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    padding: 0.5rem;
     z-index: 600;
     backdrop-filter: blur(20px);
   }
 
   :global(:root[data-theme='glass']) .profile-dropdown {
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(30, 30, 45, 0.9);
+  }
+
+  :global(:root[data-theme='light']) .profile-dropdown {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   }
 
   .mode-cards {

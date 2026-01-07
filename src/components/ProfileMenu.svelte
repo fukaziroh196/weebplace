@@ -1,6 +1,6 @@
 <script>
   import { currentUser, login, register, logout } from '../stores/authApi';
-  import { goToPublicProfile, goToAchievements, goToAdminQuiz } from '../stores/ui';
+  import { goToPublicProfile, goToAdminQuiz } from '../stores/ui';
   
   export let isAdmin = false;
   let mode = 'login'; // 'login' | 'register'
@@ -32,15 +32,9 @@
   }
 
   function handleProfileClick() {
-    // Переход в свой профиль по короткому URL /{username}
     if ($currentUser?.id && $currentUser?.username) {
       goToPublicProfile($currentUser.id, $currentUser.username);
     }
-    window.dispatchEvent(new CustomEvent('closeProfileMenu'));
-  }
-
-  function handleAchievementsClick() {
-    goToAchievements();
     window.dispatchEvent(new CustomEvent('closeProfileMenu'));
   }
   
@@ -48,74 +42,85 @@
     goToAdminQuiz();
     window.dispatchEvent(new CustomEvent('closeProfileMenu'));
   }
+
+  function getAvatarGradient(name) {
+    const colors = [
+      ['#ff6b6b', '#ee5a24'],
+      ['#74b9ff', '#0984e3'],
+      ['#55efc4', '#00b894'],
+      ['#fd79a8', '#e84393'],
+      ['#a29bfe', '#6c5ce7'],
+      ['#ffeaa7', '#fdcb6e'],
+      ['#81ecec', '#00cec9'],
+      ['#fab1a0', '#e17055'],
+    ];
+    const index = (name?.charCodeAt(0) || 0) % colors.length;
+    return `linear-gradient(135deg, ${colors[index][0]} 0%, ${colors[index][1]} 100%)`;
+  }
 </script>
 
 {#if $currentUser}
-  <!-- Меню для авторизованного пользователя -->
   <div class="profile-menu">
     <div class="menu-header">
-      <div class="user-avatar">
+      <div class="user-avatar" style="background: {getAvatarGradient($currentUser.username)}">
         <span class="avatar-letter">{$currentUser.username?.[0]?.toUpperCase() || 'U'}</span>
       </div>
       <div class="user-info">
         <div class="user-name">{$currentUser.username}</div>
-        <div class="user-email">{$currentUser.email || 'otakuz.fun'}</div>
+        <div class="user-site">otakuz.fun</div>
       </div>
     </div>
     
-    <div class="menu-divider"></div>
-    
-    <button class="menu-item" on:click={handleProfileClick}>
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-      </svg>
-      Профиль
-    </button>
-    
-    <button class="menu-item" on:click={handleAchievementsClick}>
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-      </svg>
-      Достижения
-    </button>
-    
-    <button class="menu-item">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-        <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94L14.4 2.81c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
-      </svg>
-      Настройки
-    </button>
-    
-    {#if isAdmin}
-      <button class="menu-item" on:click={handleAdminClick}>
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-          <path d="M21.21 10.78l-1.59-.13a6.51 6.51 0 0 0-.51-1.24l.96-1.27a1 1 0 0 0-.08-1.28l-1.9-1.9a1 1 0 0 0-1.28-.08l-1.27.96a6.51 6.51 0 0 0-1.24-.51l-.13-1.59A1 1 0 0 0 12.19 2h-2.38a1 1 0 0 0-1 .92l-.13 1.59a6.51 6.51 0 0 0-1.24.51l-1.27-.96a1 1 0 0 0-1.28.08l-1.9 1.9a1 1 0 0 0-.08 1.28l.96 1.27a6.51 6.51 0 0 0-.51 1.24l-1.59.13a1 1 0 0 0-.92 1v2.38a1 1 0 0 0 .92 1l1.59.13c.12.43.29.84.51 1.24l-.96 1.27a1 1 0 0 0 .08 1.28l1.9 1.9a1 1 0 0 0 1.28.08l1.27-.96c.4.22.81.39 1.24.51l.13 1.59a1 1 0 0 0 .99.92h2.38a1 1 0 0 0 1-.92l.13-1.59c.43-.12.84-.29 1.24-.51l1.27.96a1 1 0 0 0 1.28-.08l1.9-1.9a1 1 0 0 0 .08-1.28l-.96-1.27c.22-.4.39-.81.51-1.24l1.59-.13a1 1 0 0 0 .92-1V11.7a1 1 0 0 0-.92-.92zM11 15a4 4 0 1 1 4-4 4 4 0 0 1-4 4zm8.63 1.76l-1.17.1a1 1 0 0 0-.9.74 8.38 8.38 0 0 1-.82 1.95 1 1 0 0 0 .09 1.06l.71.93-1 1-1-.71a1 1 0 0 0-1.06-.09 8.38 8.38 0 0 1-1.95.82 1 1 0 0 0-.74.9l-.1 1.17h-1.41l-.1-1.17a1 1 0 0 0-.74-.9 8.38 8.38 0 0 1-1.95-.82 1 1 0 0 0-1.06.09l-1 .71-1-1 .71-.93a1 1 0 0 0 .09-1.06 8.38 8.38 0 0 1-.82-1.95 1 1 0 0 0-.9-.74l-1.17-.1v-1.41l1.17-.1a1 1 0 0 0 .9-.74 8.38 8.38 0 0 1 .82-1.95 1 1 0 0 0-.09-1.06l-.71-.93 1-1 1 .71a1 1 0 0 0 1.06.09 8.38 8.38 0 0 1 1.95-.82 1 1 0 0 0 .74-.9l.1-1.17h1.41l.1 1.17a1 1 0 0 0 .74.9 8.38 8.38 0 0 1 1.95.82 1 1 0 0 0 1.06-.09l1-.71 1 1-.71.93a1 1 0 0 0-.09 1.06 8.38 8.38 0 0 1 .82 1.95 1 1 0 0 0 .9.74l1.17.1z"/>
+    <div class="menu-items">
+      <button class="menu-item" on:click={handleProfileClick}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
         </svg>
-        Админ‑панель
+        <span>Профиль</span>
       </button>
-    {/if}
-    
-    <div class="menu-divider"></div>
+      
+      <button class="menu-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+        <span>Настройки</span>
+      </button>
+      
+      {#if isAdmin}
+        <button class="menu-item" on:click={handleAdminClick}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"></path>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path>
+          </svg>
+          <span>Админ-панель</span>
+        </button>
+      {/if}
+    </div>
     
     <button class="menu-item logout-btn" on:click={handleLogout}>
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-        <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
       </svg>
-      Выйти
+      <span>Выйти</span>
     </button>
   </div>
 {:else}
-  <!-- Форма входа/регистрации -->
   <div class="auth-form">
     <div class="form-tabs">
       <button 
-        class="tab-btn {mode === 'login' ? 'active' : ''}" 
+        class="tab-btn" 
+        class:active={mode === 'login'}
         on:click={() => { mode = 'login'; error = ''; }}
       >
         Вход
       </button>
       <button 
-        class="tab-btn {mode === 'register' ? 'active' : ''}" 
+        class="tab-btn"
+        class:active={mode === 'register'}
         on:click={() => { mode = 'register'; error = ''; }}
       >
         Регистрация
@@ -124,24 +129,20 @@
     
     <form on:submit|preventDefault={submit}>
       <div class="form-group">
-        <label for="username">Имя пользователя</label>
         <input 
           type="text" 
-          id="username" 
           bind:value={usernameInput} 
-          placeholder="Введите имя" 
+          placeholder="Имя пользователя" 
           required
           disabled={loading}
         />
       </div>
       
       <div class="form-group">
-        <label for="password">Пароль</label>
         <input 
           type="password" 
-          id="password" 
           bind:value={password} 
-          placeholder="Введите пароль" 
+          placeholder="Пароль" 
           required
           disabled={loading}
         />
@@ -153,9 +154,9 @@
       
       <button type="submit" class="submit-btn" disabled={loading}>
         {#if loading}
-          Загрузка...
+          <span class="loading-spinner"></span>
         {:else}
-          {mode === 'login' ? 'Войти' : 'Зарегистрироваться'}
+          {mode === 'login' ? 'Войти' : 'Создать аккаунт'}
         {/if}
       </button>
     </form>
@@ -164,34 +165,36 @@
 
 <style>
   .profile-menu {
-    min-width: 240px;
+    min-width: 220px;
+    padding: 0.5rem;
   }
   
   .menu-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px;
-    background: var(--surface-muted, rgba(255, 255, 255, 0.1));
-    border-radius: 8px;
-    margin-bottom: 8px;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 0.75rem;
+    margin-bottom: 0.5rem;
   }
   
   .user-avatar {
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
-    background: var(--accent-primary, #9ecaff);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    border: 2px solid rgba(255, 255, 255, 0.2);
   }
   
   .avatar-letter {
-    color: var(--text-primary, #f5f6ff);
-    font-size: 20px;
-    font-weight: 700;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 800;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   }
   
   .user-info {
@@ -200,157 +203,172 @@
   }
   
   .user-name {
-    font-weight: 600;
-    color: var(--text);
-    font-size: 15px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-primary, #f5f6ff);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
   
-  .user-email {
-    font-size: 12px;
-    color: var(--muted);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .user-site {
+    font-size: 0.75rem;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.6));
   }
   
-  .menu-divider {
-    height: 1px;
-    background: var(--divider-color, rgba(255, 255, 255, 0.2));
-    margin: 8px 0;
+  .menu-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
   }
   
   .menu-item {
     width: 100%;
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
+    gap: 0.75rem;
+    padding: 0.65rem 0.75rem;
     background: transparent;
     border: none;
-    border-radius: 8px;
-    color: var(--text);
-    font-size: 14px;
+    border-radius: 0.5rem;
+    color: var(--text-primary, #f5f6ff);
+    font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
     text-align: left;
   }
   
+  .menu-item svg {
+    width: 18px;
+    height: 18px;
+    opacity: 0.7;
+    flex-shrink: 0;
+  }
+  
   .menu-item:hover {
-    background: var(--divider-color, rgba(255, 255, 255, 0.2));
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .menu-item:hover svg {
+    opacity: 1;
     color: var(--accent-primary, #9ecaff);
   }
   
   .logout-btn {
-    color: #d32f2f;
+    margin-top: 0.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 0.75rem;
+    border-radius: 0;
   }
   
   .logout-btn:hover {
-    background: rgba(211, 47, 47, 0.1);
-    color: #d32f2f;
+    background: rgba(255, 107, 107, 0.15);
+    color: #ff6b6b;
   }
   
-  /* Auth Form Styles */
+  .logout-btn:hover svg {
+    color: #ff6b6b;
+  }
+  
+  /* Auth Form */
   .auth-form {
-    min-width: 280px;
-    padding: 4px;
+    min-width: 260px;
+    padding: 0.5rem;
   }
   
   .form-tabs {
     display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-    background: var(--surface-muted, rgba(255, 255, 255, 0.1));
-    padding: 4px;
-    border-radius: 8px;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 0.25rem;
+    border-radius: 0.5rem;
   }
   
   .tab-btn {
     flex: 1;
-    padding: 8px 16px;
+    padding: 0.5rem 0.75rem;
     background: transparent;
     border: none;
-    border-radius: 6px;
-    color: var(--muted);
-    font-size: 14px;
+    border-radius: 0.375rem;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+    font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
   }
   
   .tab-btn:hover {
-    color: var(--accent-primary, #9ecaff);
+    color: var(--text-primary, #f5f6ff);
   }
   
   .tab-btn.active {
-    background: var(--accent-primary, #9ecaff);
+    background: rgba(255, 255, 255, 0.15);
     color: var(--text-primary, #f5f6ff);
   }
   
   .form-group {
-    margin-bottom: 14px;
-  }
-  
-  .form-group label {
-    display: block;
-    margin-bottom: 6px;
-    color: var(--text);
-    font-size: 13px;
-    font-weight: 600;
+    margin-bottom: 0.75rem;
   }
   
   .form-group input {
     width: 100%;
-    padding: 10px 12px;
-    background: var(--input-surface, rgba(255, 255, 255, 0.15));
-    border: 2px solid var(--input-border-color, rgba(255, 255, 255, 0.28));
-    border-radius: 8px;
+    padding: 0.65rem 0.85rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 0.5rem;
     color: var(--text-primary, #f5f6ff);
-    font-size: 14px;
-    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    transition: all 0.15s ease;
+  }
+  
+  .form-group input::placeholder {
+    color: var(--text-secondary, rgba(255, 255, 255, 0.5));
   }
   
   .form-group input:focus {
     outline: none;
     border-color: var(--accent-primary, #9ecaff);
-    background: var(--input-surface, rgba(255, 255, 255, 0.2));
+    background: rgba(255, 255, 255, 0.12);
   }
   
   .form-group input:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
   }
   
   .error-message {
-    padding: 10px 12px;
-    background: rgba(211, 47, 47, 0.1);
-    border: 1px solid rgba(211, 47, 47, 0.3);
-    border-radius: 8px;
-    color: #d32f2f;
-    font-size: 13px;
-    margin-bottom: 14px;
+    padding: 0.6rem 0.75rem;
+    background: rgba(255, 107, 107, 0.15);
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    border-radius: 0.5rem;
+    color: #ff6b6b;
+    font-size: 0.8rem;
+    margin-bottom: 0.75rem;
   }
   
   .submit-btn {
     width: 100%;
-    padding: 12px;
-    background: var(--accent-primary, #9ecaff);
+    padding: 0.7rem;
+    background: linear-gradient(135deg, #55efc4 0%, #00b894 100%);
     border: none;
-    border-radius: 8px;
-    color: var(--text-primary, #f5f6ff);
-    font-size: 14px;
-    font-weight: 600;
+    border-radius: 0.5rem;
+    color: #1a1a2e;
+    font-size: 0.9rem;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
   }
   
   .submit-btn:hover:not(:disabled) {
-    background: var(--accent-primary-strong, #b3d6ff);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(158, 202, 255, 0.4);
+    box-shadow: 0 4px 12px rgba(85, 239, 196, 0.4);
   }
   
   .submit-btn:disabled {
@@ -358,5 +376,17 @@
     cursor: not-allowed;
     transform: none;
   }
+  
+  .loading-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(26, 26, 46, 0.3);
+    border-top-color: #1a1a2e;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
 </style>
-
