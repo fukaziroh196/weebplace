@@ -453,7 +453,7 @@
     appearance: none;
     width: 18px;
     height: 18px;
-    background: #55efc4;
+    background: #74b9ff;
     border-radius: 50%;
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -462,7 +462,7 @@
   .zoom-slider::-moz-range-thumb {
     width: 18px;
     height: 18px;
-    background: #55efc4;
+    background: #74b9ff;
     border-radius: 50%;
     cursor: pointer;
     border: none;
@@ -502,13 +502,13 @@
   }
   
   .crop-btn {
-    background: linear-gradient(135deg, #55efc4 0%, #00b894 100%);
-    color: #1a1a2e;
+    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+    color: white;
   }
   
   .crop-btn:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(85, 239, 196, 0.4);
+    box-shadow: 0 4px 15px rgba(116, 185, 255, 0.4);
   }
   
   .crop-btn:disabled {
