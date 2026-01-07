@@ -323,7 +323,7 @@
         </div>
       </aside>
 
-      <!-- Правая колонка - контент -->
+      <!-- Центральная колонка - контент -->
       <main class="profile-main">
         <!-- Статистика (всегда видна) -->
         <div class="stats-grid">
@@ -364,83 +364,57 @@
           </div>
         </div>
 
-        <!-- Избранное и История рядом -->
-        <div class="two-column-section">
-          <!-- Избранное (слева) -->
-          <div class="section-block">
-            <div class="section-header">
-              <h3 class="section-title">❤️ Избранные аниме</h3>
-              {#if isMe}
-                <button class="add-favorite-btn" on:click={() => showSearchModal = true}>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                  </svg>
-                  Добавить
-                </button>
-              {/if}
-            </div>
-            {#if userFavorites.length > 0}
-              <div class="favorites-grid compact">
-                {#each userFavorites as fav (fav.id)}
-                  <div class="favorite-card">
-                    <div class="favorite-image">
-                      {#if fav.imageUrl}
-                        <img src={fav.imageUrl} alt={fav.title} />
-                      {:else}
-                        <div class="favorite-placeholder">🎬</div>
-                      {/if}
-                      {#if fav.score}
-                        <div class="favorite-score">⭐ {fav.score}</div>
-                      {/if}
-                    </div>
-                    <div class="favorite-info">
-                      <div class="favorite-title">{fav.title}</div>
-                      {#if isMe}
-                        <button class="favorite-remove" on:click={() => handleRemoveFavorite(fav)}>
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                          </svg>
-                        </button>
-                      {/if}
-                    </div>
-                  </div>
-                {/each}
-              </div>
-            {:else}
-              <div class="empty-section">
-                {#if isMe}
-                  <p>Добавьте любимые аниме!</p>
-                {:else}
-                  <p>Нет избранных аниме</p>
-                {/if}
-              </div>
+        <!-- Избранное -->
+        <div class="section-block">
+          <div class="section-header">
+            <h3 class="section-title">❤️ Избранные аниме</h3>
+            {#if isMe}
+              <button class="add-favorite-btn" on:click={() => showSearchModal = true}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Добавить
+              </button>
             {/if}
           </div>
-
-          <!-- История (справа) -->
-          <div class="section-block">
-            <h3 class="section-title">📜 История игр</h3>
-            <div class="history-list">
-              {#each gameHistory as game (game.id)}
-                <div class="history-item">
-                  <div class="history-mode">{game.mode}</div>
-                  <div class="history-result" class:win={game.result === 'Победа'} class:lose={game.result === 'Поражение'}>
-                    {game.result}
+          {#if userFavorites.length > 0}
+            <div class="favorites-grid">
+              {#each userFavorites as fav (fav.id)}
+                <div class="favorite-card">
+                  <div class="favorite-image">
+                    {#if fav.imageUrl}
+                      <img src={fav.imageUrl} alt={fav.title} />
+                    {:else}
+                      <div class="favorite-placeholder">🎬</div>
+                    {/if}
+                    {#if fav.score}
+                      <div class="favorite-score">⭐ {fav.score}</div>
+                    {/if}
                   </div>
-                  <div class="history-score">+{game.score}</div>
-                  <div class="history-date">{game.date}</div>
+                  <div class="favorite-info">
+                    <div class="favorite-title">{fav.title}</div>
+                    {#if isMe}
+                      <button class="favorite-remove" on:click={() => handleRemoveFavorite(fav)}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </button>
+                    {/if}
+                  </div>
                 </div>
               {/each}
-              {#if gameHistory.length === 0}
-                <div class="empty-history">
-                  <span>📝</span>
-                  <p>История игр пуста</p>
-                </div>
+            </div>
+          {:else}
+            <div class="empty-section">
+              {#if isMe}
+                <p>Добавьте любимые аниме!</p>
+              {:else}
+                <p>Нет избранных аниме</p>
               {/if}
             </div>
-          </div>
+          {/if}
         </div>
 
         <!-- Достижения -->
@@ -496,6 +470,31 @@
           </div>
         {/if}
       </main>
+
+      <!-- Правая колонка - История -->
+      <aside class="profile-history-sidebar">
+        <div class="section-block sticky">
+          <h3 class="section-title">📜 История игр</h3>
+          <div class="history-list">
+            {#each gameHistory as game (game.id)}
+              <div class="history-item">
+                <div class="history-mode">{game.mode}</div>
+                <div class="history-result" class:win={game.result === 'Победа'} class:lose={game.result === 'Поражение'}>
+                  {game.result}
+                </div>
+                <div class="history-score">+{game.score}</div>
+                <div class="history-date">{game.date}</div>
+              </div>
+            {/each}
+            {#if gameHistory.length === 0}
+              <div class="empty-history">
+                <span>📝</span>
+                <p>История игр пуста</p>
+              </div>
+            {/if}
+          </div>
+        </div>
+      </aside>
     </div>
 
     <!-- Модалка поиска избранного -->
@@ -615,26 +614,25 @@
     margin: 0;
   }
 
-  /* Layout */
+  /* Layout - 3 колонки */
   .profile-layout {
     display: grid;
-    grid-template-columns: 260px 1fr;
+    grid-template-columns: 240px 1fr 280px;
     gap: 1.25rem;
-    max-width: 950px;
-    margin-left: 1.3rem;
-    margin-top: 1rem;
+    max-width: 1400px;
+    margin: 1rem auto 0;
+    padding: 0 1rem;
   }
 
-  /* 2K экраны (2560x1440) - масштабируем как 1080p */
+  /* 2K экраны (2560x1440) */
   @media (min-width: 2000px) {
     .profile-page {
       transform: scale(1.33);
       transform-origin: top left;
     }
     .profile-layout {
-      margin-left: 0.75rem;
-      max-width: 1100px;
-      grid-template-columns: 300px 1fr;
+      max-width: 1500px;
+      grid-template-columns: 280px 1fr 320px;
       gap: 1.5rem;
     }
   }
@@ -645,24 +643,40 @@
       transform: scale(2);
       transform-origin: top left;
     }
-    .profile-layout {
-      margin-left: 0;
-    }
   }
 
   @media (max-width: 1200px) {
     .profile-layout {
-      margin-left: 0.5rem;
-      max-width: 900px;
+      grid-template-columns: 220px 1fr 260px;
+      gap: 1rem;
     }
   }
 
-  @media (max-width: 900px) {
+  @media (max-width: 1000px) {
+    .profile-layout {
+      grid-template-columns: 1fr 1fr;
+      max-width: 100%;
+    }
+    .profile-sidebar {
+      grid-column: 1;
+    }
+    .profile-main {
+      grid-column: 2;
+    }
+    .profile-history-sidebar {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 768px) {
     .profile-layout {
       grid-template-columns: 1fr;
-      margin-left: 0;
-      max-width: 100%;
-      padding: 0 1rem;
+      padding: 0 0.75rem;
+    }
+    .profile-sidebar,
+    .profile-main,
+    .profile-history-sidebar {
+      grid-column: 1;
     }
   }
 
@@ -671,6 +685,40 @@
       padding: 0 0.5rem;
       gap: 1rem;
     }
+  }
+
+  /* Правый сайдбар с историей */
+  .profile-history-sidebar {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .profile-history-sidebar .section-block.sticky {
+    position: sticky;
+    top: 1rem;
+  }
+
+  .profile-history-sidebar .history-item {
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem;
+  }
+
+  .profile-history-sidebar .history-mode {
+    grid-column: 1 / -1;
+    font-size: 0.85rem;
+  }
+
+  .profile-history-sidebar .history-result {
+    font-size: 0.75rem;
+  }
+
+  .profile-history-sidebar .history-score {
+    font-size: 0.85rem;
+  }
+
+  .profile-history-sidebar .history-date {
+    grid-column: 1 / -1;
+    font-size: 0.75rem;
   }
 
   /* Сайдбар */
@@ -959,24 +1007,6 @@
   .stat-label {
     font-size: 0.8rem;
     color: var(--text-secondary);
-  }
-
-  /* Two Column Section */
-  .two-column-section {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.25rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .two-column-section .section-block {
-    margin-bottom: 0;
-  }
-
-  @media (max-width: 900px) {
-    .two-column-section {
-      grid-template-columns: 1fr;
-    }
   }
 
   /* Section Blocks */
@@ -1371,12 +1401,7 @@
 
   .favorites-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 1rem;
-  }
-
-  .favorites-grid.compact {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 0.75rem;
   }
 
