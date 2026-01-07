@@ -523,7 +523,7 @@
     grid-template-columns: 260px 1fr;
     gap: 1.25rem;
     max-width: 950px;
-    margin-left: 1.2rem;
+    margin-left: 2.5rem;
   }
 
   /* 2K экраны (2560x1440) - масштабируем как 1080p */
@@ -531,6 +531,9 @@
     .profile-page {
       transform: scale(1.33);
       transform-origin: top left;
+    }
+    .profile-layout {
+      margin-left: 0.5rem;
     }
   }
 
@@ -540,11 +543,14 @@
       transform: scale(2);
       transform-origin: top left;
     }
+    .profile-layout {
+      margin-left: 0.25rem;
+    }
   }
 
   @media (max-width: 1200px) {
     .profile-layout {
-      margin-left: 0;
+      margin-left: 1rem;
       max-width: 900px;
     }
   }
