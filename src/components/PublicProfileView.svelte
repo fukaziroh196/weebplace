@@ -523,7 +523,7 @@
     grid-template-columns: 260px 1fr;
     gap: 1.25rem;
     max-width: 950px;
-    margin-left: 1.5rem;
+    margin-left: 1.3rem;
   }
 
   /* 2K экраны (2560x1440) - масштабируем как 1080p */
