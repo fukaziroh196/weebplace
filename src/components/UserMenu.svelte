@@ -38,33 +38,16 @@
     return `linear-gradient(135deg, ${colors[index][0]} 0%, ${colors[index][1]} 100%)`;
   }
 
-  // Отладка: логируем данные пользователя
-  $: if ($currentUser) {
-    console.log('[UserMenu] currentUser data:', {
-      id: $currentUser.id,
-      username: $currentUser.username,
-      avatarUrl: $currentUser.avatarUrl,
-      hasAvatar: !!$currentUser.avatarUrl,
-      avatarUrlType: typeof $currentUser.avatarUrl
-    });
-  }
 
 </script>
 
 <div class="relative" use:clickOutside={{ enabled: true, callback: () => { showMenu = false; } }}>
   {#if $currentUser}
-    <button class="flex items-center gap-3 px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white cursor-pointer transition-all select-none backdrop-blur-sm relative"
+    <button class="user-menu-button flex items-center gap-3 px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white cursor-pointer transition-all select-none backdrop-blur-sm relative"
             on:click={() => { showMenu = !showMenu; }}>
       <div class="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0" style="background: {$currentUser?.avatarUrl ? 'transparent' : getAvatarGradient($currentUser.username)}">
         {#if $currentUser?.avatarUrl}
-          <img src={$currentUser.avatarUrl} alt="avatar" class="block w-full h-full object-cover" 
-               on:error={(e) => {
-                 console.error('[UserMenu] Avatar load error:', $currentUser.avatarUrl, e);
-                 e.target.style.display = 'none';
-               }}
-               on:load={() => {
-                 console.log('[UserMenu] Avatar loaded successfully:', $currentUser.avatarUrl);
-               }} />
+          <img src={$currentUser.avatarUrl} alt="avatar" class="block w-full h-full object-cover" />
         {:else}
           <span class="text-white font-semibold text-base">{$currentUser.username?.[0]?.toUpperCase() || 'U'}</span>
         {/if}
@@ -121,4 +104,27 @@
   {/if}
 </div>
 
+<style>
+  /* Мобильные устройства - квадратная кнопка со скругленными углами */
+  @media (max-width: 768px) {
+    .user-menu-button {
+      padding: 0.5rem !important;
+      border-radius: 0.75rem !important;
+      gap: 0 !important;
+      min-width: 2.75rem;
+      width: 2.75rem;
+      height: 2.75rem;
+      justify-content: center;
+    }
+
+    .user-menu-button > span:not(.absolute) {
+      display: none !important;
+    }
+
+    .user-menu-button > div {
+      width: 2rem !important;
+      height: 2rem !important;
+    }
+  }
+</style>
 

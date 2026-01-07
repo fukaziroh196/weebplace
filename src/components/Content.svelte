@@ -2462,19 +2462,30 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     }
 
     .mode-cards {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr);
       gap: 0.75rem;
       padding-left: 0;
     }
 
     .mode-card {
-      padding: 1.25rem 1rem;
+      padding: 1rem;
+      aspect-ratio: 1;
+      min-height: 0;
     }
 
     .mode-avatar {
-      width: 5rem;
-      height: 5rem;
-      font-size: 1.75rem;
+      width: 4rem;
+      height: 4rem;
+      font-size: 1.5rem;
+    }
+
+    .mode-label {
+      font-size: 0.85rem;
+    }
+
+    .mode-description {
+      font-size: 0.7rem;
+      max-width: 100%;
     }
 
     .dashboard-row {

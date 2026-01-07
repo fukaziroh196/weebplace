@@ -167,3 +167,25 @@
     <UserMenu />
   </div>
 </div>
+
+<style>
+  /* Мобильные устройства - адаптация Header */
+  @media (max-width: 768px) {
+    :global(.grid.grid-cols-\[auto_1fr_auto\]) {
+      grid-template-columns: auto 1fr auto !important;
+      gap: 0.5rem !important;
+      padding: 0 0.5rem !important;
+    }
+
+    :global(.grid.grid-cols-\[auto_1fr_auto\] > div:last-child) {
+      gap: 0.5rem !important;
+      padding-right: 0.5rem !important;
+    }
+
+    :global(.grid.grid-cols-\[auto_1fr_auto\] > div:last-child > button) {
+      width: 2.5rem !important;
+      height: 2.5rem !important;
+      min-width: 2.5rem !important;
+    }
+  }
+</style>
