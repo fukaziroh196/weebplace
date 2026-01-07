@@ -1,6 +1,7 @@
 <script>
   import { currentUser, changePassword } from '../stores/authApi';
   import { createEventDispatcher } from 'svelte';
+  import AvatarCropper from './AvatarCropper.svelte';
   
   const dispatch = createEventDispatcher();
   
@@ -12,6 +13,10 @@
   let saving = false;
   let saveError = '';
   let saveSuccess = '';
+  
+  // Cropper state
+  let showCropper = false;
+  let cropperFile = null;
   
   // Password settings
   let currentPassword = '';
@@ -34,18 +39,30 @@
   function handleAvatarChange(e) {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        saveError = 'Файл слишком большой (макс. 2MB)';
+      if (file.size > 10 * 1024 * 1024) {
+        saveError = 'Файл слишком большой (макс. 10MB)';
         return;
       }
-      avatarFile = file;
-      const reader = new FileReader();
-      reader.onload = () => {
-        avatarPreview = reader.result;
-      };
-      reader.readAsDataURL(file);
+      // Открываем кроппер
+      cropperFile = file;
+      showCropper = true;
       saveError = '';
     }
+    // Сбросить input чтобы можно было выбрать тот же файл снова
+    e.target.value = '';
+  }
+  
+  function handleCrop(e) {
+    const { file, preview } = e.detail;
+    avatarFile = file;
+    avatarPreview = preview;
+    showCropper = false;
+    cropperFile = null;
+  }
+  
+  function handleCropCancel() {
+    showCropper = false;
+    cropperFile = null;
   }
   
   async function handleSaveProfile() {
@@ -289,6 +306,14 @@
     </div>
   </div>
 </div>
+
+{#if showCropper && cropperFile}
+  <AvatarCropper 
+    imageFile={cropperFile} 
+    on:crop={handleCrop} 
+    on:cancel={handleCropCancel} 
+  />
+{/if}
 
 <style>
   .modal-overlay {
