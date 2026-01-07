@@ -20,6 +20,11 @@
   let showSearchModal = false;
   let addingFavorite = false;
 
+  // Game history state
+  let gameHistory = [];
+  let gameHistoryLoaded = false;
+  let gameHistoryLoading = false;
+
   $: targetId = $publicProfileUserId;
   $: if (targetId && targetId !== lastId) {
     lastId = targetId;
@@ -28,6 +33,9 @@
     // Сбрасываем состояние избранного при смене пользователя
     favoritesLoaded = false;
     userFavorites = [];
+    // Сбрасываем историю игр
+    gameHistoryLoaded = false;
+    gameHistory = [];
   }
 
   // Загружаем друзей если это наш профиль
@@ -43,12 +51,67 @@
     loadProfileFavorites($publicUser.id, isMeNow);
   }
 
+  // Загружаем историю игр при смене пользователя
+  $: if ($publicUser?.id && !gameHistoryLoaded && !gameHistoryLoading) {
+    gameHistoryLoaded = true;
+    loadGameHistory($publicUser.id);
+  }
+
   async function loadProfileFavorites(userId, isMeCheck) {
     if (isMeCheck) {
       await loadFavorites();
       userFavorites = $favorites;
     } else {
       userFavorites = await loadUserFavorites(userId);
+    }
+  }
+
+  async function loadGameHistory(userId) {
+    if (gameHistoryLoading) return;
+    gameHistoryLoading = true;
+    try {
+      const res = await fetch(`/api/users/${userId}/game-history?limit=50`);
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+      const data = await res.json();
+      // Форматируем даты для отображения
+      gameHistory = (data || []).map(game => ({
+        ...game,
+        date: formatDate(game.date)
+      }));
+    } catch (e) {
+      console.error('Failed to load game history:', e);
+      gameHistory = [];
+    } finally {
+      gameHistoryLoading = false;
+    }
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    try {
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) {
+        // Если не валидная дата, возвращаем как есть
+        return dateStr;
+      }
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      // Проверяем, сегодня ли это
+      if (date.toDateString() === today.toDateString()) {
+        return 'Сегодня';
+      }
+      // Проверяем, вчера ли это
+      if (date.toDateString() === yesterday.toDateString()) {
+        return 'Вчера';
+      }
+      // Форматируем дату
+      return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+    } catch (e) {
+      return dateStr;
     }
   }
 
@@ -63,6 +126,8 @@
       clearPublicUser();
       favoritesLoaded = false;
       userFavorites = [];
+      gameHistoryLoaded = false;
+      gameHistory = [];
     };
   });
 
@@ -194,13 +259,6 @@
     { id: 6, icon: '⚡', name: 'Молниеносный', desc: 'Угадай за 5 секунд', unlocked: false },
   ];
 
-  // Моковая история игр
-  const gameHistory = [
-    { id: 1, mode: 'Угадай аниме', result: 'Победа', score: 150, date: '2025-01-06' },
-    { id: 2, mode: 'Угадай опенинг', result: 'Победа', score: 200, date: '2025-01-05' },
-    { id: 3, mode: 'Угадай персонажа', result: 'Поражение', score: 50, date: '2025-01-05' },
-    { id: 4, mode: 'Аниме баттлы', result: 'Победа', score: 300, date: '2025-01-04' },
-  ];
 </script>
 
 <div class="profile-page">
@@ -440,21 +498,27 @@
         <div class="section-block sticky">
           <h3 class="section-title">📜 История игр</h3>
           <div class="history-list">
-            {#each gameHistory as game (game.id)}
-              <div class="history-item">
-                <div class="history-mode">{game.mode}</div>
-                <div class="history-result" class:win={game.result === 'Победа'} class:lose={game.result === 'Поражение'}>
-                  {game.result}
-                </div>
-                <div class="history-score">+{game.score}</div>
-                <div class="history-date">{game.date}</div>
+            {#if gameHistoryLoading}
+              <div class="empty-history">
+                <span>⏳</span>
+                <p>Загрузка...</p>
               </div>
-            {/each}
-            {#if gameHistory.length === 0}
+            {:else if gameHistory.length === 0}
               <div class="empty-history">
                 <span>📝</span>
                 <p>История игр пуста</p>
               </div>
+            {:else}
+              {#each gameHistory as game (game.id)}
+                <div class="history-item">
+                  <div class="history-mode">{game.mode}</div>
+                  <div class="history-result" class:win={game.result === 'Победа'} class:lose={game.result === 'Поражение'}>
+                    {game.result}
+                  </div>
+                  <div class="history-score">+{game.score}</div>
+                  <div class="history-date">{game.date}</div>
+                </div>
+              {/each}
             {/if}
           </div>
         </div>
