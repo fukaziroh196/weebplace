@@ -110,6 +110,51 @@ export function logout() {
   clearNotificationsStore();
 }
 
+// Update profile (avatar, etc.)
+export async function updateProfile(formData) {
+  const token = localStorage.getItem('api_token');
+  if (!token) throw new Error('Не авторизован');
+  
+  const res = await fetch('/api/user/profile', {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    },
+    body: formData
+  });
+  
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Ошибка сохранения');
+  }
+  
+  const updated = await res.json();
+  currentUser.update(u => ({ ...u, ...updated }));
+  return updated;
+}
+
+// Change password
+export async function changePassword(currentPassword, newPassword) {
+  const token = localStorage.getItem('api_token');
+  if (!token) throw new Error('Не авторизован');
+  
+  const res = await fetch('/api/user/password', {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ currentPassword, newPassword })
+  });
+  
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Ошибка смены пароля');
+  }
+  
+  return true;
+}
+
 // ---------- Friends ----------
 export async function refreshFriendState() {
   try {

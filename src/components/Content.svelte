@@ -25,6 +25,7 @@
   import { loadPublicUserByUsername } from '../stores/users';
   import { publicProfileUserId } from '../stores/ui';
   import PublicProfileView from './PublicProfileView.svelte';
+  import SettingsModal from './SettingsModal.svelte';
 
   // Quizzes-first app: remove anime viewing and banners; home shows quiz menu.
   
@@ -34,6 +35,7 @@ let showReplay = false;
 let showProfileMenu = false;
 let showThemeMenu = false;
 let showNotifications = false;
+let showSettings = false;
 let profileButtonEl;
 let profileDropdownEl;
 let themeButtonEl;
@@ -311,7 +313,11 @@ function toggleProfileMenu() {
   
 function closeProfileMenu() {
   showProfileMenu = false;
-  }
+}
+
+function openSettings() {
+  showSettings = true;
+}
 
 function toggleThemeMenu() {
   showThemeMenu = !showThemeMenu;
@@ -381,6 +387,7 @@ onMount(() => {
 
   window.addEventListener('click', handleClickOutside);
   window.addEventListener('closeProfileMenu', closeProfileMenu);
+  window.addEventListener('openSettings', openSettings);
 
   if (prefersDark?.addEventListener) {
     prefersDark.addEventListener('change', handleSchemeChange);
@@ -391,6 +398,7 @@ onMount(() => {
   return () => {
     window.removeEventListener('click', handleClickOutside);
     window.removeEventListener('closeProfileMenu', closeProfileMenu);
+    window.removeEventListener('openSettings', openSettings);
     if (prefersDark?.removeEventListener) {
       prefersDark.removeEventListener('change', handleSchemeChange);
     } else if (prefersDark?.removeListener) {
@@ -869,6 +877,10 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     </div>
 
     <ReplayDatesModal onClose={closeReplay} bind:open={showReplay} />
+
+    {#if showSettings}
+      <SettingsModal on:close={() => showSettings = false} />
+    {/if}
   </div>
 
 <style>

@@ -227,5 +227,103 @@ module.exports = function registerAuthRoutes(app, {
       });
     });
   });
+
+  // Обновление профиля (аватар через файл или URL)
+  app.put('/api/user/profile', authenticateToken, avatarUpload.single('avatar'), async (req, res) => {
+    try {
+      db.get('SELECT * FROM users WHERE id = ?', [req.user.id], async (err, user) => {
+        if (err || !user) {
+          return res.status(404).json({ error: 'Пользователь не найден' });
+        }
+
+        let newAvatarUrl = user.avatar_url;
+
+        // Если загружен файл аватара
+        if (req.file) {
+          try {
+            newAvatarUrl = await processAvatarImage(req.file.buffer, req.user.id);
+            if (user.avatar_url) {
+              deleteOldAvatar(user.avatar_url);
+            }
+          } catch (processError) {
+            return res.status(400).json({ error: processError.message || 'Ошибка обработки изображения' });
+          }
+        } 
+        // Если указан URL аватара
+        else if (req.body.avatarUrl !== undefined) {
+          // Удаляем старый локальный аватар если был
+          if (user.avatar_url && user.avatar_url.startsWith('/avatars/')) {
+            deleteOldAvatar(user.avatar_url);
+          }
+          newAvatarUrl = req.body.avatarUrl || null;
+        }
+
+        // Обновляем в БД
+        db.run(
+          'UPDATE users SET avatar_url = ? WHERE id = ?',
+          [newAvatarUrl, req.user.id],
+          function(updateErr) {
+            if (updateErr) {
+              return res.status(500).json({ error: 'Ошибка сохранения' });
+            }
+
+            res.json({
+              id: user.id,
+              username: user.username,
+              isAdmin: !!user.is_admin,
+              avatarUrl: newAvatarUrl
+            });
+          }
+        );
+      });
+    } catch (error) {
+      console.error('[PUT /api/user/profile] Error:', error);
+      res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    }
+  });
+
+  // Смена пароля
+  app.put('/api/user/password', authenticateToken, [
+    body('currentPassword').notEmpty().withMessage('Введите текущий пароль'),
+    body('newPassword')
+      .isLength({ min: 6 })
+      .withMessage('Новый пароль должен быть минимум 6 символов'),
+    handleValidationErrors
+  ], async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+
+    try {
+      db.get('SELECT * FROM users WHERE id = ?', [req.user.id], async (err, user) => {
+        if (err || !user) {
+          return res.status(404).json({ error: 'Пользователь не найден' });
+        }
+
+        // Проверяем текущий пароль
+        const validPassword = await bcrypt.compare(currentPassword, user.password_hash);
+        if (!validPassword) {
+          return res.status(401).json({ error: 'Неверный текущий пароль' });
+        }
+
+        // Хешируем новый пароль
+        const newHash = await bcrypt.hash(newPassword, 10);
+
+        // Обновляем в БД
+        db.run(
+          'UPDATE users SET password_hash = ? WHERE id = ?',
+          [newHash, req.user.id],
+          function(updateErr) {
+            if (updateErr) {
+              return res.status(500).json({ error: 'Ошибка сохранения пароля' });
+            }
+
+            res.json({ success: true, message: 'Пароль успешно изменён' });
+          }
+        );
+      });
+    } catch (error) {
+      console.error('[PUT /api/user/password] Error:', error);
+      res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    }
+  });
 };
 
