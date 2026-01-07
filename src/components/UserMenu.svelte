@@ -43,7 +43,7 @@
 
 <div class="relative" use:clickOutside={{ enabled: true, callback: () => { showMenu = false; } }}>
   {#if $currentUser}
-    <button class="user-menu-button flex items-center gap-3 px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white cursor-pointer transition-all select-none backdrop-blur-sm relative"
+    <button class="user-menu-button flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white cursor-pointer transition-all select-none backdrop-blur-sm relative"
             on:click={() => { showMenu = !showMenu; }}>
       <div class="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0" style="background: {$currentUser?.avatarUrl ? 'transparent' : getAvatarGradient($currentUser.username)}">
         {#if $currentUser?.avatarUrl}
@@ -105,11 +105,15 @@
 </div>
 
 <style>
-  /* Мобильные устройства - квадратная кнопка со скругленными углами */
+  /* Квадратная кнопка со скругленными углами */
+  .user-menu-button {
+    border-radius: 0.75rem !important;
+  }
+
+  /* Мобильные устройства - квадратная кнопка, только аватар */
   @media (max-width: 768px) {
     .user-menu-button {
       padding: 0.5rem !important;
-      border-radius: 0.75rem !important;
       gap: 0 !important;
       min-width: 2.75rem;
       width: 2.75rem;

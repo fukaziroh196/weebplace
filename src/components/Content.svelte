@@ -2461,6 +2461,10 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       text-align: center;
     }
 
+    .mode-cards-wrapper {
+      margin-top: 1.5rem;
+    }
+
     .mode-cards {
       grid-template-columns: repeat(2, 1fr);
       gap: 0.75rem;
@@ -2471,6 +2475,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       padding: 1rem;
       aspect-ratio: 1;
       min-height: 0;
+      background: var(--card-bg) !important;
     }
 
     .mode-avatar {
