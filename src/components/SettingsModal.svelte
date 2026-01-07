@@ -1,5 +1,5 @@
 <script>
-  import { currentUser, changePassword } from '../stores/authApi';
+  import { currentUser, changePassword, loadCurrentUser } from '../stores/authApi';
   import { createEventDispatcher } from 'svelte';
   import AvatarCropper from './AvatarCropper.svelte';
   
@@ -95,7 +95,8 @@
         }
         
         const data = await res.json();
-        currentUser.update(u => ({ ...u, avatarUrl: data.avatarUrl }));
+        // Перезагружаем пользователя, чтобы получить актуальные данные
+        await loadCurrentUser();
         avatarFile = null;
       } 
       // Удаление аватара
@@ -110,7 +111,8 @@
           throw new Error(err.error || 'Ошибка удаления');
         }
         
-        currentUser.update(u => ({ ...u, avatarUrl: null }));
+        // Перезагружаем пользователя, чтобы получить актуальные данные
+        await loadCurrentUser();
       }
       
       saveSuccess = 'Профиль сохранён!';

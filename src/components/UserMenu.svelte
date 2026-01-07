@@ -9,7 +9,6 @@
   let username = '';
   let password = '';
   let error = '';
-  let avatarError = false;
 
   async function submit() {
     error = '';
@@ -39,21 +38,15 @@
     return `linear-gradient(135deg, ${colors[index][0]} 0%, ${colors[index][1]} 100%)`;
   }
 
-  // Сбрасываем ошибку аватара при смене пользователя
-  $: if ($currentUser?.id) {
-    avatarError = false;
-  }
 </script>
 
 <div class="relative" use:clickOutside={{ enabled: true, callback: () => { showMenu = false; } }}>
   {#if $currentUser}
     <button class="flex items-center gap-2 px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white cursor-pointer transition-all select-none backdrop-blur-sm relative"
             on:click={() => { showMenu = !showMenu; }}>
-      <div class="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0" style="background: {($currentUser?.avatarUrl && !avatarError) ? 'transparent' : getAvatarGradient($currentUser.username)}">
-        {#if $currentUser?.avatarUrl && !avatarError}
-          <img src={$currentUser.avatarUrl} alt="avatar" class="block w-full h-full object-cover" 
-               on:error={() => { avatarError = true; }} 
-               on:load={() => { avatarError = false; }} />
+      <div class="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0" style="background: {$currentUser?.avatarUrl ? 'transparent' : getAvatarGradient($currentUser.username)}">
+        {#if $currentUser?.avatarUrl}
+          <img src={$currentUser.avatarUrl} alt="avatar" class="block w-full h-full object-cover" />
         {:else}
           <span class="text-white font-semibold text-sm">{$currentUser.username?.[0]?.toUpperCase() || 'U'}</span>
         {/if}
