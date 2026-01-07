@@ -10,7 +10,7 @@
   let lastId = null;
   let requestSending = false;
   let requestSent = false;
-  let activeTab = 'stats';
+  let activeTab = 'history';
   
   // Favorites state
   let userFavorites = [];
@@ -326,31 +326,121 @@
 
       <!-- Правая колонка - контент -->
       <main class="profile-main">
-        <!-- Табы -->
+        <!-- Статистика (всегда видна) -->
+        <div class="stats-grid">
+          <div class="stat-card large">
+            <div class="stat-icon">🎮</div>
+            <div class="stat-info">
+              <div class="stat-value">{$publicUser.gamesPlayed || 0}</div>
+              <div class="stat-label">Всего игр сыграно</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🏆</div>
+            <div class="stat-info">
+              <div class="stat-value">{$publicUser.totalScore || 0}</div>
+              <div class="stat-label">Общий счёт</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🔥</div>
+            <div class="stat-info">
+              <div class="stat-value">{$publicUser.streak || 0}</div>
+              <div class="stat-label">Дней подряд</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-info">
+              <div class="stat-value">{$publicUser.achievements || 0}</div>
+              <div class="stat-label">Достижений</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-info">
+              <div class="stat-value">{$publicUser.accuracy || 0}%</div>
+              <div class="stat-label">Точность</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Избранное (всегда видно) -->
+        <div class="section-block">
+          <div class="section-header">
+            <h3 class="section-title">❤️ Избранные аниме</h3>
+            {#if isMe}
+              <button class="add-favorite-btn" on:click={() => showSearchModal = true}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Добавить
+              </button>
+            {/if}
+          </div>
+          {#if userFavorites.length > 0}
+            <div class="favorites-grid">
+              {#each userFavorites as fav (fav.id)}
+                <div class="favorite-card">
+                  <div class="favorite-image">
+                    {#if fav.imageUrl}
+                      <img src={fav.imageUrl} alt={fav.title} />
+                    {:else}
+                      <div class="favorite-placeholder">🎬</div>
+                    {/if}
+                    {#if fav.score}
+                      <div class="favorite-score">⭐ {fav.score}</div>
+                    {/if}
+                  </div>
+                  <div class="favorite-info">
+                    <div class="favorite-title">{fav.title}</div>
+                    {#if isMe}
+                      <button class="favorite-remove" on:click={() => handleRemoveFavorite(fav)}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </button>
+                    {/if}
+                  </div>
+                </div>
+              {/each}
+            </div>
+          {:else}
+            <div class="empty-section">
+              {#if isMe}
+                <p>Добавьте любимые аниме!</p>
+              {:else}
+                <p>Нет избранных аниме</p>
+              {/if}
+            </div>
+          {/if}
+        </div>
+
+        <!-- Достижения (всегда видны) -->
+        <div class="section-block">
+          <h3 class="section-title">🏆 Достижения</h3>
+          <div class="achievements-grid">
+            {#each achievements as achievement (achievement.id)}
+              <div class="achievement-card" class:locked={!achievement.unlocked}>
+                <div class="achievement-icon">{achievement.icon}</div>
+                <div class="achievement-info">
+                  <div class="achievement-name">{achievement.name}</div>
+                  <div class="achievement-desc">{achievement.desc}</div>
+                </div>
+                {#if achievement.unlocked}
+                  <div class="achievement-check">✓</div>
+                {:else}
+                  <div class="achievement-lock">🔒</div>
+                {/if}
+              </div>
+            {/each}
+          </div>
+        </div>
+
+        <!-- Табы только для Истории и Друзей -->
         <div class="tabs-container">
-          <button 
-            class="tab-button" 
-            class:active={activeTab === 'stats'}
-            on:click={() => activeTab = 'stats'}
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="18" y1="20" x2="18" y2="10"></line>
-              <line x1="12" y1="20" x2="12" y2="4"></line>
-              <line x1="6" y1="20" x2="6" y2="14"></line>
-            </svg>
-            Статистика
-          </button>
-          <button 
-            class="tab-button" 
-            class:active={activeTab === 'achievements'}
-            on:click={() => activeTab = 'achievements'}
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="8" r="7"></circle>
-              <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
-            </svg>
-            Достижения
-          </button>
           <button 
             class="tab-button" 
             class:active={activeTab === 'history'}
@@ -361,16 +451,6 @@
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
             История
-          </button>
-          <button 
-            class="tab-button" 
-            class:active={activeTab === 'favorites'}
-            on:click={() => activeTab = 'favorites'}
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-            </svg>
-            Избранное
           </button>
           {#if isMe}
             <button 
@@ -391,64 +471,7 @@
 
         <!-- Контент табов -->
         <div class="tab-content">
-          {#if activeTab === 'stats'}
-            <div class="stats-grid">
-              <div class="stat-card large">
-                <div class="stat-icon">🎮</div>
-                <div class="stat-info">
-                  <div class="stat-value">{$publicUser.gamesPlayed || 0}</div>
-                  <div class="stat-label">Всего игр сыграно</div>
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon">🏆</div>
-                <div class="stat-info">
-                  <div class="stat-value">{$publicUser.totalScore || 0}</div>
-                  <div class="stat-label">Общий счёт</div>
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon">🔥</div>
-                <div class="stat-info">
-                  <div class="stat-value">{$publicUser.streak || 0}</div>
-                  <div class="stat-label">Дней подряд</div>
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon">⭐</div>
-                <div class="stat-info">
-                  <div class="stat-value">{$publicUser.achievements || 0}</div>
-                  <div class="stat-label">Достижений</div>
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon">🎯</div>
-                <div class="stat-info">
-                  <div class="stat-value">{$publicUser.accuracy || 0}%</div>
-                  <div class="stat-label">Точность</div>
-                </div>
-              </div>
-            </div>
-
-          {:else if activeTab === 'achievements'}
-            <div class="achievements-grid">
-              {#each achievements as achievement (achievement.id)}
-                <div class="achievement-card" class:locked={!achievement.unlocked}>
-                  <div class="achievement-icon">{achievement.icon}</div>
-                  <div class="achievement-info">
-                    <div class="achievement-name">{achievement.name}</div>
-                    <div class="achievement-desc">{achievement.desc}</div>
-                  </div>
-                  {#if achievement.unlocked}
-                    <div class="achievement-check">✓</div>
-                  {:else}
-                    <div class="achievement-lock">🔒</div>
-                  {/if}
-                </div>
-              {/each}
-            </div>
-
-          {:else if activeTab === 'history'}
+          {#if activeTab === 'history'}
             <div class="history-list">
               {#each gameHistory as game (game.id)}
                 <div class="history-item">
@@ -467,119 +490,6 @@
                 </div>
               {/if}
             </div>
-
-          {:else if activeTab === 'favorites'}
-            <div class="favorites-section">
-              {#if isMe}
-                <div class="favorites-header">
-                  <h3>Любимые аниме</h3>
-                  <button class="add-favorite-btn" on:click={() => showSearchModal = true}>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <line x1="12" y1="5" x2="12" y2="19"></line>
-                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                    Добавить
-                  </button>
-                </div>
-              {/if}
-              
-              {#if userFavorites.length > 0}
-                <div class="favorites-grid">
-                  {#each userFavorites as fav (fav.id)}
-                    <div class="favorite-card">
-                      <div class="favorite-image">
-                        {#if fav.imageUrl}
-                          <img src={fav.imageUrl} alt={fav.title} />
-                        {:else}
-                          <div class="favorite-placeholder">🎬</div>
-                        {/if}
-                        {#if fav.score}
-                          <div class="favorite-score">⭐ {fav.score}</div>
-                        {/if}
-                      </div>
-                      <div class="favorite-info">
-                        <div class="favorite-title">{fav.title}</div>
-                        {#if isMe}
-                          <button class="favorite-remove" on:click={() => handleRemoveFavorite(fav)}>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <line x1="18" y1="6" x2="6" y2="18"></line>
-                              <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
-                          </button>
-                        {/if}
-                      </div>
-                    </div>
-                  {/each}
-                </div>
-              {:else}
-                <div class="empty-favorites">
-                  <span>❤️</span>
-                  <p>{isMe ? 'Добавьте любимые аниме!' : 'Нет избранных аниме'}</p>
-                  {#if isMe}
-                    <span class="empty-hint">Нажмите "Добавить" чтобы найти и добавить аниме</span>
-                  {/if}
-                </div>
-              {/if}
-            </div>
-
-            <!-- Модалка поиска -->
-            {#if showSearchModal && isMe}
-              <div class="search-modal-overlay" on:click={() => showSearchModal = false}>
-                <div class="search-modal" on:click|stopPropagation>
-                  <div class="search-modal-header">
-                    <h3>Добавить в избранное</h3>
-                    <button class="search-modal-close" on:click={() => showSearchModal = false}>×</button>
-                  </div>
-                  <div class="search-input-wrapper">
-                    <input 
-                      type="text" 
-                      placeholder="Поиск аниме..." 
-                      bind:value={searchQuery}
-                      on:input={handleSearch}
-                      class="search-input"
-                    />
-                    {#if isSearching}
-                      <div class="search-spinner"></div>
-                    {/if}
-                  </div>
-                  <div class="search-results">
-                    {#if searchResults.length > 0}
-                      {#each searchResults as anime (anime.id)}
-                        <button 
-                          class="search-result-item" 
-                          class:already-added={isFavoriteAlready(anime.id)}
-                          on:click={() => !isFavoriteAlready(anime.id) && handleAddFavorite(anime)}
-                          disabled={isFavoriteAlready(anime.id) || addingFavorite}
-                        >
-                          <div class="search-result-image">
-                            {#if anime.image}
-                              <img src={anime.image} alt={anime.title} />
-                            {:else}
-                              <div class="search-result-placeholder">🎬</div>
-                            {/if}
-                          </div>
-                          <div class="search-result-info">
-                            <div class="search-result-title">{anime.title}</div>
-                            {#if anime.score}
-                              <div class="search-result-score">⭐ {anime.score}</div>
-                            {/if}
-                          </div>
-                          {#if isFavoriteAlready(anime.id)}
-                            <span class="already-badge">✓ Добавлено</span>
-                          {:else}
-                            <span class="add-badge">+ Добавить</span>
-                          {/if}
-                        </button>
-                      {/each}
-                    {:else if searchQuery && !isSearching}
-                      <div class="search-empty">Ничего не найдено</div>
-                    {:else if !searchQuery}
-                      <div class="search-empty">Начните вводить название аниме</div>
-                    {/if}
-                  </div>
-                </div>
-              </div>
-            {/if}
 
           {:else if activeTab === 'friends' && isMe}
             <div class="friends-grid">
@@ -611,6 +521,65 @@
         </div>
       </main>
     </div>
+
+    <!-- Модалка поиска избранного -->
+    {#if showSearchModal && isMe}
+      <div class="search-modal-overlay" on:click={() => showSearchModal = false}>
+        <div class="search-modal" on:click|stopPropagation>
+          <div class="search-modal-header">
+            <h3>Добавить в избранное</h3>
+            <button class="search-modal-close" on:click={() => showSearchModal = false}>×</button>
+          </div>
+          <div class="search-input-wrapper">
+            <input 
+              type="text" 
+              placeholder="Поиск аниме..." 
+              bind:value={searchQuery}
+              on:input={handleSearch}
+              class="search-input"
+            />
+            {#if isSearching}
+              <div class="search-spinner"></div>
+            {/if}
+          </div>
+          <div class="search-results">
+            {#if searchResults.length > 0}
+              {#each searchResults as anime (anime.id)}
+                <button 
+                  class="search-result-item" 
+                  class:already-added={isFavoriteAlready(anime.id)}
+                  on:click={() => !isFavoriteAlready(anime.id) && handleAddFavorite(anime)}
+                  disabled={isFavoriteAlready(anime.id) || addingFavorite}
+                >
+                  <div class="search-result-image">
+                    {#if anime.image}
+                      <img src={anime.image} alt={anime.title} />
+                    {:else}
+                      <div class="search-result-placeholder">🎬</div>
+                    {/if}
+                  </div>
+                  <div class="search-result-info">
+                    <div class="search-result-title">{anime.title}</div>
+                    {#if anime.score}
+                      <div class="search-result-score">⭐ {anime.score}</div>
+                    {/if}
+                  </div>
+                  {#if isFavoriteAlready(anime.id)}
+                    <span class="already-badge">✓ Добавлено</span>
+                  {:else}
+                    <span class="add-badge">+ Добавить</span>
+                  {/if}
+                </button>
+              {/each}
+            {:else if searchQuery && !isSearching}
+              <div class="search-empty">Ничего не найдено</div>
+            {:else if !searchQuery}
+              <div class="search-empty">Начните вводить название аниме</div>
+            {/if}
+          </div>
+        </div>
+      </div>
+    {/if}
   {/if}
 </div>
 
@@ -1014,6 +983,44 @@
   .stat-label {
     font-size: 0.8rem;
     color: var(--text-secondary);
+  }
+
+  /* Section Blocks */
+  .section-block {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.25rem;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .section-block .section-title {
+    margin: 0 0 1rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .section-header .section-title {
+    margin: 0;
+  }
+
+  .empty-section {
+    text-align: center;
+    padding: 1.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+
+  .empty-section p {
+    margin: 0;
   }
 
   /* Modes Section */
