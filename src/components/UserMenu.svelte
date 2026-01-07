@@ -42,16 +42,16 @@
 
 <div class="relative" use:clickOutside={{ enabled: true, callback: () => { showMenu = false; } }}>
   {#if $currentUser}
-    <button class="flex items-center gap-2 px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white cursor-pointer transition-all select-none backdrop-blur-sm relative"
+    <button class="flex items-center gap-3 px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white cursor-pointer transition-all select-none backdrop-blur-sm relative"
             on:click={() => { showMenu = !showMenu; }}>
-      <div class="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0" style="background: {$currentUser?.avatarUrl ? 'transparent' : getAvatarGradient($currentUser.username)}">
+      <div class="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0" style="background: {$currentUser?.avatarUrl ? 'transparent' : getAvatarGradient($currentUser.username)}">
         {#if $currentUser?.avatarUrl}
           <img src={$currentUser.avatarUrl} alt="avatar" class="block w-full h-full object-cover" />
         {:else}
-          <span class="text-white font-semibold text-sm">{$currentUser.username?.[0]?.toUpperCase() || 'U'}</span>
+          <span class="text-white font-semibold text-base">{$currentUser.username?.[0]?.toUpperCase() || 'U'}</span>
         {/if}
       </div>
-      <span class="font-medium text-sm whitespace-nowrap">{$currentUser.username}</span>
+      <span class="font-medium text-base whitespace-nowrap">{$currentUser.username}</span>
       {#if $unreadTotal > 0}
         <span class="absolute -top-1 -right-1 bg-pink-600 text-white text-xs rounded-full px-1.5 py-0.5">{$unreadTotal}</span>
       {/if}
