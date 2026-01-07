@@ -22,6 +22,21 @@
       error = e?.message || 'Ошибка';
     }
   }
+
+  function getAvatarGradient(name) {
+    const colors = [
+      ['#ff6b6b', '#ee5a24'],
+      ['#74b9ff', '#0984e3'],
+      ['#55efc4', '#00b894'],
+      ['#fd79a8', '#e84393'],
+      ['#a29bfe', '#6c5ce7'],
+      ['#ffeaa7', '#fdcb6e'],
+      ['#81ecec', '#00cec9'],
+      ['#fab1a0', '#e17055'],
+    ];
+    const index = (name?.charCodeAt(0) || 0) % colors.length;
+    return `linear-gradient(135deg, ${colors[index][0]} 0%, ${colors[index][1]} 100%)`;
+  }
 </script>
 
 <div class="relative" use:clickOutside={{ enabled: true, callback: () => { showMenu = false; } }}>
@@ -39,6 +54,23 @@
 
   {#if showMenu}
     <div class="absolute right-0 mt-2 rounded-xl overflow-hidden z-30 min-w-[220px] menu-surface p-2">
+      {#if $currentUser}
+        <div class="menu-header pb-2 mb-2 border-b border-white/10">
+          <div class="flex items-center gap-3 px-2">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0" style={$currentUser?.avatarUrl ? '' : `background: ${getAvatarGradient($currentUser.username)}`}>
+              {#if $currentUser?.avatarUrl}
+                <img src={$currentUser.avatarUrl} alt="avatar" class="block w-full h-full object-cover" />
+              {:else}
+                <span class="text-white font-semibold text-lg">{$currentUser.username?.[0]?.toUpperCase() || 'U'}</span>
+              {/if}
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="text-white font-semibold text-sm truncate">{$currentUser.username}</div>
+              <div class="text-white/60 text-xs truncate">otakuz.fun</div>
+            </div>
+          </div>
+        </div>
+      {/if}
       <button class="w-full text-left menu-item" on:click={() => { goToProfile(); showMenu = false; }}>Профиль</button>
       {#if $currentUser}
         <button class="w-full text-left menu-item" on:click={() => { goToMessages(); showMenu = false; }}>Сообщения</button>
