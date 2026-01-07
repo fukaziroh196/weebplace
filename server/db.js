@@ -174,6 +174,21 @@ db.serialize(() => {
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   )`);
 
+  // Таблица для избранных аниме пользователей
+  db.run(`CREATE TABLE IF NOT EXISTS user_favorites (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    anime_id TEXT NOT NULL,
+    title TEXT NOT NULL,
+    image_url TEXT,
+    score REAL,
+    source_id TEXT DEFAULT 'shikimori',
+    created_at INTEGER NOT NULL,
+    position INTEGER DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE(user_id, anime_id)
+  )`);
+
   // ============ ИНДЕКСЫ ============
   db.run(`CREATE INDEX IF NOT EXISTS idx_anime_guesses_quiz_date ON anime_guesses(quiz_date)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_anime_guesses_user_id ON anime_guesses(user_id)`);
@@ -189,6 +204,7 @@ db.serialize(() => {
   db.run(`CREATE INDEX IF NOT EXISTS idx_friend_requests_to_status ON friend_requests(to_user_id, status, created_at DESC)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_friend_requests_from_status ON friend_requests(from_user_id, status, created_at DESC)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_friendships_user ON friendships(user_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_user_favorites_user_id ON user_favorites(user_id, position)`);
 });
 
 module.exports = { db, dbPath };

@@ -4,11 +4,22 @@
   import { publicUser, publicUserLoading, publicUserError, loadPublicUser, clearPublicUser } from '../stores/users';
   import { currentUser, friends, friendProfiles, refreshFriendState } from '../stores/authApi';
   import { sendFriendRequest, removeFriend, friendRequestsOutgoing } from '../stores/authApi';
+  import { favorites, loadFavorites, loadUserFavorites, addFavorite, removeFavorite } from '../stores/favorites';
+  import { searchAnimes } from '../sources/shikimoriClient';
 
   let lastId = null;
   let requestSending = false;
   let requestSent = false;
   let activeTab = 'stats';
+  
+  // Favorites state
+  let userFavorites = [];
+  let favoritesLoaded = false;
+  let searchQuery = '';
+  let searchResults = [];
+  let isSearching = false;
+  let showSearchModal = false;
+  let addingFavorite = false;
 
   $: targetId = $publicProfileUserId;
   $: if (targetId && targetId !== lastId) {
@@ -23,10 +34,91 @@
     refreshFriendState();
   }
 
+  // Загружаем избранное при смене пользователя
+  $: if ($publicUser?.id && !favoritesLoaded) {
+    favoritesLoaded = true;
+    loadProfileFavorites($publicUser.id);
+  }
+
+  async function loadProfileFavorites(userId) {
+    if (isMe) {
+      await loadFavorites();
+      userFavorites = $favorites;
+    } else {
+      userFavorites = await loadUserFavorites(userId);
+    }
+  }
+
+  // Синхронизируем с store если это наш профиль
+  $: if (isMe) {
+    userFavorites = $favorites;
+  }
+
   onMount(() => {
     if (targetId) loadPublicUser(targetId);
-    return () => clearPublicUser();
+    return () => {
+      clearPublicUser();
+      favoritesLoaded = false;
+      userFavorites = [];
+    };
   });
+
+  // Поиск аниме
+  let searchTimeout;
+  async function handleSearch() {
+    if (!searchQuery.trim()) {
+      searchResults = [];
+      return;
+    }
+    
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(async () => {
+      isSearching = true;
+      try {
+        const results = await searchAnimes(searchQuery, 1, 10);
+        searchResults = results.map(a => ({
+          id: a.id,
+          title: a.russian || a.name,
+          image: a.image ? `https://shikimori.one${a.image.original || a.image.preview}` : null,
+          score: a.score,
+          __sourceId: 'shikimori'
+        }));
+      } catch (e) {
+        console.error('Search failed:', e);
+        searchResults = [];
+      } finally {
+        isSearching = false;
+      }
+    }, 300);
+  }
+
+  async function handleAddFavorite(anime) {
+    if (addingFavorite) return;
+    addingFavorite = true;
+    try {
+      await addFavorite(anime);
+      searchQuery = '';
+      searchResults = [];
+      showSearchModal = false;
+    } catch (e) {
+      alert(e?.message || 'Не удалось добавить в избранное');
+    } finally {
+      addingFavorite = false;
+    }
+  }
+
+  async function handleRemoveFavorite(fav) {
+    if (!confirm(`Удалить "${fav.title}" из избранного?`)) return;
+    try {
+      await removeFavorite(fav.id);
+    } catch (e) {
+      alert(e?.message || 'Не удалось удалить');
+    }
+  }
+
+  function isFavoriteAlready(animeId) {
+    return userFavorites.some(f => f.animeId === String(animeId));
+  }
 
   async function handleAddFriend() {
     if (!$publicUser?.username || requestSending) return;
@@ -266,6 +358,16 @@
             </svg>
             История
           </button>
+          <button 
+            class="tab-button" 
+            class:active={activeTab === 'favorites'}
+            on:click={() => activeTab = 'favorites'}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            Избранное
+          </button>
           {#if isMe}
             <button 
               class="tab-button" 
@@ -361,6 +463,119 @@
                 </div>
               {/if}
             </div>
+
+          {:else if activeTab === 'favorites'}
+            <div class="favorites-section">
+              {#if isMe}
+                <div class="favorites-header">
+                  <h3>Любимые аниме</h3>
+                  <button class="add-favorite-btn" on:click={() => showSearchModal = true}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Добавить
+                  </button>
+                </div>
+              {/if}
+              
+              {#if userFavorites.length > 0}
+                <div class="favorites-grid">
+                  {#each userFavorites as fav (fav.id)}
+                    <div class="favorite-card">
+                      <div class="favorite-image">
+                        {#if fav.imageUrl}
+                          <img src={fav.imageUrl} alt={fav.title} />
+                        {:else}
+                          <div class="favorite-placeholder">🎬</div>
+                        {/if}
+                        {#if fav.score}
+                          <div class="favorite-score">⭐ {fav.score}</div>
+                        {/if}
+                      </div>
+                      <div class="favorite-info">
+                        <div class="favorite-title">{fav.title}</div>
+                        {#if isMe}
+                          <button class="favorite-remove" on:click={() => handleRemoveFavorite(fav)}>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <line x1="18" y1="6" x2="6" y2="18"></line>
+                              <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                          </button>
+                        {/if}
+                      </div>
+                    </div>
+                  {/each}
+                </div>
+              {:else}
+                <div class="empty-favorites">
+                  <span>❤️</span>
+                  <p>{isMe ? 'Добавьте любимые аниме!' : 'Нет избранных аниме'}</p>
+                  {#if isMe}
+                    <span class="empty-hint">Нажмите "Добавить" чтобы найти и добавить аниме</span>
+                  {/if}
+                </div>
+              {/if}
+            </div>
+
+            <!-- Модалка поиска -->
+            {#if showSearchModal && isMe}
+              <div class="search-modal-overlay" on:click={() => showSearchModal = false}>
+                <div class="search-modal" on:click|stopPropagation>
+                  <div class="search-modal-header">
+                    <h3>Добавить в избранное</h3>
+                    <button class="search-modal-close" on:click={() => showSearchModal = false}>×</button>
+                  </div>
+                  <div class="search-input-wrapper">
+                    <input 
+                      type="text" 
+                      placeholder="Поиск аниме..." 
+                      bind:value={searchQuery}
+                      on:input={handleSearch}
+                      class="search-input"
+                    />
+                    {#if isSearching}
+                      <div class="search-spinner"></div>
+                    {/if}
+                  </div>
+                  <div class="search-results">
+                    {#if searchResults.length > 0}
+                      {#each searchResults as anime (anime.id)}
+                        <button 
+                          class="search-result-item" 
+                          class:already-added={isFavoriteAlready(anime.id)}
+                          on:click={() => !isFavoriteAlready(anime.id) && handleAddFavorite(anime)}
+                          disabled={isFavoriteAlready(anime.id) || addingFavorite}
+                        >
+                          <div class="search-result-image">
+                            {#if anime.image}
+                              <img src={anime.image} alt={anime.title} />
+                            {:else}
+                              <div class="search-result-placeholder">🎬</div>
+                            {/if}
+                          </div>
+                          <div class="search-result-info">
+                            <div class="search-result-title">{anime.title}</div>
+                            {#if anime.score}
+                              <div class="search-result-score">⭐ {anime.score}</div>
+                            {/if}
+                          </div>
+                          {#if isFavoriteAlready(anime.id)}
+                            <span class="already-badge">✓ Добавлено</span>
+                          {:else}
+                            <span class="add-badge">+ Добавить</span>
+                          {/if}
+                        </button>
+                      {/each}
+                    {:else if searchQuery && !isSearching}
+                      <div class="search-empty">Ничего не найдено</div>
+                    {:else if !searchQuery}
+                      <div class="search-empty">Начните вводить название аниме</div>
+                    {/if}
+                  </div>
+                </div>
+              </div>
+            {/if}
 
           {:else if activeTab === 'friends' && isMe}
             <div class="friends-grid">
@@ -1101,6 +1316,364 @@
 
     .history-date {
       grid-column: span 2;
+    }
+  }
+
+  /* Favorites */
+  .favorites-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .favorites-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .favorites-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .add-favorite-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #fd79a8, #e84393);
+    border: none;
+    border-radius: 999px;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .add-favorite-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(232, 67, 147, 0.4);
+  }
+
+  .add-favorite-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .favorites-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+  }
+
+  .favorite-card {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+
+  .favorite-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .favorite-image {
+    position: relative;
+    aspect-ratio: 3/4;
+    overflow: hidden;
+  }
+
+  .favorite-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .favorite-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    font-size: 2rem;
+  }
+
+  .favorite-score {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.2rem 0.5rem;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #ffd700;
+  }
+
+  .favorite-info {
+    padding: 0.75rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .favorite-title {
+    flex: 1;
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .favorite-remove {
+    padding: 0.25rem;
+    background: rgba(255, 107, 107, 0.2);
+    border: none;
+    border-radius: 0.5rem;
+    color: #ff6b6b;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .favorite-remove:hover {
+    background: rgba(255, 107, 107, 0.4);
+  }
+
+  .favorite-remove svg {
+    width: 14px;
+    height: 14px;
+    display: block;
+  }
+
+  .empty-favorites {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-secondary);
+  }
+
+  .empty-favorites span:first-child {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .empty-favorites p {
+    margin: 0 0 0.5rem;
+    font-size: 1rem;
+  }
+
+  /* Search Modal */
+  .search-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+  }
+
+  .search-modal {
+    background: rgba(30, 30, 40, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 1.5rem;
+    width: 100%;
+    max-width: 500px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .search-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .search-modal-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .search-modal-close {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50%;
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .search-modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .search-input-wrapper {
+    position: relative;
+    padding: 1rem 1.25rem;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 0.75rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-input:focus {
+    border-color: var(--accent-primary);
+  }
+
+  .search-input::placeholder {
+    color: var(--text-tertiary);
+  }
+
+  .search-spinner {
+    position: absolute;
+    right: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-top-color: var(--accent-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  .search-results {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 1.25rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .search-result-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    text-align: left;
+    width: 100%;
+  }
+
+  .search-result-item:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .search-result-item:disabled {
+    cursor: default;
+  }
+
+  .search-result-item.already-added {
+    opacity: 0.6;
+  }
+
+  .search-result-image {
+    width: 48px;
+    height: 64px;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .search-result-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .search-result-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    font-size: 1.25rem;
+  }
+
+  .search-result-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .search-result-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .search-result-score {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 0.2rem;
+  }
+
+  .add-badge, .already-badge {
+    padding: 0.3rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .add-badge {
+    background: rgba(85, 239, 196, 0.2);
+    color: #55efc4;
+  }
+
+  .already-badge {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+  }
+
+  .search-empty {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 600px) {
+    .favorites-grid {
+      grid-template-columns: repeat(2, 1fr);
     }
   }
 </style>

@@ -27,6 +27,7 @@ const registerPacksRoutes = require('./routes/packs');
 const registerUsersRoutes = require('./routes/users');
 const registerNotificationsRoutes = require('./routes/notifications');
 const registerFriendsRoutes = require('./routes/friends');
+const registerFavoritesRoutes = require('./routes/favorites');
 const { body, param, query, validationResult } = require('express-validator');
 
 const app = express();
@@ -307,6 +308,7 @@ registerPacksRoutes(app, { db, authenticateToken, requireAdmin, upload, uploadsD
 registerUsersRoutes(app, { db, handleValidationErrors });
 registerNotificationsRoutes(app, { db, authenticateToken, handleValidationErrors });
 registerFriendsRoutes(app, { db, authenticateToken, handleValidationErrors });
+registerFavoritesRoutes(app, { db, authenticateToken, handleValidationErrors });
 
 // ======== SPA STATIC FALLBACK (if built frontend exists) ========
 const clientDistPath = path.join(__dirname, '..', 'dist');
