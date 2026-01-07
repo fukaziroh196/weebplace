@@ -533,7 +533,7 @@
       transform-origin: top left;
     }
     .profile-layout {
-      margin-left: 0;
+      margin-left: 0.75rem;
     }
   }
 
