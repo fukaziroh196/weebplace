@@ -301,6 +301,24 @@
             </div>
           {/if}
         </div>
+
+        <!-- Друзья (только аватарки) -->
+        {#if isMe && $friendProfiles && $friendProfiles.length > 0}
+          <div class="sidebar-friends">
+            <h4 class="sidebar-friends-title">👥 Друзья</h4>
+            <div class="sidebar-friends-grid">
+              {#each $friendProfiles as friend (friend.id)}
+                <button class="sidebar-friend-avatar" on:click={() => handleFriendClick(friend)} title={friend.username} style="background: {getAvatarGradient(friend.username)}">
+                  {#if friend.avatarUrl}
+                    <img src={friend.avatarUrl} alt={friend.username} />
+                  {:else}
+                    {(friend.username?.[0] || '?').toUpperCase()}
+                  {/if}
+                </button>
+              {/each}
+            </div>
+          </div>
+        {/if}
       </aside>
 
       <!-- Центральная колонка - контент -->
@@ -418,37 +436,6 @@
           </div>
         </div>
 
-        <!-- Друзья (только для своего профиля) -->
-        {#if isMe}
-          <div class="section-block">
-            <h3 class="section-title">👥 Друзья</h3>
-            <div class="friends-grid">
-              {#if $friendProfiles && $friendProfiles.length > 0}
-                {#each $friendProfiles as friend (friend.id)}
-                  <button class="friend-card" on:click={() => handleFriendClick(friend)}>
-                    <div class="friend-avatar" style="background: {getAvatarGradient(friend.username)}">
-                      {#if friend.avatarUrl}
-                        <img src={friend.avatarUrl} alt={friend.username} />
-                      {:else}
-                        {(friend.username?.[0] || '?').toUpperCase()}
-                      {/if}
-                    </div>
-                    <div class="friend-info">
-                      <div class="friend-name">{friend.username}</div>
-                      <div class="friend-status">Онлайн</div>
-                    </div>
-                  </button>
-                {/each}
-              {:else}
-                <div class="empty-friends">
-                  <span>👥</span>
-                  <p>Пока нет друзей</p>
-                  <span class="empty-hint">Добавляйте друзей из лидерборда!</span>
-                </div>
-              {/if}
-            </div>
-          </div>
-        {/if}
       </main>
 
       <!-- Правая колонка - История -->
@@ -706,6 +693,56 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
+  }
+
+  /* Друзья в сайдбаре */
+  .sidebar-friends {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 1.25rem;
+    padding: 1rem;
+    backdrop-filter: blur(20px);
+  }
+
+  .sidebar-friends-title {
+    margin: 0 0 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .sidebar-friends-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .sidebar-friend-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .sidebar-friend-avatar:hover {
+    transform: scale(1.1);
+    border-color: var(--accent-primary);
+  }
+
+  .sidebar-friend-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   .profile-card {
