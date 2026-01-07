@@ -305,7 +305,7 @@
         <!-- Друзья (только аватарки) -->
         {#if isMe && $friendProfiles && $friendProfiles.length > 0}
           <div class="sidebar-friends">
-            <h4 class="sidebar-friends-title">👥 Друзья</h4>
+            <h4 class="sidebar-friends-title">Друзья</h4>
             <div class="sidebar-friends-grid">
               {#each $friendProfiles as friend (friend.id)}
                 <button class="sidebar-friend-avatar" on:click={() => handleFriendClick(friend)} title={friend.username} style="background: {getAvatarGradient(friend.username)}">
