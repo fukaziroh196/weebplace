@@ -524,6 +524,7 @@
     gap: 1.25rem;
     max-width: 950px;
     margin-left: 1.3rem;
+    margin-top: 1rem;
   }
 
   /* 2K экраны (2560x1440) - масштабируем как 1080p */
