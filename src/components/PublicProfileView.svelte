@@ -534,6 +534,9 @@
     }
     .profile-layout {
       margin-left: 0.75rem;
+      max-width: 1100px;
+      grid-template-columns: 300px 1fr;
+      gap: 1.5rem;
     }
   }
 
