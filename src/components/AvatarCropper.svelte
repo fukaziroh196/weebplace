@@ -289,8 +289,8 @@
               <circle cx="160" cy="160" r="140" fill="black"/>
             </mask>
           </defs>
-          <rect width="100%" height="100%" fill="rgba(0,0,0,0.7)" mask="url(#hole)"/>
-          <circle cx="160" cy="160" r="140" fill="none" stroke="white" stroke-width="2"/>
+          <rect width="100%" height="100%" fill="rgba(0,0,0,0.6)" mask="url(#hole)"/>
+          <circle cx="160" cy="160" r="140" fill="none" stroke="rgba(158, 202, 255, 0.8)" stroke-width="2"/>
         </svg>
       </div>
     </div>
@@ -453,7 +453,7 @@
     appearance: none;
     width: 18px;
     height: 18px;
-    background: #74b9ff;
+    background: var(--accent-primary, #9ecaff);
     border-radius: 50%;
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -462,7 +462,7 @@
   .zoom-slider::-moz-range-thumb {
     width: 18px;
     height: 18px;
-    background: #74b9ff;
+    background: var(--accent-primary, #9ecaff);
     border-radius: 50%;
     cursor: pointer;
     border: none;
@@ -502,13 +502,14 @@
   }
   
   .crop-btn {
-    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
-    color: white;
+    background: var(--accent-primary, #9ecaff);
+    color: var(--text-primary, #f5f6ff);
   }
   
   .crop-btn:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(116, 185, 255, 0.4);
+    background: var(--accent-primary-strong, #b3d6ff);
+    box-shadow: 0 4px 15px rgba(158, 202, 255, 0.4);
   }
   
   .crop-btn:disabled {

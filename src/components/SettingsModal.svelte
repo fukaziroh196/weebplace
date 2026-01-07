@@ -413,9 +413,9 @@
   }
   
   .tab.active {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
-    color: var(--text-primary, #f5f6ff);
+    background: var(--surface-primary, rgba(255, 255, 255, 0.1));
+    border-color: var(--accent-primary, #9ecaff);
+    color: var(--accent-primary, #9ecaff);
   }
   
   .modal-content {
@@ -472,10 +472,10 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.6rem 1rem;
-    background: linear-gradient(135deg, #55efc4 0%, #00b894 100%);
+    background: var(--accent-primary, #9ecaff);
     border: none;
     border-radius: 0.5rem;
-    color: #1a1a2e;
+    color: var(--text-primary, #f5f6ff);
     font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
@@ -484,7 +484,8 @@
   
   .upload-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(85, 239, 196, 0.3);
+    background: var(--accent-primary-strong, #b3d6ff);
+    box-shadow: 0 4px 12px rgba(158, 202, 255, 0.3);
   }
   
   .upload-btn svg {
@@ -494,10 +495,10 @@
   
   .remove-btn {
     padding: 0.5rem 0.75rem;
-    background: rgba(255, 107, 107, 0.15);
-    border: 1px solid rgba(255, 107, 107, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 0.5rem;
-    color: #ff6b6b;
+    color: var(--accent-rose, #ffb7d5);
     font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
@@ -505,7 +506,7 @@
   }
   
   .remove-btn:hover {
-    background: rgba(255, 107, 107, 0.25);
+    background: rgba(255, 255, 255, 0.12);
   }
   
   .hint {
@@ -561,18 +562,18 @@
   }
   
   .message.success {
-    background: rgba(85, 239, 196, 0.15);
-    border: 1px solid rgba(85, 239, 196, 0.3);
-    color: #55efc4;
+    background: rgba(158, 202, 255, 0.15);
+    border: 1px solid rgba(158, 202, 255, 0.3);
+    color: var(--accent-primary, #9ecaff);
   }
   
   .save-btn {
     width: 100%;
     padding: 0.85rem;
-    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+    background: var(--accent-primary, #9ecaff);
     border: none;
     border-radius: 0.5rem;
-    color: white;
+    color: var(--text-primary, #f5f6ff);
     font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
@@ -585,7 +586,8 @@
   
   .save-btn:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(116, 185, 255, 0.4);
+    background: var(--accent-primary-strong, #b3d6ff);
+    box-shadow: 0 4px 12px rgba(158, 202, 255, 0.4);
   }
   
   .save-btn:disabled {
