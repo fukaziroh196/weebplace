@@ -54,8 +54,7 @@
           <img src={$currentUser.avatarUrl} alt="avatar" class="block w-full h-full object-cover" 
                on:error={() => { avatarError = true; }} 
                on:load={() => { avatarError = false; }} />
-        {/if}
-        {#if !$currentUser?.avatarUrl || avatarError}
+        {:else}
           <span class="text-white font-semibold text-sm">{$currentUser.username?.[0]?.toUpperCase() || 'U'}</span>
         {/if}
       </div>
