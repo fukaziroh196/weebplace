@@ -110,29 +110,6 @@ export function logout() {
   clearNotificationsStore();
 }
 
-// Update profile (avatar, etc.)
-export async function updateProfile(formData) {
-  const token = localStorage.getItem('api_token');
-  if (!token) throw new Error('Не авторизован');
-  
-  const res = await fetch('/api/user/profile', {
-    method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${token}`
-    },
-    body: formData
-  });
-  
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || 'Ошибка сохранения');
-  }
-  
-  const updated = await res.json();
-  currentUser.update(u => ({ ...u, ...updated }));
-  return updated;
-}
-
 // Change password
 export async function changePassword(currentPassword, newPassword) {
   const token = localStorage.getItem('api_token');

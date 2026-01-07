@@ -1,5 +1,5 @@
 <script>
-  import { currentUser, updateProfile, changePassword } from '../stores/authApi';
+  import { currentUser, changePassword } from '../stores/authApi';
   import { createEventDispatcher } from 'svelte';
   
   const dispatch = createEventDispatcher();
@@ -7,8 +7,7 @@
   let activeTab = 'profile';
   
   // Profile settings
-  let avatarUrl = $currentUser?.avatarUrl || '';
-  let avatarPreview = avatarUrl;
+  let avatarPreview = $currentUser?.avatarUrl || '';
   let avatarFile = null;
   let saving = false;
   let saveError = '';
@@ -54,17 +53,50 @@
     saveError = '';
     saveSuccess = '';
     
+    const token = localStorage.getItem('api_token');
+    if (!token) {
+      saveError = 'Не авторизован';
+      saving = false;
+      return;
+    }
+    
     try {
-      const formData = new FormData();
+      // Загрузка файла аватара
       if (avatarFile) {
+        const formData = new FormData();
         formData.append('avatar', avatarFile);
-      } else if (avatarUrl !== $currentUser?.avatarUrl) {
-        formData.append('avatarUrl', avatarUrl);
+        
+        const res = await fetch('/api/me/avatar', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` },
+          body: formData
+        });
+        
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || 'Ошибка загрузки');
+        }
+        
+        const data = await res.json();
+        currentUser.update(u => ({ ...u, avatarUrl: data.avatarUrl }));
+        avatarFile = null;
+      } 
+      // Удаление аватара
+      else if (!avatarPreview && $currentUser?.avatarUrl) {
+        const res = await fetch('/api/me/avatar', {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || 'Ошибка удаления');
+        }
+        
+        currentUser.update(u => ({ ...u, avatarUrl: null }));
       }
       
-      await updateProfile(formData);
       saveSuccess = 'Профиль сохранён!';
-      avatarFile = null;
       setTimeout(() => saveSuccess = '', 3000);
     } catch (e) {
       saveError = e?.message || 'Не удалось сохранить';
@@ -179,22 +211,12 @@
                 <input type="file" accept="image/*" on:change={handleAvatarChange} hidden />
               </label>
               {#if avatarPreview}
-                <button class="remove-btn" on:click={() => { avatarPreview = ''; avatarUrl = ''; avatarFile = null; }}>
+                <button class="remove-btn" on:click={() => { avatarPreview = ''; avatarFile = null; }}>
                   Удалить
                 </button>
               {/if}
               <p class="hint">JPG, PNG или GIF. Макс. 2MB</p>
             </div>
-          </div>
-          
-          <div class="input-group">
-            <label>Или укажите URL аватара</label>
-            <input 
-              type="url" 
-              bind:value={avatarUrl}
-              placeholder="https://example.com/avatar.jpg"
-              on:input={() => { avatarPreview = avatarUrl; avatarFile = null; }}
-            />
           </div>
           
           {#if saveError}
