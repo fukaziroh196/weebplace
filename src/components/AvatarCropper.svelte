@@ -332,7 +332,8 @@
   .cropper-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -341,14 +342,15 @@
   }
   
   .cropper-modal {
-    background: #1a1a2e;
+    background: rgba(30, 30, 45, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 1.25rem;
-    padding: 1.25rem;
-    max-width: 360px;
+    padding: 1.5rem;
+    max-width: 380px;
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.25rem;
   }
   
   .cropper-header {
@@ -357,9 +359,9 @@
   
   .cropper-header h3 {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 1.25rem;
     font-weight: 700;
-    color: #f5f6ff;
+    color: var(--text-primary, #f5f6ff);
   }
   
   .cropper-area {
@@ -372,7 +374,7 @@
     cursor: grab;
     touch-action: none;
     user-select: none;
-    background: #0a0a14;
+    background: rgba(0, 0, 0, 0.4);
   }
   
   .cropper-area:active {
@@ -410,10 +412,10 @@
   .zoom-btn {
     width: 40px;
     height: 40px;
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 50%;
-    color: #f5f6ff;
+    color: var(--text-primary, #f5f6ff);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -423,7 +425,7 @@
   }
   
   .zoom-btn:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
   }
   
   .zoom-btn:disabled {
@@ -432,45 +434,45 @@
   }
   
   .zoom-btn svg {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
   }
   
   .zoom-slider {
     flex: 1;
-    height: 6px;
+    height: 4px;
     -webkit-appearance: none;
     appearance: none;
     background: rgba(255, 255, 255, 0.15);
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
   }
   
   .zoom-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     background: #55efc4;
     border-radius: 50%;
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   }
   
   .zoom-slider::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     background: #55efc4;
     border-radius: 50%;
     cursor: pointer;
     border: none;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   }
   
   .hint {
     text-align: center;
     font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--text-secondary, rgba(255, 255, 255, 0.5));
   }
   
   .cropper-actions {
@@ -482,7 +484,7 @@
     flex: 1;
     padding: 0.85rem 1rem;
     border: none;
-    border-radius: 0.75rem;
+    border-radius: 0.5rem;
     font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
@@ -491,7 +493,8 @@
   
   .cancel-btn {
     background: rgba(255, 255, 255, 0.08);
-    color: #f5f6ff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--text-primary, #f5f6ff);
   }
   
   .cancel-btn:hover {
@@ -514,18 +517,14 @@
     transform: none;
   }
   
-  @media (max-width: 380px) {
+  @media (max-width: 400px) {
     .cropper-modal {
-      padding: 1rem;
+      padding: 1.25rem;
     }
     
     .cropper-area {
       width: 280px;
       height: 280px;
-    }
-    
-    .crop-overlay svg {
-      viewBox: 0 0 280 280;
     }
   }
 </style>
