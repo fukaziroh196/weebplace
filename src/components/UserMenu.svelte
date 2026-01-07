@@ -38,6 +38,17 @@
     return `linear-gradient(135deg, ${colors[index][0]} 0%, ${colors[index][1]} 100%)`;
   }
 
+  // Отладка: логируем данные пользователя
+  $: if ($currentUser) {
+    console.log('[UserMenu] currentUser data:', {
+      id: $currentUser.id,
+      username: $currentUser.username,
+      avatarUrl: $currentUser.avatarUrl,
+      hasAvatar: !!$currentUser.avatarUrl,
+      avatarUrlType: typeof $currentUser.avatarUrl
+    });
+  }
+
 </script>
 
 <div class="relative" use:clickOutside={{ enabled: true, callback: () => { showMenu = false; } }}>
@@ -46,7 +57,14 @@
             on:click={() => { showMenu = !showMenu; }}>
       <div class="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0" style="background: {$currentUser?.avatarUrl ? 'transparent' : getAvatarGradient($currentUser.username)}">
         {#if $currentUser?.avatarUrl}
-          <img src={$currentUser.avatarUrl} alt="avatar" class="block w-full h-full object-cover" />
+          <img src={$currentUser.avatarUrl} alt="avatar" class="block w-full h-full object-cover" 
+               on:error={(e) => {
+                 console.error('[UserMenu] Avatar load error:', $currentUser.avatarUrl, e);
+                 e.target.style.display = 'none';
+               }}
+               on:load={() => {
+                 console.log('[UserMenu] Avatar loaded successfully:', $currentUser.avatarUrl);
+               }} />
         {:else}
           <span class="text-white font-semibold text-base">{$currentUser.username?.[0]?.toUpperCase() || 'U'}</span>
         {/if}
