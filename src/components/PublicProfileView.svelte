@@ -301,26 +301,6 @@
             </div>
           {/if}
         </div>
-
-        <!-- Быстрая статистика -->
-        <div class="quick-stats">
-          <div class="quick-stat">
-            <span class="quick-stat-value">{$publicUser.gamesPlayed || 0}</span>
-            <span class="quick-stat-label">Игр</span>
-          </div>
-          <div class="quick-stat">
-            <span class="quick-stat-value">{$publicUser.totalScore || 0}</span>
-            <span class="quick-stat-label">Очков</span>
-          </div>
-          <div class="quick-stat">
-            <span class="quick-stat-value">{$publicUser.streak || 0}</span>
-            <span class="quick-stat-label">Стрик</span>
-          </div>
-          <div class="quick-stat">
-            <span class="quick-stat-value">{($friends || []).length}</span>
-            <span class="quick-stat-label">Друзей</span>
-          </div>
-        </div>
       </aside>
 
       <!-- Центральная колонка - контент -->
@@ -884,35 +864,6 @@
     color: var(--accent-primary);
     font-weight: 600;
     font-size: 0.85rem;
-  }
-
-  /* Quick Stats */
-  .quick-stats {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-  }
-
-  .quick-stat {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 1rem;
-    padding: 1rem;
-    text-align: center;
-  }
-
-  .quick-stat-value {
-    display: block;
-    font-size: 1.5rem;
-    font-weight: 900;
-    color: var(--accent-primary);
-  }
-
-  .quick-stat-label {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
   }
 
   /* Main Content */
