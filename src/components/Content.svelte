@@ -2028,6 +2028,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     justify-content: center;
     flex-shrink: 0;
     overflow: hidden;
+    margin-right: -0.25rem;
   }
 
   .profile-nav-avatar-img {
