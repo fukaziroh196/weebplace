@@ -2019,8 +2019,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .profile-nav-avatar {
-    width: 2.125rem;
-    height: 2.125rem;
+    width: 2.5rem;
+    height: 2.5rem;
     border-radius: 50%;
     background: var(--profile-avatar-bg);
     display: flex;
@@ -2037,7 +2037,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .profile-nav-avatar-letter {
-    font-size: 1rem;
+    font-size: 1.125rem;
     font-weight: 700;
     color: white;
     line-height: 1;
