@@ -143,6 +143,12 @@
         />
       </div>
       
+      {#if mode === 'register'}
+        <div class="form-note">
+          Регистрация анонимная. Мы не собираем личные данные, только ваш ник и пароль для входа.
+        </div>
+      {/if}
+      
       {#if error}
         <div class="error-message">{error}</div>
       {/if}
@@ -332,6 +338,18 @@
   .form-group input:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+  
+  .form-note {
+    padding: 0.6rem 0.75rem;
+    background: rgba(158, 202, 255, 0.1);
+    border: 1px solid rgba(158, 202, 255, 0.2);
+    border-radius: 0.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+    text-align: center;
   }
   
   .error-message {

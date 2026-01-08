@@ -1,0 +1,46 @@
+# robots.txt для OTAKUZ.FUN
+# Защита от индексации контента квизов и служебных страниц
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /profile
+Disallow: /user/
+Disallow: /uploads/
+Disallow: /quiz-images/
+Disallow: /quiz/
+Disallow: /images/
+Disallow: /static/uploads/
+
+# Разрешаем индексировать только публичные страницы
+Allow: /legal
+Allow: /copyright
+Allow: /$
+
+# Блокируем индексацию изображений квизов
+User-agent: Googlebot-Image
+Disallow: /uploads/
+Disallow: /quiz-images/
+Disallow: /images/
+Disallow: /static/uploads/
+
+# Блокируем индексацию для других поисковых систем
+User-agent: Bingbot
+Disallow: /api/
+Disallow: /profile
+Disallow: /user/
+Disallow: /uploads/
+Disallow: /quiz-images/
+Disallow: /images/
+
+User-agent: Yandex
+Disallow: /api/
+Disallow: /profile
+Disallow: /user/
+Disallow: /uploads/
+Disallow: /quiz-images/
+Disallow: /images/
+
+# Sitemap (если будет создан)
+# Sitemap: https://otakuz.fun/sitemap.xml
+

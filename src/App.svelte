@@ -5,6 +5,7 @@
   import FriendsRoute from './routes/FriendsRoute.svelte';
   import UserRoute from './routes/UserRoute.svelte';
   import TournamentsRoute from './routes/TournamentsRoute.svelte';
+  import LegalRoute from './routes/LegalRoute.svelte';
 
   let showTop = false;
   let scrollEl;
@@ -19,6 +20,8 @@
     '/tournaments/*': TournamentsRoute,
     '/user/:nickname': UserRoute,
     '/user/:nickname/*': UserRoute,
+    '/legal': LegalRoute,
+    '/copyright': LegalRoute,
     // fallback
     '*': HomeRoute
   };
@@ -45,11 +48,9 @@
           <div class="footer-content">
             <div class="footer-section">
               <div class="footer-links">
-                <a href="#" class="footer-link">Условия использования</a>
+                <a href="/legal" class="footer-link">Правовая информация</a>
                 <span class="footer-separator">•</span>
-                <a href="#" class="footer-link">Политика конфиденциальности</a>
-                <span class="footer-separator">•</span>
-                <a href="#" class="footer-link">Правообладателям</a>
+                <a href="mailto:copyright@otakuz.fun" class="footer-link">Контакты</a>
               </div>
               <div class="footer-copyright">
                 © {new Date().getFullYear()} OTAKUZ.FUN. Все права защищены.
