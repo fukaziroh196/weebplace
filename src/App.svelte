@@ -6,9 +6,38 @@
   import UserRoute from './routes/UserRoute.svelte';
   import TournamentsRoute from './routes/TournamentsRoute.svelte';
   import LegalRoute from './routes/LegalRoute.svelte';
+  import { onMount } from 'svelte';
 
   let showTop = false;
   let scrollEl;
+
+  function handleLinkClick(e) {
+    const link = e.target.closest('a');
+    if (link && link.href) {
+      try {
+        const url = new URL(link.href);
+        if (url.hostname === window.location.hostname) {
+          const path = url.pathname;
+          if (path === '/legal' || path === '/copyright') {
+            e.preventDefault();
+            e.stopPropagation();
+            window.history.pushState(null, '', path);
+            // Принудительно обновляем роутер через popstate событие
+            window.dispatchEvent(new PopStateEvent('popstate', { state: null }));
+          }
+        }
+      } catch (err) {
+        // Игнорируем ошибки парсинга URL
+      }
+    }
+  }
+
+  onMount(() => {
+    document.addEventListener('click', handleLinkClick);
+    return () => {
+      document.removeEventListener('click', handleLinkClick);
+    };
+  });
 
   const routes = {
     '/legal': LegalRoute,
