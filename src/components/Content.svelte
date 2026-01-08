@@ -850,6 +850,27 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       </div>
 
       {#if $activeView === 'home' || $activeView === 'aniquiz'}
+        <!-- Футер -->
+        <footer class="site-footer">
+          <div class="footer-content">
+            <div class="footer-section">
+              <div class="footer-links">
+                <a href="/legal" class="footer-link" on:click|preventDefault={(e) => { e.preventDefault(); if (typeof window !== 'undefined') { window.location.href = '/legal'; } }}>Правовая информация</a>
+                <span class="footer-separator">•</span>
+                <a href="mailto:copyright@otakuz.fun" class="footer-link">Контакты</a>
+              </div>
+              <div class="footer-copyright">
+                © {new Date().getFullYear()} OTAKUZ.FUN. Все права защищены.
+              </div>
+              <div class="footer-copyright-notice">
+                В случаях нарушения авторских прав - обращайтесь на почту: <a href="mailto:copyright@otakuz.fun" class="footer-email">copyright@otakuz.fun</a>
+              </div>
+            </div>
+          </div>
+        </footer>
+      {/if}
+
+      {#if $activeView === 'home' || $activeView === 'aniquiz'}
         <aside class="leaderboard-panel">
           <div class="leaderboard-card">
             <div class="leaderboard-header">

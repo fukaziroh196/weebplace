@@ -42,25 +42,6 @@
     <div class="content-container">
       <div class="content-scroll" bind:this={scrollEl}>
         <Router {routes} useHash={false} />
-        
-        <!-- Футер -->
-        <footer class="site-footer">
-          <div class="footer-content">
-            <div class="footer-section">
-              <div class="footer-links">
-                <a href="/legal" class="footer-link" on:click|preventDefault={(e) => { e.preventDefault(); if (typeof window !== 'undefined') { window.history.pushState(null, '', '/legal'); window.dispatchEvent(new PopStateEvent('popstate')); } }}>Правовая информация</a>
-                <span class="footer-separator">•</span>
-                <a href="mailto:copyright@otakuz.fun" class="footer-link">Контакты</a>
-              </div>
-              <div class="footer-copyright">
-                © {new Date().getFullYear()} OTAKUZ.FUN. Все права защищены.
-              </div>
-              <div class="footer-copyright-notice">
-                В случаях нарушения авторских прав - обращайтесь на почту: <a href="mailto:copyright@otakuz.fun" class="footer-email">copyright@otakuz.fun</a>
-              </div>
-            </div>
-          </div>
-        </footer>
       </div>
     </div>
   </div>
