@@ -544,17 +544,15 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
               aria-expanded={showNotifications}
               aria-label="Уведомления"
             >
-              <span class="profile-nav-avatar">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
+              <span class="profile-nav-avatar notification-icon-wrapper">
+                <svg viewBox="0 0 24 24" aria-hidden="true" class="notification-icon">
                   <path d="M18 8a6 6 0 10-12 0c0 7-3 8-3 8h18s-3-1-3-8"></path>
                   <path d="M13.73 21a2 2 0 01-3.46 0"></path>
                 </svg>
               </span>
               {#if $currentUser}
                 {#if $unreadCount > 0}
-                  <span class="notif-dot notif-dot-count">{$unreadCount}</span>
-                {:else}
-                  <span class="notif-dot notif-dot-faded"></span>
+                  <span class="notif-badge">{#if $unreadCount > 9}9+{:else}{$unreadCount}{/if}</span>
                 {/if}
               {/if}
             </button>
@@ -2593,11 +2591,40 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .notification-button {
-    min-width: 0;
-    display: inline-flex;
+    position: relative;
+  }
+  
+  .notification-icon-wrapper {
+    background: transparent !important;
+    display: flex;
     align-items: center;
-    gap: 0.45rem;
-    padding: 0.35rem 0.75rem;
+    justify-content: center;
+  }
+  
+  .notification-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+    fill: currentColor;
+    stroke: none;
+  }
+  
+  .notif-badge {
+    position: absolute;
+    top: -0.25rem;
+    right: -0.25rem;
+    background: #ff3b82;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 800;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.35rem;
+    box-shadow: 0 0.25rem 0.75rem rgba(255, 59, 130, 0.4), 0 0 0 2px var(--profile-button-gradient);
+    line-height: 1;
   }
 
   .notifications-dropdown {
@@ -2650,29 +2677,6 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     font-size: 0.75rem;
   }
 
-  .notif-dot {
-    position: absolute;
-    top: -0.3rem;
-    right: -0.35rem;
-    border-radius: 999px;
-  }
-
-  .notif-dot-count {
-    background: #ff3b82;
-    color: #fff;
-    font-size: 0.7rem;
-    padding: 0.1rem 0.4rem;
-    min-width: 1.25rem;
-    text-align: center;
-    font-weight: 800;
-    box-shadow: 0 0.35rem 0.9rem rgba(255, 59, 130, 0.35);
-  }
-
-  .notif-dot-faded {
-    width: 0.5rem;
-    height: 0.5rem;
-    background: rgba(255, 255, 255, 0.55);
-  }
 
   /* Маленькие мобильные устройства (до 480px) */
   @media (max-width: 480px) {
