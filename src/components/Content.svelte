@@ -129,12 +129,16 @@ function syncViewFromLocation() {
   }
 
   const path = normalizePath(window.location.pathname || '/');
-  const knownRoutes = ['/profile', '/friends', '/tournaments', '/'];
+  const knownRoutes = ['/profile', '/friends', '/tournaments', '/', '/legal', '/copyright'];
   const isUserRoute = path.startsWith('/user/');
 
   // Главная страница
   if (path === '/') {
     activeView.set('home');
+    return;
+  }
+  // Правовая информация - не обрабатываем, пусть роутер обработает
+  if (path === '/legal' || path === '/copyright') {
     return;
   }
   if (path === '/profile') {
