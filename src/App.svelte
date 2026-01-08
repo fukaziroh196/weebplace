@@ -48,7 +48,7 @@
           <div class="footer-content">
             <div class="footer-section">
               <div class="footer-links">
-                <a href="/legal" class="footer-link" on:click|preventDefault={(e) => { e.preventDefault(); if (typeof window !== 'undefined') { window.location.href = '/legal'; } }}>Правовая информация</a>
+                <a href="/legal" class="footer-link">Правовая информация</a>
                 <span class="footer-separator">•</span>
                 <a href="mailto:copyright@otakuz.fun" class="footer-link">Контакты</a>
               </div>
