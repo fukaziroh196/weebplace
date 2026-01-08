@@ -138,7 +138,9 @@ function syncViewFromLocation() {
     return;
   }
   // Правовая информация - не обрабатываем, пусть роутер обработает
+  // НЕ устанавливаем activeView для этих маршрутов, чтобы роутер мог показать LegalRoute
   if (path === '/legal' || path === '/copyright') {
+    // Не устанавливаем activeView, чтобы роутер мог обработать маршрут
     return;
   }
   if (path === '/profile') {
@@ -189,8 +191,17 @@ if (typeof window !== 'undefined') {
 
 onMount(() => {
   if (typeof window !== 'undefined') {
-    syncViewFromLocation();
-    const onPopState = () => syncViewFromLocation();
+    // Не синхронизируем для /legal и /copyright - пусть роутер обработает
+    const path = normalizePath(window.location.pathname || '/');
+    if (path !== '/legal' && path !== '/copyright') {
+      syncViewFromLocation();
+    }
+    const onPopState = () => {
+      const currentPath = normalizePath(window.location.pathname || '/');
+      if (currentPath !== '/legal' && currentPath !== '/copyright') {
+        syncViewFromLocation();
+      }
+    };
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
   }

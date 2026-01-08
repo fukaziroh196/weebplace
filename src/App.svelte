@@ -11,6 +11,8 @@
   let scrollEl;
 
   const routes = {
+    '/legal': LegalRoute,
+    '/copyright': LegalRoute,
     '/': HomeRoute,
     '/profile': ProfileRoute,
     '/profile/*': ProfileRoute,
@@ -20,8 +22,6 @@
     '/tournaments/*': TournamentsRoute,
     '/user/:nickname': UserRoute,
     '/user/:nickname/*': UserRoute,
-    '/legal': LegalRoute,
-    '/copyright': LegalRoute,
     // fallback
     '*': HomeRoute
   };
