@@ -850,27 +850,6 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       </div>
 
       {#if $activeView === 'home' || $activeView === 'aniquiz'}
-        <!-- Футер -->
-        <footer class="site-footer">
-          <div class="footer-content">
-            <div class="footer-section">
-              <div class="footer-links">
-                <a href="/legal" class="footer-link" on:click|preventDefault={(e) => { e.preventDefault(); if (typeof window !== 'undefined') { window.location.href = '/legal'; } }}>Правовая информация</a>
-                <span class="footer-separator">•</span>
-                <a href="mailto:copyright@otakuz.fun" class="footer-link">Контакты</a>
-              </div>
-              <div class="footer-copyright">
-                © {new Date().getFullYear()} OTAKUZ.FUN. Все права защищены.
-              </div>
-              <div class="footer-copyright-notice">
-                В случаях нарушения авторских прав - обращайтесь на почту: <a href="mailto:copyright@otakuz.fun" class="footer-email">copyright@otakuz.fun</a>
-              </div>
-            </div>
-          </div>
-        </footer>
-      {/if}
-
-      {#if $activeView === 'home' || $activeView === 'aniquiz'}
         <aside class="leaderboard-panel">
           <div class="leaderboard-card">
             <div class="leaderboard-header">
@@ -918,6 +897,27 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
             <div class="leaderboard-footer">Обновляется ежедневно</div>
           </div>
         </aside>
+      {/if}
+      
+      {#if $activeView === 'home' || $activeView === 'aniquiz'}
+        <!-- Футер -->
+        <footer class="site-footer">
+          <div class="footer-content">
+            <div class="footer-section">
+              <div class="footer-links">
+                <a href="/legal" class="footer-link" on:click|preventDefault={(e) => { e.preventDefault(); if (typeof window !== 'undefined') { window.location.href = '/legal'; } }}>Правовая информация</a>
+                <span class="footer-separator">•</span>
+                <a href="mailto:copyright@otakuz.fun" class="footer-link">Контакты</a>
+              </div>
+              <div class="footer-copyright">
+                © {new Date().getFullYear()} OTAKUZ.FUN. Все права защищены.
+              </div>
+              <div class="footer-copyright-notice">
+                В случаях нарушения авторских прав - обращайтесь на почту: <a href="mailto:copyright@otakuz.fun" class="footer-email">copyright@otakuz.fun</a>
+              </div>
+            </div>
+          </div>
+        </footer>
       {/if}
     </div>
 
@@ -2768,6 +2768,106 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     .global-stats-panel,
     .leaderboard-card {
       padding: 0.875rem;
+    }
+  }
+  
+  /* Футер */
+  .site-footer {
+    width: 100%;
+    max-width: 1360px;
+    margin: 3rem auto 0;
+    padding: 1.5rem 2rem;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 1rem;
+  }
+  
+  .footer-content {
+    max-width: 1360px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .footer-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: center;
+  }
+  
+  .footer-links {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .footer-link {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  
+  .footer-link:hover {
+    color: var(--accent-primary, #9ecaff);
+  }
+  
+  .footer-separator {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.875rem;
+  }
+  
+  .footer-copyright {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+  }
+  
+  .footer-copyright-notice {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+  }
+  
+  .footer-email {
+    color: var(--accent-primary, #9ecaff);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  
+  .footer-email:hover {
+    color: var(--accent-primary-strong, #b3d6ff);
+    text-decoration: underline;
+  }
+  
+  @media (max-width: 768px) {
+    .site-footer {
+      padding: 1rem 1rem;
+    }
+    
+    .footer-links {
+      gap: 0.5rem;
+      font-size: 0.8rem;
+    }
+    
+    .footer-link {
+      font-size: 0.8rem;
+    }
+    
+    .footer-copyright {
+      font-size: 0.75rem;
+    }
+    
+    .footer-copyright-notice {
+      font-size: 0.75rem;
+      text-align: center;
+      padding: 0 0.5rem;
     }
   }
 </style>
