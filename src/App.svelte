@@ -50,6 +50,24 @@
       <span>work in progress • work in progress • work in progress • work in progress • work in progress • work in progress • work in progress • work in progress • </span>
     </div>
   </div>
+  
+  <!-- Футер -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <div class="footer-links">
+          <a href="#" class="footer-link">Условия использования</a>
+          <span class="footer-separator">•</span>
+          <a href="#" class="footer-link">Политика конфиденциальности</a>
+          <span class="footer-separator">•</span>
+          <a href="#" class="footer-link">Правообладателям</a>
+        </div>
+        <div class="footer-copyright">
+          © {new Date().getFullYear()} OTAKUZ.FUN. Все права защищены.
+        </div>
+      </div>
+    </div>
+  </footer>
 </div>
 
 <style>
@@ -173,6 +191,82 @@
     }
     100% {
       transform: translateX(-50%);
+    }
+  }
+  
+  /* Футер */
+  .site-footer {
+    width: 100%;
+    padding: 1.5rem 2rem;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    flex-shrink: 0;
+    z-index: 100;
+  }
+  
+  .footer-content {
+    max-width: 1360px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .footer-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: center;
+  }
+  
+  .footer-links {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .footer-link {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  
+  .footer-link:hover {
+    color: var(--accent-primary, #9ecaff);
+  }
+  
+  .footer-separator {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.875rem;
+  }
+  
+  .footer-copyright {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+  }
+  
+  @media (max-width: 768px) {
+    .site-footer {
+      padding: 1rem 1rem;
+    }
+    
+    .footer-links {
+      gap: 0.5rem;
+      font-size: 0.8rem;
+    }
+    
+    .footer-link {
+      font-size: 0.8rem;
+    }
+    
+    .footer-copyright {
+      font-size: 0.75rem;
     }
   }
 </style>
