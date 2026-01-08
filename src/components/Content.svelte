@@ -462,6 +462,21 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
     showReplay = false;
   }
   
+  function getAvatarGradient(name) {
+    const colors = [
+      ['#ff6b6b', '#ee5a24'],
+      ['#74b9ff', '#0984e3'],
+      ['#55efc4', '#00b894'],
+      ['#fd79a8', '#e84393'],
+      ['#a29bfe', '#6c5ce7'],
+      ['#ffeaa7', '#fdcb6e'],
+      ['#81ecec', '#00cec9'],
+      ['#fab1a0', '#e17055'],
+    ];
+    const index = (name?.charCodeAt(0) || 0) % colors.length;
+    return `linear-gradient(135deg, ${colors[index][0]} 0%, ${colors[index][1]} 100%)`;
+  }
+  
   // No-op mounts for quizzes home
 </script>
 
@@ -572,12 +587,17 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
             aria-haspopup="true"
             aria-expanded={showProfileMenu}
           >
-            <span class="profile-nav-avatar">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 2C6.485 2 2 6.485 2 12s4.485 10 10 10 10-4.485 10-10S17.515 2 12 2zm0 3.2a3.2 3.2 0 1 1 0 6.4 3.2 3.2 0 0 1 0-6.4zm0 14.56c-2.644 0-4.984-1.355-6.4-3.424.056-2.096 4.272-3.248 6.4-3.248 2.104 0 6.344 1.152 6.4 3.248-1.416 2.069-3.756 3.424-6.4 3.424z" />
-              </svg>
+            <span 
+              class="profile-nav-avatar" 
+              style={$currentUser?.avatarUrl ? '' : `background: ${getAvatarGradient($currentUser?.username || 'User')}`}
+            >
+              {#if $currentUser?.avatarUrl}
+                <img src={$currentUser.avatarUrl} alt="avatar" class="profile-nav-avatar-img" />
+              {:else}
+                <span class="profile-nav-avatar-letter">{$currentUser?.username?.[0]?.toUpperCase() || 'U'}</span>
+              {/if}
             </span>
-            <span class="profile-nav-name">{$currentUser?.username || 'Профиль'}</span>
+            <span class="profile-nav-name profile-nav-name-mobile">{$currentUser?.username || 'Профиль'}</span>
           </button>
           {#if showProfileMenu}
             <div class="profile-dropdown" bind:this={profileDropdownEl}>
@@ -1973,24 +1993,23 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .profile-nav-button {
     border: none;
-    border-radius: 999px;
-    padding: 0.6rem 1.3rem;
+    border-radius: 0.75rem;
+    padding: 0.5rem;
+    width: 3.625rem;
+    height: 3.625rem;
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    justify-content: center;
     background: var(--profile-button-gradient);
     color: var(--text-primary);
-    font-weight: 700;
-    font-size: 0.875rem;
     box-shadow: var(--profile-button-shadow);
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
   .profile-nav-button:hover {
-    transform: translateY(-3px);
+    transform: translateY(-2px);
     box-shadow: var(--profile-button-hover-shadow);
-    color: var(--accent-primary-strong);
   }
 
   .profile-nav-button:focus-visible {
@@ -1999,27 +2018,31 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .profile-nav-avatar {
-    width: 2.125rem;
-    height: 2.125rem;
-    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+    border-radius: 0.5rem;
     background: var(--profile-avatar-bg);
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
+    overflow: hidden;
   }
 
-  .profile-nav-avatar svg {
-    width: 1.25rem;
-    height: 1.25rem;
-    fill: currentColor;
+  .profile-nav-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .profile-nav-avatar-letter {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    line-height: 1;
   }
 
   .profile-nav-name {
-    white-space: nowrap;
-    max-width: 10rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    display: none;
   }
 
   .profile-dropdown {
@@ -2449,6 +2472,30 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
       width: 100%;
       justify-content: center;
       max-width: 20rem;
+      border-radius: 999px;
+      padding: 0.6rem 1.3rem;
+      gap: 0.6rem;
+      height: auto;
+    }
+    
+    .profile-nav-button .profile-nav-avatar {
+      width: 2.125rem;
+      height: 2.125rem;
+      border-radius: 50%;
+    }
+    
+    .profile-nav-button .profile-nav-avatar-letter {
+      font-size: 1rem;
+    }
+    
+    .profile-nav-name-mobile {
+      display: block !important;
+      white-space: nowrap;
+      max-width: 10rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 700;
+      font-size: 0.875rem;
     }
 
     .profile-dropdown {
