@@ -66,16 +66,6 @@
 
 {#if $currentUser}
   <div class="profile-menu">
-    <div class="menu-header">
-      <div class="user-avatar" style="background: {getAvatarGradient($currentUser.username)}">
-        <span class="avatar-letter">{$currentUser.username?.[0]?.toUpperCase() || 'U'}</span>
-      </div>
-      <div class="user-info">
-        <div class="user-name">{$currentUser.username}</div>
-        <div class="user-site">otakuz.fun</div>
-      </div>
-    </div>
-    
     <div class="menu-items">
       <button class="menu-item" on:click={handleProfileClick}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
