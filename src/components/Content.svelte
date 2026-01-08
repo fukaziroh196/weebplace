@@ -1994,9 +1994,9 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   .profile-nav-button {
     border: none;
     border-radius: 0.75rem;
-    padding: 0.5rem;
-    width: 3.625rem;
-    height: 3.625rem;
+    padding: 0.25rem;
+    width: 4.5rem;
+    height: 4.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
