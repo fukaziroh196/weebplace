@@ -553,6 +553,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
               {#if $currentUser}
                 {#if $unreadCount > 0}
                   <span class="notif-badge">{#if $unreadCount > 9}9+{:else}{$unreadCount}{/if}</span>
+                {:else}
+                  <span class="notif-dot-faded"></span>
                 {/if}
               {/if}
             </button>
@@ -595,7 +597,7 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
                 <span class="profile-nav-avatar-letter">{$currentUser?.username?.[0]?.toUpperCase() || 'U'}</span>
               {/if}
             </span>
-            <span class="profile-nav-name profile-nav-name-mobile">{$currentUser?.username || 'Профиль'}</span>
+            <span class="profile-nav-name">{$currentUser?.username || 'Профиль'}</span>
           </button>
           {#if showProfileMenu}
             <div class="profile-dropdown" bind:this={profileDropdownEl}>
@@ -1991,23 +1993,24 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
   .profile-nav-button {
     border: none;
-    border-radius: 0.75rem;
-    padding: 0.25rem;
-    width: 4.5rem;
-    height: 4.5rem;
+    border-radius: 999px;
+    padding: 0.6rem 1.3rem;
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 0.6rem;
     background: var(--profile-button-gradient);
     color: var(--text-primary);
+    font-weight: 700;
+    font-size: 0.875rem;
     box-shadow: var(--profile-button-shadow);
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
   }
 
   .profile-nav-button:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
     box-shadow: var(--profile-button-hover-shadow);
+    color: var(--accent-primary-strong);
   }
 
   .profile-nav-button:focus-visible {
@@ -2016,13 +2019,14 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .profile-nav-avatar {
-    width: 100%;
-    height: 100%;
-    border-radius: 0.5rem;
+    width: 2.125rem;
+    height: 2.125rem;
+    border-radius: 50%;
     background: var(--profile-avatar-bg);
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
     overflow: hidden;
   }
 
@@ -2033,13 +2037,20 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .profile-nav-avatar-letter {
-    font-size: 1.5rem;
+    font-size: 1rem;
     font-weight: 700;
     color: white;
     line-height: 1;
   }
 
   .profile-nav-name {
+    white-space: nowrap;
+    max-width: 10rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .profile-nav-name-mobile {
     display: none;
   }
 
@@ -2591,40 +2602,55 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
   }
 
   .notification-button {
+    min-width: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.35rem 0.75rem;
     position: relative;
   }
   
   .notification-icon-wrapper {
-    background: transparent !important;
+    background: var(--profile-avatar-bg);
     display: flex;
     align-items: center;
     justify-content: center;
   }
   
   .notification-icon {
-    width: 1.75rem;
-    height: 1.75rem;
+    width: 1.25rem;
+    height: 1.25rem;
     fill: currentColor;
     stroke: none;
   }
   
   .notif-badge {
     position: absolute;
-    top: -0.25rem;
-    right: -0.25rem;
+    top: -0.3rem;
+    right: -0.35rem;
     background: #ff3b82;
     color: #fff;
     font-size: 0.7rem;
     font-weight: 800;
+    padding: 0.1rem 0.4rem;
     min-width: 1.25rem;
     height: 1.25rem;
     border-radius: 999px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 0.35rem;
-    box-shadow: 0 0.25rem 0.75rem rgba(255, 59, 130, 0.4), 0 0 0 2px var(--profile-button-gradient);
+    box-shadow: 0 0.35rem 0.9rem rgba(255, 59, 130, 0.35);
     line-height: 1;
+  }
+  
+  .notif-dot-faded {
+    position: absolute;
+    top: -0.3rem;
+    right: -0.35rem;
+    width: 0.5rem;
+    height: 0.5rem;
+    background: rgba(255, 255, 255, 0.55);
+    border-radius: 999px;
   }
 
   .notifications-dropdown {
