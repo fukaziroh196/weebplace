@@ -57,7 +57,7 @@
                 <a href="mailto:copyright@otakuz.fun" class="footer-link">Контакты</a>
               </div>
               <div class="footer-copyright">
-                © {new Date().getFullYear()} OTAKUZ.FUN. Все права защищены.
+                Фанатский некоммерческий проект для любителей аниме
               </div>
               <div class="footer-copyright-notice">
                 В случаях нарушения авторских прав - обращайтесь на почту: <a href="mailto:copyright@otakuz.fun" class="footer-email">copyright@otakuz.fun</a>
