@@ -483,46 +483,6 @@
           </div>
         </div>
 
-        <!-- Статистика -->
-        <div class="section-block stats-section">
-          <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-icon">🎮</div>
-              <div class="stat-info">
-                <div class="stat-value">{$publicUser.gamesPlayed || 0}</div>
-                <div class="stat-label">Всего игр сыграно</div>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">🏆</div>
-              <div class="stat-info">
-                <div class="stat-value">{$publicUser.totalScore || 0}</div>
-                <div class="stat-label">Общий счёт</div>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">🔥</div>
-              <div class="stat-info">
-                <div class="stat-value">{$publicUser.streak || 0}</div>
-                <div class="stat-label">Дней подряд</div>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">⭐</div>
-              <div class="stat-info">
-                <div class="stat-value">{$publicUser.achievements || 0}</div>
-                <div class="stat-label">Достижений</div>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">🎯</div>
-              <div class="stat-info">
-                <div class="stat-value">{$publicUser.accuracy || 0}%</div>
-                <div class="stat-label">Точность</div>
-              </div>
-            </div>
-          </div>
-        </div>
       </aside>
     </div>
 
