@@ -373,6 +373,10 @@ onMount(() => {
   loadGlobalStats();
   loadNews();
 
+  // Инициализация таймера
+  updateTimer();
+  timerInterval = setInterval(updateTimer, 1000);
+
   const prefersDark = typeof window.matchMedia === 'function' ? window.matchMedia('(prefers-color-scheme: dark)') : null;
   const savedTheme = typeof localStorage !== 'undefined' ? localStorage.getItem(THEME_STORAGE_KEY) : null;
 
@@ -409,6 +413,9 @@ onMount(() => {
       prefersDark.removeEventListener('change', handleSchemeChange);
     } else if (prefersDark?.removeListener) {
       prefersDark.removeListener(handleSchemeChange);
+    }
+    if (timerInterval) {
+      clearInterval(timerInterval);
     }
   };
 });
@@ -456,10 +463,55 @@ const gameCards = [
   }
 ];
 
-  // Подсчёт общей статистики
-  $: globalData = $globalStats?.data || {};
-  $: totalGamesPlayed = (globalData.recentModes || []).reduce((sum, mode) => sum + (mode.plays || 0), 0) || 1234;
-  $: activePlayers = (globalData.fastestPlayers || []).length || 567;
+  // Таймер до следующей полуночи по МСК (UTC+3)
+  let timeUntilMidnight = { hours: 0, minutes: 0, seconds: 0 };
+  let timerInterval;
+
+  function getNextMidnightMSK() {
+    const now = new Date();
+    // МСК = UTC+3 (3 часа в миллисекундах)
+    const mskOffset = 3 * 60 * 60 * 1000;
+    
+    // Текущее UTC время в миллисекундах
+    const utcNow = now.getTime();
+    
+    // Текущее МСК время в миллисекундах
+    const mskNow = utcNow + mskOffset;
+    
+    // Количество миллисекунд в дне
+    const msPerDay = 24 * 60 * 60 * 1000;
+    
+    // Количество миллисекунд с начала дня МСК
+    const msSinceMidnight = mskNow % msPerDay;
+    
+    // Оставшееся время до следующей полуночи МСК
+    return msPerDay - msSinceMidnight;
+  }
+
+  function updateTimer() {
+    const msUntilMidnight = getNextMidnightMSK();
+    const totalSeconds = Math.floor(msUntilMidnight / 1000);
+    
+    if (totalSeconds <= 0) {
+      timeUntilMidnight = { hours: 0, minutes: 0, seconds: 0 };
+      // Обновляем при достижении полуночи
+      setTimeout(() => updateTimer(), 1000);
+      return;
+    }
+    
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    
+    timeUntilMidnight = { hours, minutes, seconds };
+  }
+
+  function formatTimeUntil() {
+    const h = timeUntilMidnight.hours.toString().padStart(2, '0');
+    const m = timeUntilMidnight.minutes.toString().padStart(2, '0');
+    const s = timeUntilMidnight.seconds.toString().padStart(2, '0');
+    return `${h}:${m}:${s}`;
+  }
 
   function openReplay() {
     console.log('[Content] Opening replay modal, dates:', $availableQuizDates);
@@ -843,9 +895,9 @@ const gameCards = [
         {#if $activeView === 'home' || $activeView === 'aniquiz'}
           <footer class="hero-footer">
             <div class="hero-achievements">
-              <span class="hero-achievements-title">Всего игр сыграно</span>
-              <span class="hero-achievements-value">{totalGamesPlayed.toLocaleString()}</span>
-              <span class="hero-achievements-meta">Активных игроков: {activePlayers.toLocaleString()}</span>
+              <span class="hero-achievements-title">Новый пак появится через</span>
+              <span class="hero-achievements-value">{formatTimeUntil()}</span>
+              <span class="hero-achievements-meta">Обновление в 00:00 МСК</span>
             </div>
             <button class="hero-replays-button" on:click={openReplay}>
               <span class="hero-replays-icon">📅</span>
