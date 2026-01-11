@@ -456,9 +456,6 @@ const gameCards = [
   }
 ];
 
-$: achievementsToday = $userStats?.data?.achievementsToday ?? 3456;
-$: playersToday = $userStats?.data?.playersToday ?? 3456;
-  
   function openReplay() {
     console.log('[Content] Opening replay modal, dates:', $availableQuizDates);
     showReplay = true;
@@ -840,11 +837,6 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
 
         {#if $activeView === 'home' || $activeView === 'aniquiz'}
           <footer class="hero-footer">
-            <div class="hero-achievements">
-              <span class="hero-achievements-title">Достижения дня</span>
-              <span class="hero-achievements-value">{achievementsToday.toLocaleString()}</span>
-              <span class="hero-achievements-meta">{playersToday.toLocaleString()} пользователей сегодня</span>
-            </div>
             <button class="hero-replays-button" on:click={openReplay}>
               <span class="hero-replays-icon">📅</span>
               <span class="hero-replays-label">Повторы</span>
