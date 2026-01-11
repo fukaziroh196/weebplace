@@ -187,25 +187,46 @@ const avatarUpload = multer({
 // Функция для безопасной обработки и сохранения аватара
 async function processAvatarImage(fileBuffer, userId) {
   try {
-    // 1. Проверяем реальный формат через Sharp
-    const metadata = await sharp(fileBuffer).metadata();
+    // 1. Проверяем размер буфера (защита от слишком больших файлов)
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    if (fileBuffer.length > MAX_FILE_SIZE) {
+      throw new Error('Файл слишком большой. Максимум 5MB');
+    }
     
-    // Проверяем, что это действительно изображение
+    // 2. Проверяем реальный формат через Sharp (это уничтожает поддельные расширения)
+    let metadata;
+    try {
+      metadata = await sharp(fileBuffer).metadata();
+    } catch (sharpError) {
+      throw new Error('Файл не является валидным изображением');
+    }
+    
+    // 3. Проверяем, что это действительно изображение (JPEG или PNG)
     if (!metadata.format || !['jpeg', 'png'].includes(metadata.format)) {
       throw new Error('Файл не является валидным изображением JPEG или PNG');
     }
     
-    // 2. Проверяем размеры изображения
+    // 4. Проверяем размеры изображения
+    if (!metadata.width || !metadata.height) {
+      throw new Error('Не удалось определить размеры изображения');
+    }
+    
     const MAX_DIMENSION = 6000;
     if (metadata.width > MAX_DIMENSION || metadata.height > MAX_DIMENSION) {
       throw new Error(`Размер изображения слишком большой. Максимум: ${MAX_DIMENSION}x${MAX_DIMENSION}px`);
     }
     
-    // 3. Генерируем безопасное имя файла (UUID)
-    const fileId = uuidv4();
-    const filename = `${fileId}.jpg`; // Всегда сохраняем как JPG для безопасности
+    // 5. Проверяем, что изображение не слишком маленькое (минимум 32x32)
+    const MIN_DIMENSION = 32;
+    if (metadata.width < MIN_DIMENSION || metadata.height < MIN_DIMENSION) {
+      throw new Error(`Изображение слишком маленькое. Минимум: ${MIN_DIMENSION}x${MIN_DIMENSION}px`);
+    }
     
-    // 4. Пересохраняем изображение через Sharp (это уничтожит любой вредоносный код)
+    // 6. Генерируем безопасное имя файла (UUID)
+    const fileId = uuidv4();
+    const filename = `${fileId}.webp`; // Сохраняем как WebP для снижения размера
+    
+    // 7. Пересохраняем изображение через Sharp (это уничтожит любой вредоносный код)
     // Обрезаем до квадрата и масштабируем до 512x512
     const outputPath = path.join(avatarsDir, filename);
     
@@ -214,13 +235,13 @@ async function processAvatarImage(fileBuffer, userId) {
         fit: 'cover',
         position: 'center'
       })
-      .jpeg({ 
-        quality: 90,
-        mozjpeg: true
+      .webp({ 
+        quality: 85,
+        effort: 4 // Баланс между размером файла и скоростью обработки
       })
       .toFile(outputPath);
     
-    // 5. Возвращаем относительный путь
+    // 8. Возвращаем относительный путь
     return `/uploads/avatars/${filename}`;
   } catch (error) {
     console.error('[processAvatarImage] Error:', error);
