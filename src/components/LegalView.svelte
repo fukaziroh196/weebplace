@@ -37,7 +37,7 @@
       <section class="legal-section">
         <h2 class="legal-section-title">3. Обратная связь</h2>
         <p class="legal-text">
-          Мы уважаем авторское право. Если вы обнаружили на сайте свой контент и хотите, чтобы он был удален, пожалуйста, напишите нам на почту: <a href="mailto:copyright@otakuz.fun" class="legal-email">copyright@otakuz.fun</a>. Мы обработаем запрос и удалим материалы в течение 48 часов.
+          Мы уважаем авторское право. Если вы обнаружили на сайте свой контент и хотите, чтобы он был удален, пожалуйста, напишите нам на почту: <a href="mailto:copyright@otakuz.fun" class="legal-email">copyright@otakuz.fun</a>. Мы обработаем запрос и удалим материалы в течение 24 часов.
         </p>
       </section>
     </div>
