@@ -456,6 +456,11 @@ const gameCards = [
   }
 ];
 
+  // Подсчёт общей статистики
+  $: globalData = $globalStats?.data || {};
+  $: totalGamesPlayed = (globalData.recentModes || []).reduce((sum, mode) => sum + (mode.plays || 0), 0) || 1234;
+  $: activePlayers = (globalData.fastestPlayers || []).length || 567;
+
   function openReplay() {
     console.log('[Content] Opening replay modal, dates:', $availableQuizDates);
     showReplay = true;
@@ -837,6 +842,11 @@ const gameCards = [
 
         {#if $activeView === 'home' || $activeView === 'aniquiz'}
           <footer class="hero-footer">
+            <div class="hero-achievements">
+              <span class="hero-achievements-title">Всего игр сыграно</span>
+              <span class="hero-achievements-value">{totalGamesPlayed.toLocaleString()}</span>
+              <span class="hero-achievements-meta">Активных игроков: {activePlayers.toLocaleString()}</span>
+            </div>
             <button class="hero-replays-button" on:click={openReplay}>
               <span class="hero-replays-icon">📅</span>
               <span class="hero-replays-label">Повторы</span>
