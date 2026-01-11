@@ -381,7 +381,7 @@
       <main class="profile-main">
         <!-- Статистика (всегда видна) -->
         <div class="stats-grid">
-          <div class="stat-card large">
+          <div class="stat-card">
             <div class="stat-icon">🎮</div>
             <div class="stat-info">
               <div class="stat-value">{$publicUser.gamesPlayed || 0}</div>
@@ -1011,24 +1011,31 @@
     margin-bottom: 2rem;
   }
 
+  @media (min-width: 900px) {
+    .stats-grid {
+      grid-template-columns: repeat(5, 1fr);
+    }
+  }
+
   .stat-card {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 1.25rem;
     padding: 1.25rem;
     display: flex;
     align-items: center;
     gap: 1rem;
-    transition: transform 0.2s, border-color 0.2s;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
   .stat-card:hover {
     transform: translateY(-2px);
-    border-color: rgba(255, 255, 255, 0.2);
-  }
-
-  .stat-card.large {
-    grid-column: span 2;
+    border-color: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
   }
 
   .stat-icon {
@@ -1369,9 +1376,6 @@
       grid-template-columns: repeat(4, 1fr);
     }
 
-    .stat-card.large {
-      grid-column: span 1;
-    }
   }
 
   @media (max-width: 600px) {
