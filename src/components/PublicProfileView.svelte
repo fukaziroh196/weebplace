@@ -126,6 +126,63 @@
     }
   }
 
+  // Radar chart data
+  const radarCategories = [
+    { key: 'battle', label: 'СРАЖЕНИЕ' },
+    { key: 'gold', label: 'ДОБЫЧА ЗОЛОТА' },
+    { key: 'support', label: 'ПОДДЕРЖКА' },
+    { key: 'siege', label: 'ОСАДА' },
+    { key: 'flexibility', label: 'ГИБКОСТЬ' }
+  ];
+
+  function calculateRadarData(history) {
+    const last20Games = history.slice(0, 20);
+    
+    // Пока используем простую логику: распределяем по режимам
+    const modeStats = {
+      'Аниме баттлы': { battle: 80, gold: 60, support: 40, siege: 70, flexibility: 50 },
+      'Угадай аниме': { battle: 40, gold: 70, support: 60, siege: 30, flexibility: 80 },
+      'Угадай опенинг': { battle: 30, gold: 50, support: 70, siege: 40, flexibility: 90 },
+      'Угадай персонажа': { battle: 50, gold: 80, support: 50, siege: 50, flexibility: 70 }
+    };
+
+    if (last20Games.length === 0) {
+      return { values: [0, 0, 0, 0, 0] };
+    }
+
+    const totals = { battle: 0, gold: 0, support: 0, siege: 0, flexibility: 0 };
+    let count = 0;
+
+    last20Games.forEach(game => {
+      const stats = modeStats[game.mode] || modeStats['Угадай аниме'];
+      Object.keys(totals).forEach(key => {
+        totals[key] += stats[key];
+      });
+      count++;
+    });
+
+    const values = radarCategories.map(cat => {
+      const avg = count > 0 ? totals[cat.key] / count : 0;
+      return Math.round(avg);
+    });
+
+    return { values };
+  }
+
+  $: radarData = calculateRadarData(gameHistory);
+  
+  $: radarPoints = radarCategories.map((category, i) => {
+    const angle = (i * 2 * Math.PI / radarCategories.length) - Math.PI / 2;
+    const value = radarData.values[i] || 0;
+    const radius = (value / 100) * 140;
+    return {
+      x: 200 + Math.cos(angle) * radius,
+      y: 200 + Math.sin(angle) * radius
+    };
+  });
+
+  $: radarPolygonPoints = radarPoints.map(p => `${p.x},${p.y}`).join(' ');
+
   // Синхронизируем с store если это наш профиль
   $: if (isMe && $favorites) {
     userFavorites = $favorites;
@@ -483,44 +540,66 @@
           </div>
         </div>
 
-        <!-- Статистика -->
+        <!-- Статистика по последним 20 играм -->
         <div class="section-block stats-section">
-          <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-icon">🎮</div>
-              <div class="stat-info">
-                <div class="stat-value">{$publicUser.gamesPlayed || 0}</div>
-                <div class="stat-label">Всего игр сыграно</div>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">🏆</div>
-              <div class="stat-info">
-                <div class="stat-value">{$publicUser.totalScore || 0}</div>
-                <div class="stat-label">Общий счёт</div>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">🔥</div>
-              <div class="stat-info">
-                <div class="stat-value">{$publicUser.streak || 0}</div>
-                <div class="stat-label">Дней подряд</div>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">⭐</div>
-              <div class="stat-info">
-                <div class="stat-value">{$publicUser.achievements || 0}</div>
-                <div class="stat-label">Достижений</div>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">🎯</div>
-              <div class="stat-info">
-                <div class="stat-value">{$publicUser.accuracy || 0}%</div>
-                <div class="stat-label">Точность</div>
-              </div>
-            </div>
+          <h3 class="section-title radar-title">20 ПОСЛЕДНИХ ИГР</h3>
+          <div class="radar-chart-container">
+            <svg class="radar-chart" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="radarGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" style="stop-color:#ff9500;stop-opacity:0.8" />
+                  <stop offset="100%" style="stop-color:#ff9500;stop-opacity:0.4" />
+                </linearGradient>
+              </defs>
+              
+              <!-- Grid lines -->
+              <g class="radar-grid">
+                {#each Array(5) as _, i}
+                  {@const level = (i + 1) / 5}
+                  {@const radius = level * 140}
+                  <circle cx="200" cy="200" r={radius} fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+                {/each}
+              </g>
+              
+              <!-- Axes -->
+              <g class="radar-axes">
+                {#each radarCategories as category, i}
+                  {@const angle = (i * 2 * Math.PI / radarCategories.length) - Math.PI / 2}
+                  {@const x1 = 200}
+                  {@const y1 = 200}
+                  {@const x2 = 200 + Math.cos(angle) * 140}
+                  {@const y2 = 200 + Math.sin(angle) * 140}
+                  {@const labelX = 200 + Math.cos(angle) * 160}
+                  {@const labelY = 200 + Math.sin(angle) * 160}
+                  <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(255,255,255,0.15)" stroke-width="1" />
+                  <text x={labelX} y={labelY} class="radar-axis-label" text-anchor="middle" dominant-baseline="middle">
+                    {category.label}
+                  </text>
+                {/each}
+              </g>
+              
+              <!-- Data polygon -->
+              <polygon 
+                class="radar-polygon" 
+                points={radarPolygonPoints} 
+                fill="url(#radarGradient)"
+                stroke="#ff9500"
+                stroke-width="2"
+                opacity="0.6"
+              />
+              
+              <!-- Data points -->
+              {#each radarPoints as point}
+                <circle 
+                  cx={point.x} 
+                  cy={point.y} 
+                  r="4" 
+                  fill="#ff9500" 
+                  stroke="rgba(255,255,255,0.8)"
+                  stroke-width="1.5"
+                />
+              {/each}
+            </svg>
           </div>
         </div>
       </aside>
@@ -1005,16 +1084,44 @@
     color: var(--accent-primary);
   }
 
-  /* Stats Grid */
+  /* Radar Chart */
   .stats-section {
     margin-top: 1.5rem;
   }
 
-  .stats-section .stats-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-    margin: 0;
+  .radar-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 1rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .radar-chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 1rem 0;
+  }
+
+  .radar-chart {
+    width: 100%;
+    max-width: 350px;
+    height: auto;
+  }
+
+  .radar-axis-label {
+    font-size: 11px;
+    font-weight: 600;
+    fill: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .radar-polygon {
+    filter: drop-shadow(0 0 8px rgba(255, 149, 0, 0.4));
   }
 
   .stat-card {
