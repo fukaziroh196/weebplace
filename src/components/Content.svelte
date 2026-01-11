@@ -897,7 +897,6 @@ const gameCards = [
             <div class="hero-achievements">
               <span class="hero-achievements-title">Новый пак появится через</span>
               <span class="hero-achievements-value">{formatTimeUntil()}</span>
-              <span class="hero-achievements-meta">Обновление в 00:00 МСК</span>
             </div>
             <button class="hero-replays-button" on:click={openReplay}>
               <span class="hero-replays-icon">📅</span>
