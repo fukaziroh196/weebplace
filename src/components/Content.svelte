@@ -14,6 +14,7 @@
   import BattlePackSelector from './BattlePackSelector.svelte';
   import AdminQuizPanel from './AdminQuizPanel.svelte';
   import TournamentsView from './TournamentsView.svelte';
+  import LegalView from './LegalView.svelte';
   import { availableQuizDates, refreshQuizDates } from '../stores/quizzes';
   import { userStats, loadUserStats, loadGlobalStats, globalStats } from '../stores/stats';
   import { leaderboard, leaderboardPeriod, refreshLeaderboard } from '../stores/leaderboard';
@@ -137,10 +138,9 @@ function syncViewFromLocation() {
     activeView.set('home');
     return;
   }
-  // Правовая информация - не обрабатываем, пусть роутер обработает
-  // НЕ устанавливаем activeView для этих маршрутов, чтобы роутер мог показать LegalRoute
+  // Правовая информация
   if (path === '/legal' || path === '/copyright') {
-    // Не устанавливаем activeView, чтобы роутер мог обработать маршрут
+    activeView.set('legal');
     return;
   }
   if (path === '/profile') {
@@ -191,17 +191,8 @@ if (typeof window !== 'undefined') {
 
 onMount(() => {
   if (typeof window !== 'undefined') {
-    // Не синхронизируем для /legal и /copyright - пусть роутер обработает
-    const path = normalizePath(window.location.pathname || '/');
-    if (path !== '/legal' && path !== '/copyright') {
-      syncViewFromLocation();
-    }
-    const onPopState = () => {
-      const currentPath = normalizePath(window.location.pathname || '/');
-      if (currentPath !== '/legal' && currentPath !== '/copyright') {
-        syncViewFromLocation();
-      }
-    };
+    syncViewFromLocation();
+    const onPopState = () => syncViewFromLocation();
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
   }
@@ -839,6 +830,8 @@ $: playersToday = $userStats?.data?.playersToday ?? 3456;
           <BattlePackSelector />
         {:else if $activeView === 'tournaments'}
           <TournamentsView />
+        {:else if $activeView === 'legal'}
+          <LegalView />
         {:else if $activeView === 'adminQuiz'}
           <AdminQuizPanel />
         {:else if $activeView === 'admin'}

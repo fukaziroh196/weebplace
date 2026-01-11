@@ -5,43 +5,12 @@
   import FriendsRoute from './routes/FriendsRoute.svelte';
   import UserRoute from './routes/UserRoute.svelte';
   import TournamentsRoute from './routes/TournamentsRoute.svelte';
-  import LegalRoute from './routes/LegalRoute.svelte';
-  import { onMount } from 'svelte';
 
   let showTop = false;
   let scrollEl;
 
-  function handleLinkClick(e) {
-    const link = e.target.closest('a');
-    if (link && link.href) {
-      try {
-        const url = new URL(link.href);
-        if (url.hostname === window.location.hostname) {
-          const path = url.pathname;
-          if (path === '/legal' || path === '/copyright') {
-            e.preventDefault();
-            e.stopPropagation();
-            window.history.pushState(null, '', path);
-            // Принудительно обновляем роутер через popstate событие
-            window.dispatchEvent(new PopStateEvent('popstate', { state: null }));
-          }
-        }
-      } catch (err) {
-        // Игнорируем ошибки парсинга URL
-      }
-    }
-  }
-
-  onMount(() => {
-    document.addEventListener('click', handleLinkClick);
-    return () => {
-      document.removeEventListener('click', handleLinkClick);
-    };
-  });
 
   const routes = {
-    '/legal': LegalRoute,
-    '/copyright': LegalRoute,
     '/': HomeRoute,
     '/profile': ProfileRoute,
     '/profile/*': ProfileRoute,
@@ -77,7 +46,13 @@
           <div class="footer-content">
             <div class="footer-section">
               <div class="footer-links">
-                <a href="/legal" class="footer-link">Правовая информация</a>
+                <a href="/legal" class="footer-link" on:click|preventDefault={(e) => {
+                  e.preventDefault();
+                  if (typeof window !== 'undefined') {
+                    window.history.pushState(null, '', '/legal');
+                    window.dispatchEvent(new PopStateEvent('popstate', { state: null }));
+                  }
+                }}>Правовая информация</a>
                 <span class="footer-separator">•</span>
                 <a href="mailto:copyright@otakuz.fun" class="footer-link">Контакты</a>
               </div>
