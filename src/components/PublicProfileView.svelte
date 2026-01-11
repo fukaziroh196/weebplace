@@ -379,45 +379,6 @@
 
       <!-- Центральная колонка - контент -->
       <main class="profile-main">
-        <!-- Статистика (всегда видна) -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon">🎮</div>
-            <div class="stat-info">
-              <div class="stat-value">{$publicUser.gamesPlayed || 0}</div>
-              <div class="stat-label">Всего игр сыграно</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">🏆</div>
-            <div class="stat-info">
-              <div class="stat-value">{$publicUser.totalScore || 0}</div>
-              <div class="stat-label">Общий счёт</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">🔥</div>
-            <div class="stat-info">
-              <div class="stat-value">{$publicUser.streak || 0}</div>
-              <div class="stat-label">Дней подряд</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">⭐</div>
-            <div class="stat-info">
-              <div class="stat-value">{$publicUser.achievements || 0}</div>
-              <div class="stat-label">Достижений</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">🎯</div>
-            <div class="stat-info">
-              <div class="stat-value">{$publicUser.accuracy || 0}%</div>
-              <div class="stat-label">Точность</div>
-            </div>
-          </div>
-        </div>
-
         <!-- Избранное -->
         <div class="section-block">
           <div class="section-header">
@@ -519,6 +480,47 @@
                 </div>
               {/each}
             {/if}
+          </div>
+        </div>
+
+        <!-- Статистика -->
+        <div class="section-block stats-section">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">🎮</div>
+              <div class="stat-info">
+                <div class="stat-value">{$publicUser.gamesPlayed || 0}</div>
+                <div class="stat-label">Всего игр сыграно</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">🏆</div>
+              <div class="stat-info">
+                <div class="stat-value">{$publicUser.totalScore || 0}</div>
+                <div class="stat-label">Общий счёт</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">🔥</div>
+              <div class="stat-info">
+                <div class="stat-value">{$publicUser.streak || 0}</div>
+                <div class="stat-label">Дней подряд</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">⭐</div>
+              <div class="stat-info">
+                <div class="stat-value">{$publicUser.achievements || 0}</div>
+                <div class="stat-label">Достижений</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">🎯</div>
+              <div class="stat-info">
+                <div class="stat-value">{$publicUser.accuracy || 0}%</div>
+                <div class="stat-label">Точность</div>
+              </div>
+            </div>
           </div>
         </div>
       </aside>
@@ -1004,17 +1006,15 @@
   }
 
   /* Stats Grid */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
+  .stats-section {
+    margin-top: 1.5rem;
   }
 
-  @media (min-width: 900px) {
-    .stats-grid {
-      grid-template-columns: repeat(5, 1fr);
-    }
+  .stats-section .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin: 0;
   }
 
   .stat-card {
