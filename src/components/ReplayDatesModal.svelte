@@ -48,7 +48,7 @@
   >
     <div class="replay-modal" on:click|stopPropagation>
       <div class="replay-header">
-        <h2 id="replay-title" class="replay-title">REPLAY</h2>
+        <h2 id="replay-title" class="replay-title">Повторы</h2>
         <button 
           class="replay-close-btn" 
           on:click={onClose}
@@ -62,7 +62,7 @@
       </div>
 
       <div class="replay-body">
-        <div class="replay-subtitle">Выберите дату</div>
+        <div class="replay-subtitle">ВЫБЕРИТЕ ДАТУ</div>
         
         <div class="replay-grid">
           {#each slice as d}
@@ -191,10 +191,10 @@
 
   .replay-title {
     font-size: 1.5rem;
-    font-weight: 900;
+    font-weight: 800;
     color: var(--text-primary, #f5f6ff);
     margin: 0;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.02em;
   }
 
   .replay-close-btn {
@@ -231,10 +231,11 @@
 
   .replay-subtitle {
     font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--text-tertiary, rgba(245, 246, 255, 0.65));
+    font-weight: 700;
+    color: var(--text-secondary, rgba(245, 246, 255, 0.75));
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.25rem;
   }
 
   .replay-grid {
